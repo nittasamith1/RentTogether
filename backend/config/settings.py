@@ -114,6 +114,8 @@ if DATABASE_URL:
             ssl_require=True
         )
     }
+    # Neon connection pooling (PgBouncer) best practice: disable server-side cursors
+    DATABASES['default']['DISABLE_SERVER_SIDE_CURSORS'] = True
 else:
     DATABASES = {
         'default': {
