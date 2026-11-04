@@ -80,3 +80,4 @@ export const CampusNetworkCard: React.FC<CampusNetworkCardProps> = ({
     </div>
   );
 };
+
