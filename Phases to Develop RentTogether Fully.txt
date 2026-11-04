@@ -156,6 +156,7 @@ PHASE 03: UNIFIED STUDENT PROFILE & REPUTATION SCORING ENGINE
 ================================================================================
 [Goal]: Implement the core "One Account — Dual Role" student profile system.
 
+
 3.1. Database Models (apps/profiles)
      - Model: StudentProfile
        * user (OneToOneField -> User)

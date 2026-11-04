@@ -11,6 +11,20 @@ export interface College {
   is_active: boolean;
 }
 
+export interface AuthUser {
+  id: string;
+  email: string;
+  name: string;
+  first_name?: string;
+  last_name?: string;
+  college_code: string;
+  college_name: string;
+  email_verified: boolean;
+  is_college_verified: boolean;
+  verification_status: 'PENDING' | 'VERIFIED' | 'REJECTED' | 'NOT_SUBMITTED';
+  is_staff?: boolean;
+}
+
 export interface User {
   id: string;
   email: string;
@@ -38,6 +52,25 @@ export interface StudentProfile {
   is_verified: boolean;
 }
 
+export interface StudentVerification {
+  id: string;
+  user_email: string;
+  student_name: string;
+  college_code: string;
+  college_name: string;
+  roll_number: string;
+  department: string;
+  year_of_study: number;
+  id_card_image?: string | null;
+  id_card_url?: string;
+  verification_status: 'PENDING' | 'VERIFIED' | 'REJECTED';
+  rejection_reason?: string;
+  submitted_at: string;
+  verified_at?: string | null;
+  verified_by_name?: string;
+  updated_at?: string;
+}
+
 export interface HealthResponse {
   status: string;
   database: string;
@@ -50,4 +83,3 @@ export interface HealthResponse {
     code: string;
   } | null;
 }
-

@@ -9,7 +9,9 @@ import {
   Sparkles,
   BarChart2,
   Settings,
+  ShieldCheck,
 } from 'lucide-react';
+import { useAuth } from '../../context/AuthContext';
 import sidebarWaveImg from '../../assets/sidebar_wave.png';
 
 interface NavItem {
@@ -29,6 +31,8 @@ const navItems: NavItem[] = [
 ];
 
 export const Sidebar: React.FC = () => {
+  const { user } = useAuth();
+
   return (
     <aside className="w-64 bg-[#061C3D] text-slate-300 flex flex-col justify-between shrink-0 relative overflow-hidden select-none">
       {/* Top Section */}
@@ -89,6 +93,31 @@ export const Sidebar: React.FC = () => {
               </NavLink>
             );
           })}
+
+          {/* Admin Verifications Link (if user has admin rights) */}
+          {user?.is_staff && (
+            <NavLink
+              to="/admin/verifications"
+              className={({ isActive }) =>
+                `flex items-center gap-3.5 px-4 py-3 rounded-2xl text-sm font-semibold transition-all duration-150 ${
+                  isActive
+                    ? 'bg-brand-yellow text-brand-navy font-bold shadow-md shadow-brand-yellow/20'
+                    : 'text-indigo-300/90 hover:text-white hover:bg-white/5'
+                }`
+              }
+            >
+              {({ isActive }) => (
+                <>
+                  <ShieldCheck
+                    className={`w-4 h-4 shrink-0 ${
+                      isActive ? 'text-brand-navy' : 'text-indigo-400'
+                    }`}
+                  />
+                  <span>ID Verifications</span>
+                </>
+              )}
+            </NavLink>
+          )}
 
           {/* Thin Divider Line matching mockup */}
           <div className="pt-2 pb-1">
