@@ -3,7 +3,54 @@
 @tailwind utilities;
 
 @layer base {
+  :root {
+    color-scheme: light;
+  }
+
   body {
-    @apply bg-brand-cream text-slate-800 font-sans selection:bg-brand-yellow/30 selection:text-brand-navy-950;
+    @apply bg-brand-cream-50 text-slate-800 font-sans selection:bg-brand-yellow/30 selection:text-brand-navy-950 overflow-x-hidden;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Custom Modern Scrollbar */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #CBD5E1;
+    border-radius: 9999px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: #94A3B8;
+  }
+}
+
+@layer utilities {
+  .glass-card {
+    background: rgba(255, 255, 255, 0.88);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.7);
+  }
+
+  .glass-card-dark {
+    background: rgba(12, 19, 39, 0.85);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  /* Smooth multi-stop background wave as in dashboard mockup */
+  .bg-organic-hero {
+    background: radial-gradient(circle at 80% 20%, rgba(254, 243, 199, 0.6) 0%, rgba(255, 251, 235, 0.4) 40%, rgba(250, 248, 244, 0) 70%);
   }
 }

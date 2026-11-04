@@ -99,3 +99,4 @@ class User(AbstractUser):
     def __str__(self):
         full_name = self.get_full_name()
         return f"{full_name} ({self.email})" if full_name else self.email
+

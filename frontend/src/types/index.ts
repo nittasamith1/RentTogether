@@ -50,3 +50,4 @@ export interface HealthResponse {
     code: string;
   } | null;
 }
+

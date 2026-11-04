@@ -62,3 +62,4 @@ class Command(BaseCommand):
             self.stdout.write(self.style.SUCCESS(f"Created demo Student: {student.email} (Sai Reddy) matching dashboard mockup!"))
         else:
             self.stdout.write(f"Student user already exists: {student_email}")
+

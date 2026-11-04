@@ -50,3 +50,4 @@ export const HealthBadge: React.FC = () => {
     </div>
   );
 };
+

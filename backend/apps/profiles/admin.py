@@ -15,3 +15,4 @@ class StudentProfileAdmin(admin.ModelAdmin):
     )
     list_filter = ('is_verified', 'college', 'department', 'year_of_study')
     search_fields = ('user__email', 'user__first_name', 'user__last_name', 'roll_number', 'department')
+

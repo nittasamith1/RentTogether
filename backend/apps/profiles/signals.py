@@ -16,3 +16,4 @@ def create_or_update_student_profile(sender, instance, created, **kwargs):
             if instance.profile.college != instance.college:
                 instance.profile.college = instance.college
                 instance.profile.save()
+

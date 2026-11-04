@@ -53,3 +53,4 @@ class HealthCheckView(APIView):
             return JsonResponse(response_data, status=503)
 
         return JsonResponse(response_data, status=200)
+

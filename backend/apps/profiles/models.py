@@ -52,3 +52,4 @@ class StudentProfile(models.Model):
 
     def __str__(self):
         return f"Profile: {self.user.email} [{self.college.code if self.college else 'No College'}]"
+

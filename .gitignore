@@ -55,3 +55,4 @@ frontend/.env
 *.swo
 .DS_Store
 Thumbs.db
+

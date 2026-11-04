@@ -34,3 +34,4 @@ export const PlaceholderPage: React.FC<PlaceholderProps> = ({ title, description
     </div>
   );
 };
+
