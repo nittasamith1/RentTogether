@@ -32,7 +32,7 @@ export const authService = {
   },
 
   // 2. Student Registration
-  async register(data: RegisterPayload): Promise<{ message: string; email: string; college: string }> {
+  async register(data: RegisterPayload): Promise<{ message: string; email: string; college: string; dev_otp?: string }> {
     const formData = new FormData();
     formData.append('full_name', data.full_name);
     formData.append('email', data.email);
@@ -59,7 +59,7 @@ export const authService = {
   },
 
   // 4. Resend OTP
-  async resendOTP(email: string): Promise<{ message: string }> {
+  async resendOTP(email: string): Promise<{ message: string; dev_otp?: string }> {
     const res = await apiClient.post('/api/v1/auth/resend-otp/', { email });
     return res.data;
   },

@@ -12,8 +12,12 @@ export const VerifyOtpPage: React.FC = () => {
   const { login } = useAuth();
 
   const emailParam = searchParams.get('email') || '';
+  const initialOtp = searchParams.get('otp') || '';
   const [email] = useState<string>(emailParam);
-  const [otp, setOtp] = useState<string[]>(['', '', '', '', '', '']);
+  const [devOtp, setDevOtp] = useState<string>(initialOtp);
+  const [otp, setOtp] = useState<string[]>(
+    initialOtp.length === 6 ? initialOtp.split('') : ['', '', '', '', '', '']
+  );
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
 
   // 5-minute countdown (300 seconds)
@@ -109,8 +113,11 @@ export const VerifyOtpPage: React.FC = () => {
     setSuccessMessage('');
     try {
       setResending(true);
-      await authService.resendOTP(email);
+      const res = await authService.resendOTP(email);
       setSuccessMessage('A fresh 6-digit verification code has been dispatched to your email.');
+      if (res?.dev_otp) {
+        setDevOtp(res.dev_otp);
+      }
       setCooldown(60);
       setTimeLeft(300);
       setOtp(['', '', '', '', '', '']);
@@ -177,6 +184,33 @@ export const VerifyOtpPage: React.FC = () => {
             >
               <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" />
               <span>{successMessage}</span>
+            </motion.div>
+          )}
+
+          {devOtp && (
+            <motion.div
+              initial={{ opacity: 0, y: -6 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="mb-5 p-3.5 rounded-2xl bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200/80 flex items-center justify-between text-xs text-amber-900"
+            >
+              <div>
+                <div className="font-bold text-[11px] text-amber-800 uppercase tracking-wider">
+                  Verification Code:
+                </div>
+                <div className="font-mono text-base font-black text-[#5B4DFF] tracking-wider">
+                  {devOtp}
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  const digits = devOtp.split('').slice(0, 6);
+                  setOtp(digits);
+                }}
+                className="px-3 py-1.5 rounded-xl bg-[#5B4DFF] text-white font-bold text-xs shadow-xs hover:bg-[#4F46E5] transition-all cursor-pointer"
+              >
+                Auto-Fill Code
+              </button>
             </motion.div>
           )}
 

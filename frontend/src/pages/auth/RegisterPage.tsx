@@ -143,7 +143,8 @@ export const RegisterPage: React.FC = () => {
         id_card_image: idCardFile,
       });
 
-      navigate(`/verify-email?email=${encodeURIComponent(res.email || email.trim().toLowerCase())}`);
+      const otpParam = res.dev_otp ? `&otp=${encodeURIComponent(res.dev_otp)}` : '';
+      navigate(`/verify-email?email=${encodeURIComponent(res.email || email.trim().toLowerCase())}${otpParam}`);
     } catch (err: any) {
       const data = err.response?.data;
       let msg = 'Registration failed. Please verify your details.';

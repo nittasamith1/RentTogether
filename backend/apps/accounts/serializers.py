@@ -158,7 +158,9 @@ class StudentRegistrationSerializer(serializers.Serializer):
         )
 
         # 5. Send Email OTP
-        send_verification_otp(user)
+        otp_record = send_verification_otp(user)
+        if hasattr(otp_record, 'raw_otp'):
+            user._dev_otp = otp_record.raw_otp
 
         return user
 

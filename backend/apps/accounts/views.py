@@ -1,3 +1,4 @@
+from django.conf import settings
 from rest_framework import status, views, permissions
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
@@ -43,17 +44,18 @@ class RegisterView(views.APIView):
         serializer.is_valid(raise_exception=True)
         user = serializer.save()
 
-        return Response(
-            {
-                "message": (
-                    f"Registration successful! A 6-digit verification code has been sent to {user.email}. "
-                    "Please verify your email to continue."
-                ),
-                "email": user.email,
-                "college": user.college.code if user.college else "",
-            },
-            status=status.HTTP_201_CREATED
-        )
+        res_data = {
+            "message": (
+                f"Registration successful! A 6-digit verification code has been sent to {user.email}. "
+                "Please verify your email to continue."
+            ),
+            "email": user.email,
+            "college": user.college.code if user.college else "",
+        }
+        if settings.DEBUG and hasattr(user, '_dev_otp'):
+            res_data["dev_otp"] = user._dev_otp
+
+        return Response(res_data, status=status.HTTP_201_CREATED)
 
 
 class VerifyEmailView(views.APIView):
@@ -96,12 +98,15 @@ class ResendOTPView(views.APIView):
         email = serializer.validated_data['email']
         user = User.objects.get(email=email)
 
-        send_verification_otp(user)
+        otp_record = send_verification_otp(user)
 
-        return Response(
-            {"message": f"A new 6-digit verification code has been sent to {email}."},
-            status=status.HTTP_200_OK
-        )
+        res_data = {
+            "message": f"A new 6-digit verification code has been sent to {email}."
+        }
+        if settings.DEBUG and hasattr(otp_record, 'raw_otp'):
+            res_data["dev_otp"] = otp_record.raw_otp
+
+        return Response(res_data, status=status.HTTP_200_OK)
 
 
 class LoginView(views.APIView):
@@ -178,12 +183,15 @@ class PasswordResetRequestView(views.APIView):
         email = serializer.validated_data['email']
         user = User.objects.get(email=email)
 
-        send_verification_otp(user)
+        otp_record = send_verification_otp(user)
 
-        return Response(
-            {"message": f"A password reset code has been sent to {email}."},
-            status=status.HTTP_200_OK
-        )
+        res_data = {
+            "message": f"A password reset code has been sent to {email}."
+        }
+        if settings.DEBUG and hasattr(otp_record, 'raw_otp'):
+            res_data["dev_otp"] = otp_record.raw_otp
+
+        return Response(res_data, status=status.HTTP_200_OK)
 
 
 class PasswordResetConfirmView(views.APIView):
