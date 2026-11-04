@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, Variants } from 'framer-motion';
 import {
   ArrowRight,
   Heart,
@@ -29,7 +29,7 @@ export const DashboardPage: React.FC = () => {
 
   const showToast = (msg: string) => {
     setToastMessage(msg);
-    setTimeout(() => setToastMessage(null), 3200);
+    setTimeout(() => setToastMessage(null), 3000);
   };
 
   const toggleWishlist = (id: string, title: string, e: React.MouseEvent) => {
@@ -97,17 +97,46 @@ export const DashboardPage: React.FC = () => {
     },
   ];
 
+  // Premium, subtle cubic-bezier easing [0.16, 1, 0.3, 1] (Apple/Linear standard)
+  const containerVariants: Variants = {
+    hidden: { opacity: 0 },
+    show: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.07,
+        delayChildren: 0.05,
+      },
+    },
+  };
+
+  const fadeUpVariants: Variants = {
+    hidden: { opacity: 0, y: 12 },
+    show: {
+      opacity: 1,
+      y: 0,
+      transition: {
+        duration: 0.5,
+        ease: 'easeOut',
+      },
+    },
+  };
+
   return (
-    <div className="space-y-6 max-w-7xl mx-auto relative pb-6 text-[#061C3D]">
-      {/* Toast Notification with Spring Physics */}
+    <motion.div
+      variants={containerVariants}
+      initial="hidden"
+      animate="show"
+      className="space-y-6 max-w-7xl mx-auto relative pb-6 text-[#061C3D]"
+    >
+      {/* Toast Notification with Elegant Spring Physics */}
       <AnimatePresence>
         {toastMessage && (
           <motion.div
-            initial={{ opacity: 0, y: 20, scale: 0.95 }}
+            initial={{ opacity: 0, y: 15, scale: 0.96 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 20, scale: 0.95 }}
-            transition={{ type: 'spring', damping: 20, stiffness: 300 }}
-            className="fixed bottom-6 right-6 z-50 bg-[#061C3D] text-white px-5 py-3 rounded-2xl shadow-2xl flex items-center gap-3 border border-slate-700/80 backdrop-blur-md"
+            exit={{ opacity: 0, y: 10, scale: 0.96 }}
+            transition={{ duration: 0.25, ease: 'easeOut' }}
+            className="fixed bottom-6 right-6 z-50 bg-[#061C3D] text-white px-5 py-3 rounded-2xl shadow-xl flex items-center gap-3 border border-slate-700/60 backdrop-blur-md"
           >
             <CheckCircle2 className="w-4 h-4 text-[#F5A623] shrink-0" />
             <span className="text-xs font-semibold">{toastMessage}</span>
@@ -116,7 +145,7 @@ export const DashboardPage: React.FC = () => {
       </AnimatePresence>
 
       {/* 1. Hero Welcome Section (Seamless, Open Canvas matching Mockup 1:1) */}
-      <div className="relative pt-2 pb-2 grid grid-cols-1 lg:grid-cols-12 items-center">
+      <motion.div variants={fadeUpVariants} className="relative pt-2 pb-2 grid grid-cols-1 lg:grid-cols-12 items-center">
         {/* Left Text Column */}
         <div className="lg:col-span-6 space-y-3.5 pr-2 z-10">
           <div className="text-[11px] font-black tracking-[0.24em] text-[#061C3D] uppercase">
@@ -132,37 +161,50 @@ export const DashboardPage: React.FC = () => {
           </p>
 
           <div className="flex items-center gap-3.5 pt-2">
-            <button
+            <motion.button
+              whileHover={{ scale: 1.025 }}
+              whileTap={{ scale: 0.975 }}
+              transition={{ duration: 0.15 }}
               onClick={() => navigate('/explore')}
-              className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full bg-[#F5A623] text-[#061C3D] font-bold text-sm shadow-sm hover:brightness-105 active:scale-98 transition-all cursor-pointer"
+              className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full bg-[#F5A623] text-[#061C3D] font-bold text-sm shadow-sm hover:brightness-105 transition-all cursor-pointer"
             >
               <span>Explore Resources</span>
               <ArrowRight className="w-4 h-4 stroke-[2.5]" />
-            </button>
+            </motion.button>
 
-            <button
+            <motion.button
+              whileHover={{ scale: 1.025 }}
+              whileTap={{ scale: 0.975 }}
+              transition={{ duration: 0.15 }}
               onClick={() => setIsListModalOpen(true)}
-              className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full bg-white border border-slate-300 text-[#061C3D] font-semibold text-sm shadow-xs hover:bg-slate-50 active:scale-98 transition-all cursor-pointer"
+              className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full bg-white border border-slate-300 text-[#061C3D] font-semibold text-sm shadow-xs hover:bg-slate-50 transition-all cursor-pointer"
             >
               <span>+ List an Item</span>
-            </button>
+            </motion.button>
           </div>
         </div>
 
         {/* Right Gear & Wave Image (Seamlessly blended into canvas) */}
         <div className="lg:col-span-6 flex justify-end items-center select-none relative -mr-4">
-          <img
+          <motion.img
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.7, ease: 'easeOut' }}
             src={heroWithWaveImg}
             alt="Campus Resources: Books, MacBook Laptop, Canon DSLR"
             className="w-full max-w-lg object-contain pointer-events-none"
           />
         </div>
-      </div>
+      </motion.div>
 
-      {/* 2. Key Metrics Row (4 Floating White Cards matching Mockup) */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-5">
+      {/* 2. Key Metrics Row (4 Floating White Cards with Elegant Hover Micro-Interaction) */}
+      <motion.div variants={fadeUpVariants} className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-5">
         {/* Active Rentals */}
-        <div className="flex items-center gap-4 p-4.5 bg-white rounded-[20px] border border-slate-100 shadow-soft hover:shadow-card transition-all duration-200">
+        <motion.div
+          whileHover={{ y: -3 }}
+          transition={{ duration: 0.2, ease: 'easeOut' }}
+          className="flex items-center gap-4 p-4.5 bg-white rounded-[20px] border border-slate-100/90 shadow-soft hover:shadow-card transition-shadow cursor-default"
+        >
           <div className="w-12 h-12 rounded-xl bg-[#FFF8EC] flex items-center justify-center shrink-0">
             <svg
               className="w-6 h-6 text-[#E68A00]"
@@ -186,10 +228,14 @@ export const DashboardPage: React.FC = () => {
               Active Rentals
             </div>
           </div>
-        </div>
+        </motion.div>
 
         {/* Completed Rentals */}
-        <div className="flex items-center gap-4 p-4.5 bg-white rounded-[20px] border border-slate-100 shadow-soft hover:shadow-card transition-all duration-200">
+        <motion.div
+          whileHover={{ y: -3 }}
+          transition={{ duration: 0.2, ease: 'easeOut' }}
+          className="flex items-center gap-4 p-4.5 bg-white rounded-[20px] border border-slate-100/90 shadow-soft hover:shadow-card transition-shadow cursor-default"
+        >
           <div className="w-12 h-12 rounded-xl bg-[#EEF5FD] flex items-center justify-center shrink-0">
             <svg
               className="w-6 h-6 text-[#2563EB]"
@@ -215,10 +261,14 @@ export const DashboardPage: React.FC = () => {
               Completed Rentals
             </div>
           </div>
-        </div>
+        </motion.div>
 
         {/* Money Saved */}
-        <div className="flex items-center gap-4 p-4.5 bg-white rounded-[20px] border border-slate-100 shadow-soft hover:shadow-card transition-all duration-200">
+        <motion.div
+          whileHover={{ y: -3 }}
+          transition={{ duration: 0.2, ease: 'easeOut' }}
+          className="flex items-center gap-4 p-4.5 bg-white rounded-[20px] border border-slate-100/90 shadow-soft hover:shadow-card transition-shadow cursor-default"
+        >
           <div className="w-12 h-12 rounded-xl bg-[#FDF0F1] flex items-center justify-center shrink-0">
             <span className="text-[#DC2626] font-bold text-2xl leading-none font-sans">
               ₹
@@ -232,10 +282,14 @@ export const DashboardPage: React.FC = () => {
               Money Saved
             </div>
           </div>
-        </div>
+        </motion.div>
 
         {/* Waste Avoided */}
-        <div className="flex items-center gap-4 p-4.5 bg-white rounded-[20px] border border-slate-100 shadow-soft hover:shadow-card transition-all duration-200">
+        <motion.div
+          whileHover={{ y: -3 }}
+          transition={{ duration: 0.2, ease: 'easeOut' }}
+          className="flex items-center gap-4 p-4.5 bg-white rounded-[20px] border border-slate-100/90 shadow-soft hover:shadow-card transition-shadow cursor-default"
+        >
           <div className="w-12 h-12 rounded-xl bg-[#EDF7FD] flex items-center justify-center shrink-0">
             <svg
               className="w-6 h-6 text-[#0284C7]"
@@ -258,11 +312,11 @@ export const DashboardPage: React.FC = () => {
               Waste Avoided
             </div>
           </div>
-        </div>
-      </div>
+        </motion.div>
+      </motion.div>
 
       {/* 3. Bottom Grid: Popular Resources (8 cols) + Sustainability Impact (4 cols) */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start pt-2">
+      <motion.div variants={fadeUpVariants} className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start pt-2">
         {/* Popular Resources Section */}
         <div className="lg:col-span-8 space-y-3.5">
           <div className="flex items-center justify-between">
@@ -282,15 +336,18 @@ export const DashboardPage: React.FC = () => {
             </button>
           </div>
 
-          {/* 4 Cards Grid matching Mockup */}
+          {/* 4 Cards Grid matching Mockup with Smooth Lift */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
             {popularResources.map((item) => {
               const isWishlisted = wishlist.has(item.id);
               return (
-                <div
+                <motion.div
                   key={item.id}
+                  whileHover={{ y: -4 }}
+                  whileTap={{ scale: 0.99 }}
+                  transition={{ duration: 0.2, ease: 'easeOut' }}
                   onClick={() => setActiveDetailItem(item)}
-                  className="bg-white rounded-[20px] border border-slate-100 shadow-soft hover:shadow-card transition-all p-3 flex flex-col justify-between cursor-pointer group relative"
+                  className="bg-white rounded-[20px] border border-slate-100/90 shadow-soft hover:shadow-card transition-shadow p-3 flex flex-col justify-between cursor-pointer group relative"
                 >
                   <div>
                     {/* Item Image with Heart Button */}
@@ -298,13 +355,14 @@ export const DashboardPage: React.FC = () => {
                       <img
                         src={item.image}
                         alt={item.title}
-                        className="w-full h-full object-contain p-0.5 group-hover:scale-105 transition-transform duration-300"
+                        className="w-full h-full object-contain p-0.5 group-hover:scale-104 transition-transform duration-300 ease-out"
                         loading="lazy"
                       />
-                      {/* Heart Button */}
-                      <button
+                      {/* Heart Button with Tactile Pop */}
+                      <motion.button
+                        whileTap={{ scale: 0.8 }}
                         onClick={(e) => toggleWishlist(item.id, item.title, e)}
-                        className={`absolute top-2 right-2 w-7 h-7 rounded-full flex items-center justify-center transition-all duration-150 ${
+                        className={`absolute top-2 right-2 w-7 h-7 rounded-full flex items-center justify-center transition-colors duration-150 ${
                           isWishlisted
                             ? 'bg-rose-50 text-rose-500'
                             : 'bg-white text-slate-700 hover:text-rose-500 shadow-xs'
@@ -312,15 +370,15 @@ export const DashboardPage: React.FC = () => {
                         aria-label="Wishlist"
                       >
                         <Heart
-                          className={`w-3.5 h-3.5 stroke-[2] ${
-                            isWishlisted ? 'fill-rose-500 text-rose-500' : ''
+                          className={`w-3.5 h-3.5 stroke-[2] transition-transform ${
+                            isWishlisted ? 'fill-rose-500 text-rose-500 scale-105' : ''
                           }`}
                         />
-                      </button>
+                      </motion.button>
                     </div>
 
                     {/* Title */}
-                    <h3 className="font-bold text-[13.5px] text-[#061C3D] truncate">
+                    <h3 className="font-bold text-[13.5px] text-[#061C3D] truncate group-hover:text-amber-600 transition-colors">
                       {item.title}
                     </h3>
 
@@ -353,12 +411,12 @@ export const DashboardPage: React.FC = () => {
                       <span>{item.rating}</span>
                     </div>
                   </div>
-                </div>
+                </motion.div>
               );
             })}
           </div>
 
-          {/* Carousel Pagination Dots matching mockup */}
+          {/* Carousel Pagination Dots matching mockup with Fluid Width */}
           <div className="flex items-center justify-center gap-1.5 pt-3">
             {[0, 1, 2].map((idx) => (
               <button
@@ -375,8 +433,8 @@ export const DashboardPage: React.FC = () => {
           </div>
         </div>
 
-        {/* Sustainability Impact Card matching Mockup 1:1 */}
-        <div className="lg:col-span-4 bg-white rounded-[20px] border border-slate-100 shadow-soft p-6 space-y-5">
+        {/* Sustainability Impact Card with Calm Circular SVG Animation */}
+        <div className="lg:col-span-4 bg-white rounded-[20px] border border-slate-100/90 shadow-soft p-6 space-y-5">
           {/* Header */}
           <div className="flex items-center gap-2">
             <svg
@@ -398,7 +456,7 @@ export const DashboardPage: React.FC = () => {
 
           {/* Donut Chart + Vertical Metrics Row */}
           <div className="grid grid-cols-2 gap-4 items-center">
-            {/* Donut Ring Chart */}
+            {/* Donut Ring Chart with Soft Draw-in */}
             <div className="relative w-32 h-32 mx-auto flex items-center justify-center">
               <svg className="w-full h-full -rotate-90" viewBox="0 0 100 100">
                 <circle
@@ -409,7 +467,7 @@ export const DashboardPage: React.FC = () => {
                   stroke="#EDF2F7"
                   strokeWidth="9"
                 />
-                <circle
+                <motion.circle
                   cx="50"
                   cy="50"
                   r="38"
@@ -417,7 +475,9 @@ export const DashboardPage: React.FC = () => {
                   stroke="#F5A623"
                   strokeWidth="9"
                   strokeDasharray="238.76"
-                  strokeDashoffset={238.76 * (1 - 0.78)}
+                  initial={{ strokeDashoffset: 238.76 }}
+                  animate={{ strokeDashoffset: 238.76 * (1 - 0.78) }}
+                  transition={{ duration: 1.1, delay: 0.15, ease: 'easeOut' }}
                   strokeLinecap="round"
                 />
               </svg>
@@ -477,7 +537,7 @@ export const DashboardPage: React.FC = () => {
             </div>
           </div>
         </div>
-      </div>
+      </motion.div>
 
       {/* Interactive Item Detail Modal */}
       <ItemDetailModal
@@ -496,6 +556,6 @@ export const DashboardPage: React.FC = () => {
           showToast(`Listed "${title}" for ₹${price}/day! 🚀`);
         }}
       />
-    </div>
+    </motion.div>
   );
 };
