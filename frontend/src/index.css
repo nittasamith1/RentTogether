@@ -7,13 +7,20 @@
     color-scheme: light;
   }
 
+  html {
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-y: none;
+  }
+
   body {
     @apply bg-brand-cream-50 text-slate-800 font-sans selection:bg-brand-yellow/30 selection:text-brand-navy-950 overflow-x-hidden;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
   }
 
-  /* Custom Modern Scrollbar */
+  /* Ultra-Sleek Modern Minimal Scrollbar */
   ::-webkit-scrollbar {
     width: 6px;
     height: 6px;
@@ -22,35 +29,41 @@
     background: transparent;
   }
   ::-webkit-scrollbar-thumb {
-    background: #CBD5E1;
+    background: rgba(148, 163, 184, 0.35);
     border-radius: 9999px;
+    transition: background 0.3s ease;
   }
   ::-webkit-scrollbar-thumb:hover {
-    background: #94A3B8;
+    background: rgba(100, 116, 139, 0.6);
   }
 }
 
 @layer utilities {
+  .smooth-scroll {
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+  }
+
   .glass-card {
-    background: rgba(255, 255, 255, 0.88);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    border: 1px solid rgba(255, 255, 255, 0.7);
+    background: rgba(255, 255, 255, 0.92);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.8);
   }
 
   .glass-card-dark {
-    background: rgba(12, 19, 39, 0.85);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(12, 19, 39, 0.90);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border: 1px solid rgba(255, 255, 255, 0.12);
   }
 
   .text-balance {
     text-wrap: balance;
   }
 
-  /* Smooth multi-stop background wave as in dashboard mockup */
+  /* Smooth organic ambient light */
   .bg-organic-hero {
-    background: radial-gradient(circle at 80% 20%, rgba(254, 243, 199, 0.6) 0%, rgba(255, 251, 235, 0.4) 40%, rgba(250, 248, 244, 0) 70%);
+    background: radial-gradient(circle at 85% 15%, rgba(254, 243, 199, 0.65) 0%, rgba(255, 251, 235, 0.4) 45%, rgba(250, 248, 244, 0) 75%);
   }
 }
