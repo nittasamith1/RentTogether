@@ -1,0 +1,400 @@
+RentTogether — System Architecture
+Brand: RentTogether
+Tagline: Share Smart. Save More. Live Better.
+Product: AI-Powered Campus Resource Sharing Platform.
+
+Scope: Version 1 — Single-College Platform
+RentTogether will initially be developed as a single-college resource-sharing platform:
+- Registration restricted strictly to students belonging to the selected college.
+- Mandatory college identity verification (institutional email domain & student ID).
+- All resource listings, searches, bookings, and transactions remain strictly intra-campus.
+- AI engines (price prediction, fraud detection, demand forecasting) analyze campus-specific rental patterns, semester schedules, and academic events.
+- Platform administration and dispute resolution managed by college-specific administrators.
+
+I recommend a modular monolithic architecture with an independent ML layer.
+
+This gives you a clean, scalable architecture without introducing unnecessary microservices.
+1. High-Level System Architecture
+                 COLLEGE STUDENTS / CAMPUS ADMIN
+                        |
+                        v
+              REACT + TYPESCRIPT
+                  FRONTEND
+                        |
+                        v
+                 DJANGO REST API
+                        |
+          +-------------+-------------+
+          |             |             |
+          v             v             v
+      AUTH &         MARKETPLACE    RENTAL &
+     PROFILES        MANAGEMENT     BOOKINGS
+          |             |             |
+          +-------------+-------------+
+                        |
+          +-------------+-------------+
+          |             |             |
+          v             v             v
+       PAYMENTS      NOTIFICATIONS   REVIEWS
+          |             |             |
+          +-------------+-------------+
+                        |
+                        v
+                 DJANGO SERVICES
+                        |
+          +-------------+-------------+
+          |             |             |
+          v             v             v
+      PostgreSQL     Redis          Celery
+       (Neon)        Cache        Background Jobs
+          |
+          |
+          v
+                AI / ML ENGINE
+          +-------------+-------------+
+          |             |             |
+          v             v             v
+      FAIR PRICE      FRAUD         DEMAND
+     PREDICTION     DETECTION     FORECASTING
+          |             |             |
+          +-------------+-------------+
+                        |
+                        v
+                ML PREDICTION
+                   SERVICES
+                        |
+                        v
+                 DJANGO REST API
+                        |
+                        v
+                 REACT FRONTEND
+
+2. Frontend Architecture
+Technology: React.js + TypeScript + Tailwind CSS.
+
+Organize the frontend into these sections:
+frontend/
+│
+├── src/
+│   ├── assets/
+│   │
+│   ├── components/
+│   │   ├── common/
+│   │   ├── navbar/
+│   │   ├── sidebar/
+│   │   ├── cards/
+│   │   └── charts/
+│   │
+│   ├── pages/
+│   │   ├── auth/
+│   │   ├── dashboard/
+│   │   ├── marketplace/
+│   │   ├── listings/
+│   │   ├── bookings/
+│   │   ├── payments/
+│   │   ├── analytics/
+│   │   └── admin/
+│   │
+│   ├── services/
+│   │   ├── api.ts
+│   │   ├── auth.ts
+│   │   ├── marketplace.ts
+│   │   ├── bookings.ts
+│   │   └── payments.ts
+│   │
+│   ├── hooks/
+│   ├── context/
+│   ├── types/
+│   ├── utils/
+│   └── App.tsx
+│
+└── package.json
+
+Important frontend behaviour
+Every student gets one dashboard and one account.
+
+The dashboard contains:
+- My Rentals — resources borrowed.
+- My Listings — resources shared.
+- My Bookings — incoming and outgoing requests.
+- My Earnings — rental income.
+- My Spending — rental expenses.
+- AI Recommendations.
+- Sustainability Insights.
+No separate owner or renter login.
+3. Backend Architecture
+Technology: Python + Django + Django REST Framework.
+
+Use a modular Django application structure.
+backend/
+│
+├── config/
+│   ├── settings.py
+│   ├── urls.py
+│   ├── asgi.py
+│   └── wsgi.py
+│
+├── apps/
+│   │
+│   ├── accounts/
+│   │   ├── models.py
+│   │   ├── serializers.py
+│   │   ├── views.py
+│   │   └── urls.py
+│   │
+│   ├── profiles/
+│   ├── marketplace/
+│   ├── listings/
+│   ├── bookings/
+│   ├── availability/
+│   ├── payments/
+│   ├── reviews/
+│   ├── notifications/
+│   ├── recommendations/
+│   ├── sustainability/
+│   ├── fraud_management/
+│   └── administration/
+│
+├── ml_engine/
+│   ├── pricing/
+│   ├── fraud_detection/
+│   ├── demand_prediction/
+│   └── recommendations/
+│
+├── services/
+├── permissions/
+├── utils/
+├── tests/
+├── manage.py
+└── requirements.txt
+
+Backend responsibilities
+Module	Responsibility
+Accounts	Registration, login, JWT
+Profiles	Student information
+Marketplace	Search and discover resources
+Listings	Item creation and management
+Bookings	Rental lifecycle
+Availability	Calendar and conflict detection
+Payments	Transactions and refunds
+Reviews	Ratings and feedback
+Notifications	Email and in-app alerts
+Recommendations	Personalized suggestions
+Sustainability	Impact calculations
+Fraud Management	Risk analysis and alerts
+Administration	Platform management
+
+
+4. AI/ML Architecture
+This is one of the most important parts of RentTogether.
+
+Use Python, Pandas, NumPy, Scikit-learn and XGBoost.
+
+Build three independent ML engines.
+A. Fair Price Prediction
+Item Details
+     |
+     v
+Feature Engineering
+     |
+     v
+Trained ML Model
+     |
+     v
+Predicted Rental Price
+     |
+     v
+Django API
+     |
+     v
+Owner Dashboard
+
+Input:
+- Category
+- Original price
+- Item age
+- Condition
+- Demand
+- Historical rental prices
+Output:
+- Recommended rental price.
+- Suggested price range.
+B. Fraud Risk Detection
+User + Listing + Booking Activity
+                |
+                v
+         Feature Extraction
+                |
+                v
+         Fraud Detection Model
+                |
+                v
+           Risk Score
+                |
+                v
+          Django Backend
+                |
+                v
+          Admin Dashboard
+
+Use Isolation Forest initially. Introduce supervised classification when labelled fraud data becomes available.
+C. Demand Prediction
+Historical Booking Data
+          |
+          v
+    Data Processing
+          |
+          v
+    Feature Engineering
+          |
+          v
+      ML Model
+          |
+          v
+   Future Demand Forecast
+          |
+          v
+    Owner Dashboard
+
+Output:
+- Weekly demand.
+- Monthly demand.
+- High-demand categories.
+- Upcoming demand trends.
+Important: Train models separately from the live application. Save trained artifacts and load them through reusable prediction services.
+5. Database Architecture
+Database: Neon PostgreSQL
+ORM: Django ORM
+
+Recommended database tables:
+Table	Purpose
+College	Active college tenant entity (defines domain whitelist & campus rules)
+User	Student account (strictly linked to the college)
+StudentProfile	Student details, department, roll number, ID verification
+Category	Resource categories
+Item	Listed resources
+ItemImage	Item images
+Availability	Available rental periods
+Booking	Rental transactions
+Payment	Payment records
+Deposit	Security deposits
+Review	Ratings and reviews
+Wishlist	Saved items
+Notification	User notifications
+Report	Reported listings/users
+FraudAlert	AI-generated risk alerts
+Dispute	Rental disputes
+Transaction	Financial activity
+
+
+Most important database relationship
+One user can be an owner and renter.
+                  USER
+                   |
+          +--------+--------+
+          |                 |
+          v                 v
+       LISTINGS           BOOKINGS
+          |                 |
+          v                 v
+        ITEM          OWNER_ID
+                            |
+                         RENTER_ID
+                            |
+                            v
+                           USER
+
+In the Booking table:
+- owner_id references User.
+- renter_id references User.
+- item_id references Item.
+Both users are normal student accounts. The roles are determined by their activity in a particular transaction.
+6. Supporting Infrastructure
+Component	Technology	Purpose
+Database	Neon PostgreSQL	Persistent application data
+Cache	Redis	Frequently accessed data
+Background jobs	Celery	Reminders and scheduled tasks
+Image storage	Cloudinary	Item and profile images
+Authentication	SimpleJWT	Secure API authentication
+Payments	Razorpay	Rental payments
+ML	Scikit-learn/XGBoost	AI predictions
+Deployment	Docker	Application containerization
+Version control	GitHub	Source code management
+
+
+7. Complete Request Flow
+Example: A student wants to rent a scientific calculator within their campus.
+1. Student logs in (verified institutional credentials)
+2. Marketplace queries return items exclusively listed by students of the same college
+       |
+2. React sends request to Django API
+       |
+3. Django verifies JWT
+       |
+4. Marketplace returns calculator details
+       |
+5. Student selects rental dates
+       |
+6. Django checks availability
+       |
+7. Django calculates rental price
+       |
+8. Student sends booking request
+       |
+9. Owner receives notification
+       |
+10. Owner approves request
+       |
+11. Payment is processed
+       |
+12. Booking is confirmed
+       |
+13. Student collects calculator
+       |
+14. Rental is completed
+       |
+15. Return is verified
+       |
+16. Both students can submit reviews
+
+All operations happen through the same student account system.
+8. Deployment Architecture
+For your initial deployment, keep it simple.
+Component	Hosting
+React frontend	Vercel
+Django backend	Render or another suitable cloud host
+PostgreSQL	Neon
+Images	Cloudinary
+Redis	Managed Redis provider
+ML models	Packaged with Django initially
+Source code	GitHub
+
+
+You can later separate ML inference into its own service if workload justifies it.
+9. Final Architecture Decisions
+I recommend freezing these decisions:
+Layer	Final Choice
+Architecture	Modular Monolith (Single-College Scoped, Multi-Tenancy Ready)
+Frontend	React + TypeScript
+Backend	Django + DRF
+Database	Neon PostgreSQL
+ORM	Django ORM
+Authentication	JWT
+ML Framework	Scikit-learn + XGBoost
+AI Integration	Django ML Services
+Background Jobs	Celery + Redis
+Storage	Cloudinary
+Payment	Razorpay
+Deployment	Docker + Cloud
+
+
+Why Modular Monolith?
+Because RentTogether is initially a student marketplace, not a massive enterprise platform.
+
+A modular monolith gives you:
+- Easier development.
+- Simpler deployment.
+- Centralized authentication.
+- Consistent database transactions.
+- Easier testing.
+- Clear separation between modules.

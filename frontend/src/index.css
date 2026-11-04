@@ -1,0 +1,9 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-brand-cream text-slate-800 font-sans selection:bg-brand-yellow/30 selection:text-brand-navy-950;
+  }
+}

@@ -1,0 +1,19 @@
+# ==============================================================================
+# RentTogether Backend — Phase 01 Dependencies
+# ==============================================================================
+
+# Core Django & REST Framework
+Django>=5.0,<6.0
+djangorestframework>=3.15.1
+djangorestframework-simplejwt>=5.3.1
+django-cors-headers>=4.3.1
+
+# Database Drivers & Configuration
+psycopg[binary]>=3.1.18
+dj-database-url>=2.1.0
+
+# Environment Management
+python-dotenv>=1.0.1
+
+# Static file serving in development/production
+whitenoise>=6.6.0
