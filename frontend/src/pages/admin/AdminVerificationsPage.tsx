@@ -102,7 +102,7 @@ export const AdminVerificationsPage: React.FC = () => {
           </div>
           <h1 className="text-2xl font-bold text-[#0E131F]">Student Identity Verifications</h1>
           <p className="text-xs text-neutral-500 mt-0.5">
-            Review submitted student ID cards and institutional credentials for VNRVJIET.
+            Review submitted student ID cards and institutional credentials for Aditya University.
           </p>
         </div>
 

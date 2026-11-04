@@ -18,12 +18,12 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 // Initial fallback demo student (matching dashboard mockup) if user hasn't logged in yet
 const DEFAULT_DEMO_STUDENT: AuthUser = {
   id: 'demo-sai-id',
-  email: 'sai.reddy@vnrvjiet.in',
+  email: 'sai.reddy@adityauniversity.in',
   name: 'Sai Reddy',
   first_name: 'Sai',
   last_name: 'Reddy',
-  college_code: 'VNRVJIET',
-  college_name: 'VNR Vignana Jyothi Institute of Engineering & Technology',
+  college_code: 'Aditya University',
+  college_name: 'Aditya University',
   email_verified: true,
   is_college_verified: true,
   verification_status: 'VERIFIED',

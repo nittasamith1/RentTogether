@@ -86,10 +86,10 @@ export const Navbar: React.FC = () => {
             <div className="absolute right-0 mt-3 w-56 bg-white rounded-2xl shadow-card border border-slate-100 p-3 space-y-2 z-50 animate-in fade-in slide-in-from-top-2">
               <div className="pb-2 border-b border-slate-100">
                 <div className="text-xs font-bold text-slate-900">{displayName}</div>
-                <div className="text-[11px] text-slate-500 truncate">{user?.email || 'sai.reddy@vnrvjiet.in'}</div>
+                <div className="text-[11px] text-slate-500 truncate">{user?.email || 'sai.reddy@adityauniversity.in'}</div>
                 <div className="mt-1.5 inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-emerald-50 text-[10px] font-bold text-emerald-700 border border-emerald-200/60">
                   <ShieldCheck className="w-3 h-3 text-emerald-600" />
-                  <span>VNRVJIET Campus Verified</span>
+                  <span>Aditya University Verified</span>
                 </div>
               </div>
 

@@ -12,6 +12,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { Logo } from '../common/Logo';
+import { CampusNetworkCard } from '../common/CampusNetworkCard';
 
 interface NavItem {
   name: string;
@@ -101,14 +102,12 @@ export const Sidebar: React.FC = () => {
         </nav>
       </div>
 
-      {/* Bottom Tagline matching screenshot */}
-      <div className="px-6 pt-6 border-t border-slate-100/80">
-        <div className="text-xs font-bold text-[#E11D48] tracking-tight">
-          Share Smart.
-        </div>
-        <div className="text-xs font-medium text-slate-400 mt-0.5">
-          Save More. Live Better.
-        </div>
+      {/* Bottom Campus Network Widget with Image 1 styling */}
+      <div className="px-3 pt-4 border-t border-slate-100/80">
+        <CampusNetworkCard
+          collegeName={user?.college_name || 'Aditya University'}
+          collegeCode={user?.college_code || 'ADITYA'}
+        />
       </div>
     </aside>
   );

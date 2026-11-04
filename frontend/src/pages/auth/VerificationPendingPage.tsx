@@ -135,7 +135,7 @@ export const VerificationPendingPage: React.FC = () => {
               <div>
                 <h2 className="text-xl font-extrabold text-[#1E1B4B]">Identity Verified!</h2>
                 <p className="text-xs text-slate-500 mt-1">
-                  Your VNRVJIET campus membership has been approved by the campus administrator.
+                  Your Aditya University campus membership has been approved by the campus administrator.
                 </p>
               </div>
 
@@ -154,7 +154,7 @@ export const VerificationPendingPage: React.FC = () => {
                 </div>
                 <div className="flex justify-between">
                   <span className="text-slate-400">Institution:</span>
-                  <span className="font-semibold text-slate-800">{verification?.college_name || 'VNRVJIET'}</span>
+                  <span className="font-semibold text-slate-800">{verification?.college_name || 'Aditya University'}</span>
                 </div>
               </div>
 
@@ -313,7 +313,7 @@ export const VerificationPendingPage: React.FC = () => {
                   </div>
                   <div className="flex justify-between">
                     <span className="text-slate-400">Campus:</span>
-                    <span className="font-medium text-slate-800">{verification.college_name || 'VNRVJIET'}</span>
+                    <span className="font-medium text-slate-800">{verification.college_name || 'Aditya University'}</span>
                   </div>
                 </div>
               )}

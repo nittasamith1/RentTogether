@@ -75,12 +75,12 @@ export const LoginPage: React.FC = () => {
   };
 
   const handleDemoStudentLogin = async () => {
-    setEmail('sai.reddy@vnrvjiet.in');
+    setEmail('sai.reddy@adityauniversity.in');
     setPassword('StudentPassword123!');
     setErrorMessage('');
     try {
       setLoading(true);
-      const res = await authService.login('sai.reddy@vnrvjiet.in', 'StudentPassword123!');
+      const res = await authService.login('sai.reddy@adityauniversity.in', 'StudentPassword123!');
       login(res.access, res.refresh, res.user);
       navigate('/');
     } catch (err: any) {
@@ -91,12 +91,12 @@ export const LoginPage: React.FC = () => {
   };
 
   const handleDemoAdminLogin = async () => {
-    setEmail('admin@vnrvjiet.in');
+    setEmail('admin@adityauniversity.in');
     setPassword('AdminPassword123!');
     setErrorMessage('');
     try {
       setLoading(true);
-      const res = await authService.login('admin@vnrvjiet.in', 'AdminPassword123!');
+      const res = await authService.login('admin@adityauniversity.in', 'AdminPassword123!');
       login(res.access, res.refresh, res.user);
       navigate('/admin/verifications');
     } catch (err: any) {
@@ -174,7 +174,7 @@ export const LoginPage: React.FC = () => {
           </Link>
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-indigo-50 border border-indigo-100/80 text-[#5B4DFF] text-xs font-semibold mb-2">
             <ShieldCheck className="w-3.5 h-3.5" />
-            <span>VNRVJIET Campus Network</span>
+            <span>Aditya University Campus Network</span>
           </div>
           <h2 className="text-xl font-extrabold text-[#1E1B4B]">Student & Faculty Portal</h2>
           <p className="text-xs text-slate-500 mt-1 max-w-xs">
@@ -206,7 +206,7 @@ export const LoginPage: React.FC = () => {
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="student.name@vnrvjiet.in"
+                  placeholder="student.name@adityauniversity.in"
                   className="w-full pl-10 pr-3.5 py-2.5 rounded-xl border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-[#5B4DFF]/30 focus:border-[#5B4DFF] transition-all bg-white"
                   required
                 />
@@ -275,7 +275,7 @@ export const LoginPage: React.FC = () => {
                 className="py-2.5 px-3 rounded-xl border border-indigo-100 bg-indigo-50/60 hover:bg-indigo-100/80 text-indigo-900 text-xs font-bold transition-all text-center cursor-pointer"
               >
                 🎓 Demo Student
-                <span className="block text-[10px] font-medium text-indigo-600/90 mt-0.5">Sai Reddy (VNR)</span>
+                <span className="block text-[10px] font-medium text-indigo-600/90 mt-0.5">Sai Reddy (Aditya Univ)</span>
               </button>
               <button
                 type="button"
@@ -283,7 +283,7 @@ export const LoginPage: React.FC = () => {
                 className="py-2.5 px-3 rounded-xl border border-amber-100 bg-amber-50/60 hover:bg-amber-100/80 text-amber-900 text-xs font-bold transition-all text-center cursor-pointer"
               >
                 🛡️ Campus Admin
-                <span className="block text-[10px] font-medium text-amber-700/90 mt-0.5">ID Card Reviewer</span>
+                <span className="block text-[10px] font-medium text-amber-700/90 mt-0.5">Identity Approver</span>
               </button>
             </div>
           </div>
@@ -335,7 +335,7 @@ export const LoginPage: React.FC = () => {
                       type="email"
                       value={forgotEmail}
                       onChange={(e) => setForgotEmail(e.target.value)}
-                      placeholder="student@vnrvjiet.in"
+                      placeholder="student.name@adityauniversity.in"
                       className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-[#5B4DFF]/30"
                       required
                     />

@@ -62,10 +62,10 @@ export const RegisterPage: React.FC = () => {
         setCollege(data);
       } catch {
         setCollege({
-          id: 'vnr-id',
-          name: 'VNR Vignana Jyothi Institute of Engineering & Technology',
-          code: 'VNRVJIET',
-          domain_whitelist: ['vnrvjiet.in', 'vnrvjiet.ac.in'],
+          id: 'aditya-id',
+          name: 'Aditya University',
+          code: 'ADITYA',
+          domain_whitelist: ['adityauniversity.in', 'aditya.ac.in'],
           is_active: true,
         });
       } finally {
@@ -187,7 +187,7 @@ export const RegisterPage: React.FC = () => {
           <p className="text-xs text-slate-500 mt-1 max-w-md mx-auto">
             {collegeLoading
               ? 'Loading active campus configuration...'
-              : `One account for renting & lending exclusively for ${college?.name || 'VNRVJIET'} students.`}
+              : `One account for renting & lending exclusively for ${college?.name || 'Aditya University'} students.`}
           </p>
         </div>
 
@@ -239,7 +239,7 @@ export const RegisterPage: React.FC = () => {
                       type="text"
                       value={rollNumber}
                       onChange={(e) => setRollNumber(e.target.value)}
-                      placeholder="e.g. 21071A05B8"
+                      placeholder="e.g. 21A91A05B8"
                       className="w-full pl-10 pr-3.5 py-2.5 rounded-xl border border-slate-200 text-xs uppercase focus:outline-none focus:ring-2 focus:ring-[#5B4DFF]/30 focus:border-[#5B4DFF] bg-white font-mono"
                       required
                     />
@@ -257,7 +257,7 @@ export const RegisterPage: React.FC = () => {
                     type="email"
                     value={email}
                     onChange={(e) => handleEmailChange(e.target.value)}
-                    placeholder="student.name@vnrvjiet.in"
+                    placeholder="student.name@adityauniversity.in"
                     className="w-full pl-10 pr-10 py-2.5 rounded-xl border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-[#5B4DFF]/30 focus:border-[#5B4DFF] bg-white"
                     required
                   />

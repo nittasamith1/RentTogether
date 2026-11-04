@@ -16,7 +16,7 @@ export const DashboardPage: React.FC = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const displayName = user?.first_name || user?.name?.split(' ')[0] || 'Sai';
-  const collegeName = user?.college_code || 'VNRVJIET';
+  const collegeName = user?.college_name || 'Aditya University';
 
   // Modal States
   const [activeDetailItem, setActiveDetailItem] = useState<ModalResourceItem | null>(null);
