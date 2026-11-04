@@ -2,12 +2,12 @@ import React from 'react';
 import { NavLink } from 'react-router-dom';
 import {
   Home,
-  Compass,
+  Search,
   Package,
   Layers,
-  CalendarDays,
+  Calendar,
   Sparkles,
-  BarChart3,
+  BarChart2,
   Settings,
 } from 'lucide-react';
 import sidebarWaveImg from '../../assets/sidebar_wave.png';
@@ -20,28 +20,28 @@ interface NavItem {
 
 const navItems: NavItem[] = [
   { name: 'Dashboard', path: '/', icon: Home },
-  { name: 'Explore', path: '/explore', icon: Compass },
+  { name: 'Explore', path: '/explore', icon: Search },
   { name: 'My Rentals', path: '/rentals', icon: Package },
   { name: 'My Listings', path: '/listings', icon: Layers },
-  { name: 'Bookings', path: '/bookings', icon: CalendarDays },
+  { name: 'Bookings', path: '/bookings', icon: Calendar },
   { name: 'AI Insights', path: '/ai-insights', icon: Sparkles },
-  { name: 'Sustainability', path: '/sustainability', icon: BarChart3 },
+  { name: 'Sustainability', path: '/sustainability', icon: BarChart2 },
 ];
 
 export const Sidebar: React.FC = () => {
   return (
-    <aside className="w-64 bg-brand-navy-950 text-slate-300 flex flex-col justify-between shrink-0 relative overflow-hidden select-none border-r border-slate-900">
+    <aside className="w-64 bg-[#061C3D] text-slate-300 flex flex-col justify-between shrink-0 relative overflow-hidden select-none">
       {/* Top Section */}
-      <div className="relative z-10">
-        {/* Brand Logo with Isometric Cube Icon */}
-        <div className="h-20 px-6 flex items-center gap-3.5">
-          <div className="w-10 h-10 rounded-xl bg-brand-yellow flex items-center justify-center text-brand-navy-950 shadow-glow-sm transition-transform hover:scale-105">
+      <div className="relative z-10 pt-6">
+        {/* Brand Logo matching mockup: Rent in White + Together in Yellow */}
+        <div className="px-6 flex items-center gap-3 pb-8">
+          <div className="w-9 h-9 rounded-xl bg-brand-yellow flex items-center justify-center text-brand-navy shadow-sm">
             <svg
-              className="w-5 h-5 text-brand-navy-950"
+              className="w-5 h-5 text-brand-navy"
               viewBox="0 0 24 24"
               fill="none"
               stroke="currentColor"
-              strokeWidth="2.4"
+              strokeWidth="2.3"
               strokeLinecap="round"
               strokeLinejoin="round"
             >
@@ -49,15 +49,17 @@ export const Sidebar: React.FC = () => {
               <path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z" />
               <path d="m3.3 7 8.7 5 8.7-5" />
               <path d="M12 22V12" />
+              <circle cx="12" cy="7" r="1.2" fill="currentColor" stroke="none" />
             </svg>
           </div>
-          <span className="text-xl font-extrabold tracking-tight text-white font-display">
-            RentTogether
-          </span>
+          <div className="text-xl font-bold tracking-tight">
+            <span className="text-white font-black">Rent</span>
+            <span className="text-brand-yellow font-black">Together</span>
+          </div>
         </div>
 
         {/* Navigation Items */}
-        <nav className="px-4 py-3 space-y-1.5">
+        <nav className="px-4 space-y-1.5">
           {navItems.map((item) => {
             const Icon = item.icon;
             return (
@@ -65,20 +67,20 @@ export const Sidebar: React.FC = () => {
                 key={item.path}
                 to={item.path}
                 className={({ isActive }) =>
-                  `group flex items-center gap-3.5 px-4 py-3 rounded-2xl text-sm font-semibold transition-all duration-200 ${
+                  `flex items-center gap-3.5 px-4 py-3 rounded-2xl text-sm font-semibold transition-all duration-150 ${
                     isActive
-                      ? 'bg-brand-yellow text-brand-navy-950 shadow-md shadow-brand-yellow/20 font-bold translate-x-1'
-                      : 'text-slate-400 hover:text-white hover:bg-white/5 hover:translate-x-1'
+                      ? 'bg-brand-yellow text-brand-navy font-bold shadow-md shadow-brand-yellow/20'
+                      : 'text-slate-300/80 hover:text-white hover:bg-white/5'
                   }`
                 }
               >
                 {({ isActive }) => (
                   <>
                     <Icon
-                      className={`w-4 h-4 transition-transform duration-200 group-hover:scale-110 ${
+                      className={`w-4 h-4 shrink-0 ${
                         isActive
-                          ? 'text-brand-navy-950 stroke-[2.5]'
-                          : 'text-slate-400 group-hover:text-white'
+                          ? 'text-brand-navy fill-brand-navy stroke-[2.2]'
+                          : 'text-slate-300/80'
                       }`}
                     />
                     <span>{item.name}</span>
@@ -87,28 +89,31 @@ export const Sidebar: React.FC = () => {
               </NavLink>
             );
           })}
+
+          {/* Thin Divider Line matching mockup */}
+          <div className="pt-2 pb-1">
+            <div className="h-px bg-slate-700/60 mx-1" />
+          </div>
+
+          {/* Settings Nav Item */}
+          <NavLink
+            to="/settings"
+            className={({ isActive }) =>
+              `flex items-center gap-3.5 px-4 py-3 rounded-2xl text-sm font-semibold transition-all duration-150 ${
+                isActive
+                  ? 'bg-brand-yellow text-brand-navy font-bold'
+                  : 'text-slate-300/80 hover:text-white hover:bg-white/5'
+              }`
+            }
+          >
+            <Settings className="w-4 h-4 shrink-0 text-slate-300/80" />
+            <span>Settings</span>
+          </NavLink>
         </nav>
       </div>
 
-      {/* Settings Navigation Link */}
-      <div className="relative z-10 px-4 mb-28">
-        <NavLink
-          to="/settings"
-          className={({ isActive }) =>
-            `group flex items-center gap-3.5 px-4 py-3 rounded-2xl text-sm font-semibold transition-all duration-200 ${
-              isActive
-                ? 'bg-brand-yellow text-brand-navy-950 font-bold'
-                : 'text-slate-400 hover:text-white hover:bg-white/5 hover:translate-x-1'
-            }`
-          }
-        >
-          <Settings className="w-4 h-4 transition-transform duration-200 group-hover:rotate-45" />
-          <span>Settings</span>
-        </NavLink>
-      </div>
-
       {/* Signature Brand Overlapping Curved Wave at Bottom Left (Exact Mockup Match) */}
-      <div className="absolute bottom-0 left-0 right-0 h-40 pointer-events-none select-none overflow-hidden z-0">
+      <div className="absolute bottom-0 left-0 right-0 h-48 pointer-events-none select-none overflow-hidden z-0">
         <img
           src={sidebarWaveImg}
           alt=""

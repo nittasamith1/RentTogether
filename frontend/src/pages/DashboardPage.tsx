@@ -1,26 +1,17 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { motion, AnimatePresence, Variants } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
-  Package,
-  CalendarCheck,
-  IndianRupee,
-  Leaf,
-  Plus,
   ArrowRight,
   Heart,
   Star,
-  Coins,
-  Recycle,
   CheckCircle2,
 } from 'lucide-react';
-import { Card } from '../components/common/Card';
-import { Button } from '../components/common/Button';
 import { ItemDetailModal, ModalResourceItem } from '../components/common/ItemDetailModal';
 import { ListItemModal } from '../components/common/ListItemModal';
 
 // Authentic visual assets extracted directly from the reference mockup
-import heroGearImg from '../assets/hero_gear.png';
+import heroWithWaveImg from '../assets/hero_with_wave.png';
 import itemCasioImg from '../assets/item_casio.png';
 import itemDsaImg from '../assets/item_dsa.png';
 import itemArduinoImg from '../assets/item_arduino.png';
@@ -28,7 +19,6 @@ import itemCanonImg from '../assets/item_canon.png';
 
 export const DashboardPage: React.FC = () => {
   const navigate = useNavigate();
-  const [selectedCategory, setSelectedCategory] = useState<string>('All');
   const [wishlist, setWishlist] = useState<Set<string>>(new Set());
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [carouselIndex, setCarouselIndex] = useState<number>(0);
@@ -55,9 +45,7 @@ export const DashboardPage: React.FC = () => {
     setWishlist(next);
   };
 
-  const categories = ['All', 'Calculator', 'Books', 'Project', 'Electronics'];
-
-  // 100% exact match to RentTogether Campus Rental Dashboard.png
+  // Exact 4 Popular Resources matching RentTogether Campus Rental Dashboard.png
   const popularResources: ModalResourceItem[] = [
     {
       id: 'casio-991ex',
@@ -109,40 +97,8 @@ export const DashboardPage: React.FC = () => {
     },
   ];
 
-  const filteredResources = selectedCategory === 'All'
-    ? popularResources
-    : popularResources.filter((r) => r.category === selectedCategory);
-
-  // Framer Motion Animation Variants
-  const containerVariants: Variants = {
-    hidden: { opacity: 0 },
-    show: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.08,
-      },
-    },
-  };
-
-  const itemVariants: Variants = {
-    hidden: { opacity: 0, y: 16 },
-    show: {
-      opacity: 1,
-      y: 0,
-      transition: {
-        duration: 0.4,
-        ease: 'easeOut',
-      },
-    },
-  };
-
   return (
-    <motion.div
-      variants={containerVariants}
-      initial="hidden"
-      animate="show"
-      className="space-y-8 max-w-7xl mx-auto relative pb-8"
-    >
+    <div className="space-y-6 max-w-7xl mx-auto relative pb-6 text-[#061C3D]">
       {/* Toast Notification with Spring Physics */}
       <AnimatePresence>
         {toastMessage && (
@@ -151,382 +107,376 @@ export const DashboardPage: React.FC = () => {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.95 }}
             transition={{ type: 'spring', damping: 20, stiffness: 300 }}
-            className="fixed bottom-6 right-6 z-50 bg-brand-navy-950 text-white px-5 py-3 rounded-2xl shadow-2xl flex items-center gap-3 border border-slate-700/80 backdrop-blur-md"
+            className="fixed bottom-6 right-6 z-50 bg-[#061C3D] text-white px-5 py-3 rounded-2xl shadow-2xl flex items-center gap-3 border border-slate-700/80 backdrop-blur-md"
           >
-            <CheckCircle2 className="w-4 h-4 text-brand-yellow shrink-0" />
+            <CheckCircle2 className="w-4 h-4 text-[#F5A623] shrink-0" />
             <span className="text-xs font-semibold">{toastMessage}</span>
           </motion.div>
         )}
       </AnimatePresence>
 
-      {/* 1. Hero Welcome Banner (Exact match to Mockup: Typography + 3D Render Image) */}
-      <motion.div
-        variants={itemVariants}
-        className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-amber-50/90 via-amber-100/40 to-amber-200/50 p-8 sm:p-12 border border-amber-200/50 shadow-soft"
-      >
-        {/* Soft Ambient Organic Backdrop Gradient */}
-        <div className="absolute top-0 right-0 w-[55%] h-full bg-gradient-to-l from-amber-200/40 via-amber-100/30 to-transparent pointer-events-none rounded-r-3xl" />
-        <div className="absolute -top-24 -right-24 w-96 h-96 rounded-full bg-brand-yellow/20 blur-3xl pointer-events-none" />
-
-        <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
-          {/* Left Text Column */}
-          <div className="lg:col-span-7 space-y-4">
-            <div className="text-xs font-extrabold tracking-widest uppercase text-slate-500 font-display">
-              CAMPUS RESOURCE SHARING
-            </div>
-
-            <h1 className="text-3xl sm:text-5xl font-black text-slate-900 tracking-tight leading-tight font-display">
-              Welcome back, Sai!
-            </h1>
-
-            <p className="text-slate-600 text-sm sm:text-base leading-relaxed max-w-lg">
-              Rent, lend and share resources within your campus.
-            </p>
-
-            <div className="flex flex-wrap items-center gap-3.5 pt-3">
-              <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
-                <Button
-                  variant="primary"
-                  size="md"
-                  onClick={() => navigate('/explore')}
-                  className="gap-2 shadow-glow-yellow px-6 py-3 font-bold"
-                >
-                  <span>Explore Resources</span>
-                  <ArrowRight className="w-4 h-4" />
-                </Button>
-              </motion.div>
-              <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
-                <Button
-                  variant="outline"
-                  size="md"
-                  onClick={() => setIsListModalOpen(true)}
-                  className="gap-2 bg-white/90 hover:bg-white text-slate-800 border-slate-300/80 shadow-soft px-6 py-3 font-semibold"
-                >
-                  <Plus className="w-4 h-4 text-slate-600" />
-                  <span>+ List an Item</span>
-                </Button>
-              </motion.div>
-            </div>
+      {/* 1. Hero Welcome Section (Seamless, Open Canvas matching Mockup 1:1) */}
+      <div className="relative pt-2 pb-2 grid grid-cols-1 lg:grid-cols-12 items-center">
+        {/* Left Text Column */}
+        <div className="lg:col-span-6 space-y-3.5 pr-2 z-10">
+          <div className="text-[11px] font-black tracking-[0.24em] text-[#061C3D] uppercase">
+            CAMPUS RESOURCE SHARING
           </div>
 
-          {/* Right Visual: Exact 3D Render of Books, MacBook, and Canon Camera */}
-          <div className="hidden lg:flex lg:col-span-5 justify-end items-center relative select-none">
-            <motion.div
-              initial={{ opacity: 0, scale: 0.96 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.5 }}
-              whileHover={{ scale: 1.02 }}
-              className="relative max-w-md cursor-pointer"
+          <h1 className="text-4xl sm:text-[46px] font-black text-[#061C3D] tracking-tight leading-[1.12]">
+            Welcome back, Sai!
+          </h1>
+
+          <p className="text-slate-600 text-sm sm:text-[15px] leading-relaxed">
+            Rent, lend and share resources within your campus.
+          </p>
+
+          <div className="flex items-center gap-3.5 pt-2">
+            <button
+              onClick={() => navigate('/explore')}
+              className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full bg-[#F5A623] text-[#061C3D] font-bold text-sm shadow-sm hover:brightness-105 active:scale-98 transition-all cursor-pointer"
             >
-              <img
-                src={heroGearImg}
-                alt="Campus Resources: Books, Laptop, Camera"
-                className="w-full h-auto drop-shadow-xl object-contain"
-              />
-            </motion.div>
+              <span>Explore Resources</span>
+              <ArrowRight className="w-4 h-4 stroke-[2.5]" />
+            </button>
+
+            <button
+              onClick={() => setIsListModalOpen(true)}
+              className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full bg-white border border-slate-300 text-[#061C3D] font-semibold text-sm shadow-xs hover:bg-slate-50 active:scale-98 transition-all cursor-pointer"
+            >
+              <span>+ List an Item</span>
+            </button>
           </div>
         </div>
-      </motion.div>
 
-      {/* 2. Key Metrics Row (4 Floating KPI Cards matching Mockup) */}
-      <motion.div variants={itemVariants} className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
+        {/* Right Gear & Wave Image (Seamlessly blended into canvas) */}
+        <div className="lg:col-span-6 flex justify-end items-center select-none relative -mr-4">
+          <img
+            src={heroWithWaveImg}
+            alt="Campus Resources: Books, MacBook Laptop, Canon DSLR"
+            className="w-full max-w-lg object-contain pointer-events-none"
+          />
+        </div>
+      </div>
+
+      {/* 2. Key Metrics Row (4 Floating White Cards matching Mockup) */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-5">
         {/* Active Rentals */}
-        <motion.div whileHover={{ y: -4 }} transition={{ type: 'spring', stiffness: 400, damping: 25 }}>
-          <Card className="flex items-center gap-4.5 p-5 bg-white rounded-2xl border border-slate-100 shadow-soft hover:shadow-card-hover transition-all cursor-pointer group">
-            <div className="w-13 h-13 rounded-2xl bg-amber-100/80 text-amber-600 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
-              <Package className="w-6 h-6 stroke-[2.2]" />
+        <div className="flex items-center gap-4 p-4.5 bg-white rounded-[20px] border border-slate-100 shadow-soft hover:shadow-card transition-all duration-200">
+          <div className="w-12 h-12 rounded-xl bg-[#FFF8EC] flex items-center justify-center shrink-0">
+            <svg
+              className="w-6 h-6 text-[#E68A00]"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z" />
+              <path d="m3.3 7 8.7 5 8.7-5" />
+              <path d="M12 22V12" />
+            </svg>
+          </div>
+          <div>
+            <div className="text-2xl font-black text-[#061C3D] leading-tight">
+              3
             </div>
-            <div>
-              <div className="text-3xl font-black text-slate-900 tracking-tight font-display">
-                3
-              </div>
-              <div className="text-xs font-semibold text-slate-500 mt-0.5">
-                Active Rentals
-              </div>
-            </div>
-          </Card>
-        </motion.div>
-
-        {/* Completed Rentals */}
-        <motion.div whileHover={{ y: -4 }} transition={{ type: 'spring', stiffness: 400, damping: 25 }}>
-          <Card className="flex items-center gap-4.5 p-5 bg-white rounded-2xl border border-slate-100 shadow-soft hover:shadow-card-hover transition-all cursor-pointer group">
-            <div className="w-13 h-13 rounded-2xl bg-sky-100/80 text-sky-600 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
-              <CalendarCheck className="w-6 h-6 stroke-[2.2]" />
-            </div>
-            <div>
-              <div className="text-3xl font-black text-slate-900 tracking-tight font-display">
-                8
-              </div>
-              <div className="text-xs font-semibold text-slate-500 mt-0.5">
-                Completed Rentals
-              </div>
-            </div>
-          </Card>
-        </motion.div>
-
-        {/* Money Saved */}
-        <motion.div whileHover={{ y: -4 }} transition={{ type: 'spring', stiffness: 400, damping: 25 }}>
-          <Card className="flex items-center gap-4.5 p-5 bg-white rounded-2xl border border-slate-100 shadow-soft hover:shadow-card-hover transition-all cursor-pointer group">
-            <div className="w-13 h-13 rounded-2xl bg-rose-100/80 text-rose-600 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
-              <IndianRupee className="w-6 h-6 stroke-[2.2]" />
-            </div>
-            <div>
-              <div className="text-3xl font-black text-slate-900 tracking-tight font-display">
-                ₹2,450
-              </div>
-              <div className="text-xs font-semibold text-slate-500 mt-0.5">
-                Money Saved
-              </div>
-            </div>
-          </Card>
-        </motion.div>
-
-        {/* Waste Avoided */}
-        <motion.div whileHover={{ y: -4 }} transition={{ type: 'spring', stiffness: 400, damping: 25 }}>
-          <Card className="flex items-center gap-4.5 p-5 bg-white rounded-2xl border border-slate-100 shadow-soft hover:shadow-card-hover transition-all cursor-pointer group">
-            <div className="w-13 h-13 rounded-2xl bg-emerald-100/80 text-emerald-600 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
-              <Leaf className="w-6 h-6 stroke-[2.2]" />
-            </div>
-            <div>
-              <div className="text-3xl font-black text-slate-900 tracking-tight font-display">
-                12.4 kg
-              </div>
-              <div className="text-xs font-semibold text-slate-500 mt-0.5">
-                Waste Avoided
-              </div>
-            </div>
-          </Card>
-        </motion.div>
-      </motion.div>
-
-      {/* 3. Bottom Grid: Popular Resources (8 cols) + Sustainability Impact (4 cols) */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-7 items-start">
-        {/* Popular Resources Section */}
-        <motion.div variants={itemVariants} className="lg:col-span-8 space-y-4">
-          <div className="flex flex-wrap items-center justify-between gap-3">
-            <div>
-              <h2 className="text-xl font-extrabold text-slate-900 tracking-tight font-display">
-                Popular Resources
-              </h2>
-              <div className="h-0.5 w-10 bg-brand-yellow mt-1 rounded-full" />
-            </div>
-
-            <div className="flex items-center gap-3">
-              {/* Category Filter Pills */}
-              <div className="hidden sm:flex items-center gap-1.5 bg-slate-100/80 p-1 rounded-full">
-                {categories.map((cat) => (
-                  <button
-                    key={cat}
-                    onClick={() => setSelectedCategory(cat)}
-                    className={`px-3 py-1 rounded-full text-xs font-bold transition-all duration-200 ${
-                      selectedCategory === cat
-                        ? 'bg-white text-slate-900 shadow-xs scale-102 font-extrabold'
-                        : 'text-slate-500 hover:text-slate-800'
-                    }`}
-                  >
-                    {cat}
-                  </button>
-                ))}
-              </div>
-
-              <button
-                onClick={() => navigate('/explore')}
-                className="text-xs font-bold text-slate-700 hover:text-brand-navy-950 flex items-center gap-1 transition-colors hover:underline"
-              >
-                <span>View All</span>
-                <ArrowRight className="w-3.5 h-3.5" />
-              </button>
+            <div className="text-xs font-medium text-slate-500 mt-0.5">
+              Active Rentals
             </div>
           </div>
+        </div>
 
-          {/* Cards Grid matching 4 items in mockup with authentic images */}
-          <motion.div layout className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-            <AnimatePresence>
-              {filteredResources.map((item) => {
-                const isWishlisted = wishlist.has(item.id);
-                return (
-                  <motion.div
-                    layout
-                    key={item.id}
-                    initial={{ opacity: 0, scale: 0.95 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0, scale: 0.95 }}
-                    whileHover={{ y: -6 }}
-                    transition={{ type: 'spring', damping: 25, stiffness: 350 }}
-                    onClick={() => setActiveDetailItem(item)}
-                    className="bg-white rounded-2xl border border-slate-100 shadow-soft hover:shadow-card-hover transition-all p-3 flex flex-col justify-between cursor-pointer group relative"
-                  >
-                    <div>
-                      {/* Item Image with Wishlist Button */}
-                      <div className="relative aspect-[4/3] w-full rounded-xl overflow-hidden bg-slate-50 mb-3">
-                        <img
-                          src={item.image}
-                          alt={item.title}
-                          className="w-full h-full object-contain p-1 group-hover:scale-108 transition-transform duration-500 ease-out"
-                          loading="lazy"
+        {/* Completed Rentals */}
+        <div className="flex items-center gap-4 p-4.5 bg-white rounded-[20px] border border-slate-100 shadow-soft hover:shadow-card transition-all duration-200">
+          <div className="w-12 h-12 rounded-xl bg-[#EEF5FD] flex items-center justify-center shrink-0">
+            <svg
+              className="w-6 h-6 text-[#2563EB]"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <rect width="18" height="18" x="3" y="4" rx="2" ry="2" />
+              <line x1="16" x2="16" y1="2" y2="6" />
+              <line x1="8" x2="8" y1="2" y2="6" />
+              <line x1="3" x2="21" y1="10" y2="10" />
+              <path d="m9 16 2 2 4-4" />
+            </svg>
+          </div>
+          <div>
+            <div className="text-2xl font-black text-[#061C3D] leading-tight">
+              8
+            </div>
+            <div className="text-xs font-medium text-slate-500 mt-0.5">
+              Completed Rentals
+            </div>
+          </div>
+        </div>
+
+        {/* Money Saved */}
+        <div className="flex items-center gap-4 p-4.5 bg-white rounded-[20px] border border-slate-100 shadow-soft hover:shadow-card transition-all duration-200">
+          <div className="w-12 h-12 rounded-xl bg-[#FDF0F1] flex items-center justify-center shrink-0">
+            <span className="text-[#DC2626] font-bold text-2xl leading-none font-sans">
+              ₹
+            </span>
+          </div>
+          <div>
+            <div className="text-2xl font-black text-[#061C3D] leading-tight">
+              ₹2,450
+            </div>
+            <div className="text-xs font-medium text-slate-500 mt-0.5">
+              Money Saved
+            </div>
+          </div>
+        </div>
+
+        {/* Waste Avoided */}
+        <div className="flex items-center gap-4 p-4.5 bg-white rounded-[20px] border border-slate-100 shadow-soft hover:shadow-card transition-all duration-200">
+          <div className="w-12 h-12 rounded-xl bg-[#EDF7FD] flex items-center justify-center shrink-0">
+            <svg
+              className="w-6 h-6 text-[#0284C7]"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z" />
+              <path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12" />
+            </svg>
+          </div>
+          <div>
+            <div className="text-2xl font-black text-[#061C3D] leading-tight">
+              12.4 kg
+            </div>
+            <div className="text-xs font-medium text-slate-500 mt-0.5">
+              Waste Avoided
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* 3. Bottom Grid: Popular Resources (8 cols) + Sustainability Impact (4 cols) */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start pt-2">
+        {/* Popular Resources Section */}
+        <div className="lg:col-span-8 space-y-3.5">
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="text-[20px] font-black text-[#061C3D] tracking-tight">
+                Popular Resources
+              </h2>
+              <div className="h-1 w-10 bg-[#F5A623] rounded-full mt-0.5" />
+            </div>
+
+            <button
+              onClick={() => navigate('/explore')}
+              className="text-xs font-bold text-[#061C3D] hover:underline flex items-center gap-1 transition-colors cursor-pointer"
+            >
+              <span>View All</span>
+              <ArrowRight className="w-3.5 h-3.5 stroke-[2.5]" />
+            </button>
+          </div>
+
+          {/* 4 Cards Grid matching Mockup */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+            {popularResources.map((item) => {
+              const isWishlisted = wishlist.has(item.id);
+              return (
+                <div
+                  key={item.id}
+                  onClick={() => setActiveDetailItem(item)}
+                  className="bg-white rounded-[20px] border border-slate-100 shadow-soft hover:shadow-card transition-all p-3 flex flex-col justify-between cursor-pointer group relative"
+                >
+                  <div>
+                    {/* Item Image with Heart Button */}
+                    <div className="relative aspect-[4/3] w-full rounded-xl overflow-hidden bg-slate-50 mb-2.5">
+                      <img
+                        src={item.image}
+                        alt={item.title}
+                        className="w-full h-full object-contain p-0.5 group-hover:scale-105 transition-transform duration-300"
+                        loading="lazy"
+                      />
+                      {/* Heart Button */}
+                      <button
+                        onClick={(e) => toggleWishlist(item.id, item.title, e)}
+                        className={`absolute top-2 right-2 w-7 h-7 rounded-full flex items-center justify-center transition-all duration-150 ${
+                          isWishlisted
+                            ? 'bg-rose-50 text-rose-500'
+                            : 'bg-white text-slate-700 hover:text-rose-500 shadow-xs'
+                        }`}
+                        aria-label="Wishlist"
+                      >
+                        <Heart
+                          className={`w-3.5 h-3.5 stroke-[2] ${
+                            isWishlisted ? 'fill-rose-500 text-rose-500' : ''
+                          }`}
                         />
-                        {/* Interactive Heart Button */}
-                        <button
-                          onClick={(e) => toggleWishlist(item.id, item.title, e)}
-                          className={`absolute top-2 right-2 w-7 h-7 rounded-full flex items-center justify-center transition-all duration-200 active:scale-75 ${
-                            isWishlisted
-                              ? 'bg-rose-50 text-rose-500 shadow-sm'
-                              : 'bg-white/90 text-slate-400 hover:text-rose-500 hover:bg-white'
-                          }`}
-                          aria-label="Toggle wishlist"
-                        >
-                          <Heart
-                            className={`w-3.5 h-3.5 transition-transform ${
-                              isWishlisted ? 'fill-rose-500 scale-110' : ''
-                            }`}
-                          />
-                        </button>
-                      </div>
-
-                      {/* Title & Category Badge */}
-                      <h3 className="font-bold text-sm text-slate-900 truncate group-hover:text-brand-yellow-600 transition-colors">
-                        {item.title}
-                      </h3>
-                      <div className="mt-1">
-                        <span
-                          className={`inline-block px-2.5 py-0.5 rounded-full text-[11px] font-bold ${
-                            item.category === 'Calculator'
-                              ? 'bg-amber-100/70 text-amber-900'
-                              : item.category === 'Books'
-                              ? 'bg-blue-100/70 text-blue-900'
-                              : item.category === 'Project'
-                              ? 'bg-rose-100/70 text-rose-900'
-                              : 'bg-sky-100/70 text-sky-900'
-                          }`}
-                        >
-                          {item.category}
-                        </span>
-                      </div>
+                      </button>
                     </div>
 
-                    {/* Price & Rating */}
-                    <div className="flex items-center justify-between mt-3 pt-2.5 border-t border-slate-100/90">
-                      <div className="text-sm font-black text-slate-900 font-display">
-                        ₹{item.pricePerDay}{' '}
-                        <span className="text-[11px] font-normal text-slate-500">/ day</span>
-                      </div>
-                      <div className="flex items-center gap-1 text-xs font-bold text-slate-800">
-                        <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
-                        <span>{item.rating}</span>
-                      </div>
-                    </div>
-                  </motion.div>
-                );
-              })}
-            </AnimatePresence>
-          </motion.div>
+                    {/* Title */}
+                    <h3 className="font-bold text-[13.5px] text-[#061C3D] truncate">
+                      {item.title}
+                    </h3>
 
-          {/* Carousel Pagination Dots Indicator (Matching Mockup) */}
+                    {/* Category Badge matching mockup colors */}
+                    <div className="mt-1">
+                      <span
+                        className={`inline-block px-2.5 py-0.5 rounded-full text-[11px] font-bold ${
+                          item.category === 'Calculator'
+                            ? 'bg-[#FDF3E7] text-[#8C5E28]'
+                            : item.category === 'Books'
+                            ? 'bg-[#EAF2FC] text-[#2F65B9]'
+                            : item.category === 'Project'
+                            ? 'bg-[#FDECEB] text-[#B73838]'
+                            : 'bg-[#E8F4FC] text-[#2F65B9]'
+                        }`}
+                      >
+                        {item.category}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Price & Star Rating */}
+                  <div className="flex items-center justify-between mt-3 pt-2 border-t border-slate-100">
+                    <div className="text-[14px] font-black text-[#061C3D]">
+                      ₹{item.pricePerDay}{' '}
+                      <span className="text-[11px] font-normal text-slate-500">/ day</span>
+                    </div>
+                    <div className="flex items-center gap-1 text-xs font-bold text-[#061C3D]">
+                      <Star className="w-3.5 h-3.5 fill-[#F5A623] text-[#F5A623]" />
+                      <span>{item.rating}</span>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
+          {/* Carousel Pagination Dots matching mockup */}
           <div className="flex items-center justify-center gap-1.5 pt-3">
             {[0, 1, 2].map((idx) => (
               <button
                 key={idx}
                 onClick={() => setCarouselIndex(idx)}
-                className={`transition-all duration-300 rounded-full ${
+                className={`transition-all duration-300 rounded-full cursor-pointer ${
                   carouselIndex === idx
-                    ? 'w-5 h-1.5 bg-brand-yellow'
+                    ? 'w-5 h-1.5 bg-[#F5A623]'
                     : 'w-1.5 h-1.5 bg-slate-300 hover:bg-slate-400'
                 }`}
                 aria-label={`Slide ${idx + 1}`}
               />
             ))}
           </div>
-        </motion.div>
+        </div>
 
-        {/* Sustainability Impact Widget (4 cols matching Mockup) */}
-        <motion.div variants={itemVariants} className="lg:col-span-4 space-y-4">
-          <div>
-            <h2 className="text-xl font-extrabold text-slate-900 tracking-tight font-display flex items-center gap-2">
-              <Leaf className="w-5 h-5 text-brand-yellow fill-brand-yellow" />
-              <span>Sustainability Impact</span>
+        {/* Sustainability Impact Card matching Mockup 1:1 */}
+        <div className="lg:col-span-4 bg-white rounded-[20px] border border-slate-100 shadow-soft p-6 space-y-5">
+          {/* Header */}
+          <div className="flex items-center gap-2">
+            <svg
+              className="w-5 h-5 text-[#F5A623]"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.4"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z" />
+              <path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12" />
+            </svg>
+            <h2 className="text-[18px] font-black text-[#061C3D]">
+              Sustainability Impact
             </h2>
-            <div className="h-0.5 w-10 bg-brand-yellow mt-1 rounded-full" />
           </div>
 
-          <Card className="p-6 bg-white rounded-3xl border border-slate-100 shadow-soft hover:shadow-card transition-shadow">
-            {/* Animated Circular Donut Ring Chart (Matching UI Mockup 78%) */}
-            <div className="flex items-center justify-center py-2">
-              <div className="relative w-40 h-40 flex items-center justify-center group">
-                <svg className="w-full h-full -rotate-90" viewBox="0 0 100 100">
-                  {/* Outer Subtle Track */}
-                  <circle
-                    cx="50"
-                    cy="50"
-                    r="40"
-                    fill="transparent"
-                    stroke="#F1F5F9"
-                    strokeWidth="11"
-                  />
-                  {/* Contribution Arc (78%) in Brand Yellow with SVG Spring Animation */}
-                  <motion.circle
-                    cx="50"
-                    cy="50"
-                    r="40"
-                    fill="transparent"
-                    stroke="#FBBF24"
-                    strokeWidth="11"
-                    strokeDasharray="251.2"
-                    initial={{ strokeDashoffset: 251.2 }}
-                    animate={{ strokeDashoffset: 251.2 * (1 - 0.78) }}
-                    transition={{ duration: 1.4, ease: 'easeOut' }}
-                    strokeLinecap="round"
-                  />
-                </svg>
-
-                {/* Center Content */}
-                <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
-                  <span className="text-3xl font-black text-slate-900 tracking-tight font-display">
-                    78%
-                  </span>
-                  <span className="text-[11px] font-semibold text-slate-500">
-                    Your Contribution
-                  </span>
-                </div>
+          {/* Donut Chart + Vertical Metrics Row */}
+          <div className="grid grid-cols-2 gap-4 items-center">
+            {/* Donut Ring Chart */}
+            <div className="relative w-32 h-32 mx-auto flex items-center justify-center">
+              <svg className="w-full h-full -rotate-90" viewBox="0 0 100 100">
+                <circle
+                  cx="50"
+                  cy="50"
+                  r="38"
+                  fill="transparent"
+                  stroke="#EDF2F7"
+                  strokeWidth="9"
+                />
+                <circle
+                  cx="50"
+                  cy="50"
+                  r="38"
+                  fill="transparent"
+                  stroke="#F5A623"
+                  strokeWidth="9"
+                  strokeDasharray="238.76"
+                  strokeDashoffset={238.76 * (1 - 0.78)}
+                  strokeLinecap="round"
+                />
+              </svg>
+              <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
+                <span className="text-2xl font-black text-[#061C3D]">78%</span>
+                <span className="text-[10px] text-slate-500 font-medium">Your Contribution</span>
               </div>
             </div>
 
-            {/* Impact Metric Breakdown List (Matching Icons & Numbers) */}
-            <div className="space-y-4 pt-4 border-t border-slate-100">
-              {/* Stat 1 */}
-              <div className="flex items-center justify-between group">
-                <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center group-hover:scale-110 transition-transform">
-                    <Coins className="w-4 h-4" />
-                  </div>
-                  <span className="text-xs font-semibold text-slate-600">Total Money Saved</span>
+            {/* 3 Metrics Column matching mockup */}
+            <div className="space-y-3.5">
+              {/* Stat 1: Money Saved */}
+              <div className="flex items-center gap-2.5">
+                <div className="w-8 h-8 rounded-lg bg-[#FFF8EC] flex items-center justify-center shrink-0">
+                  <svg className="w-4 h-4 text-[#E68A00]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                    <circle cx="8" cy="8" r="6"/>
+                    <path d="M18.09 10.37A6 6 0 1 1 10.34 18"/>
+                    <path d="m7 6 5 5"/>
+                    <path d="m12 6-2 8"/>
+                  </svg>
                 </div>
-                <span className="font-extrabold text-sm text-slate-900 font-display">₹2,450</span>
+                <div>
+                  <div className="text-sm font-black text-[#061C3D] leading-none">₹2,450</div>
+                  <div className="text-[10px] text-slate-500 mt-0.5">Total Money Saved</div>
+                </div>
               </div>
 
-              {/* Stat 2 */}
-              <div className="flex items-center justify-between group">
-                <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-xl bg-rose-100 text-rose-600 flex items-center justify-center group-hover:scale-110 transition-transform">
-                    <Recycle className="w-4 h-4" />
-                  </div>
-                  <span className="text-xs font-semibold text-slate-600">Resources Reused</span>
+              {/* Stat 2: Resources Reused */}
+              <div className="flex items-center gap-2.5">
+                <div className="w-8 h-8 rounded-lg bg-[#FDF0F1] flex items-center justify-center shrink-0">
+                  <svg className="w-4 h-4 text-[#DC2626]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M7 19H4.815a1.83 1.83 0 0 1-1.57-.881 1.785 1.785 0 0 1-.004-1.784L7.196 9.5"/>
+                    <path d="M11 19h8.2a1.8 1.8 0 0 0 1.565-.914 1.78 1.78 0 0 0 .034-1.783L17.5 11"/>
+                    <path d="m14 14 3-3 3 3"/>
+                    <path d="m3 14 3-3 3 3"/>
+                  </svg>
                 </div>
-                <span className="font-extrabold text-sm text-slate-900 font-display">12</span>
+                <div>
+                  <div className="text-sm font-black text-[#061C3D] leading-none">12</div>
+                  <div className="text-[10px] text-slate-500 mt-0.5">Resources Reused</div>
+                </div>
               </div>
 
-              {/* Stat 3 */}
-              <div className="flex items-center justify-between group">
-                <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-xl bg-emerald-100 text-emerald-600 flex items-center justify-center group-hover:scale-110 transition-transform">
-                    <Leaf className="w-4 h-4" />
-                  </div>
-                  <span className="text-xs font-semibold text-slate-600">Estimated Waste Reduced</span>
+              {/* Stat 3: Waste Avoided */}
+              <div className="flex items-center gap-2.5">
+                <div className="w-8 h-8 rounded-lg bg-[#FFF8EC] flex items-center justify-center shrink-0">
+                  <svg className="w-4 h-4 text-[#E68A00]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z" />
+                    <path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12" />
+                  </svg>
                 </div>
-                <span className="font-extrabold text-sm text-slate-900 font-display">12.4 kg</span>
+                <div>
+                  <div className="text-sm font-black text-[#061C3D] leading-none">12.4 kg</div>
+                  <div className="text-[10px] text-slate-500 mt-0.5">Estimated Waste Reduced</div>
+                </div>
               </div>
             </div>
-          </Card>
-        </motion.div>
+          </div>
+        </div>
       </div>
 
       {/* Interactive Item Detail Modal */}
@@ -546,6 +496,6 @@ export const DashboardPage: React.FC = () => {
           showToast(`Listed "${title}" for ₹${price}/day! 🚀`);
         }}
       />
-    </motion.div>
+    </div>
   );
 };
