@@ -12,16 +12,19 @@ import {
   Star,
   Coins,
   Recycle,
-  Sparkles,
   CheckCircle2,
-  Laptop,
-  Camera,
-  BookOpen,
 } from 'lucide-react';
 import { Card } from '../components/common/Card';
 import { Button } from '../components/common/Button';
 import { ItemDetailModal, ModalResourceItem } from '../components/common/ItemDetailModal';
 import { ListItemModal } from '../components/common/ListItemModal';
+
+// Authentic visual assets extracted directly from the reference mockup
+import heroGearImg from '../assets/hero_gear.png';
+import itemCasioImg from '../assets/item_casio.png';
+import itemDsaImg from '../assets/item_dsa.png';
+import itemArduinoImg from '../assets/item_arduino.png';
+import itemCanonImg from '../assets/item_canon.png';
 
 export const DashboardPage: React.FC = () => {
   const navigate = useNavigate();
@@ -54,7 +57,7 @@ export const DashboardPage: React.FC = () => {
 
   const categories = ['All', 'Calculator', 'Books', 'Project', 'Electronics'];
 
-  // High quality images matching the exact items in RentTogether Campus Rental Dashboard.png
+  // 100% exact match to RentTogether Campus Rental Dashboard.png
   const popularResources: ModalResourceItem[] = [
     {
       id: 'casio-991ex',
@@ -62,8 +65,8 @@ export const DashboardPage: React.FC = () => {
       category: 'Calculator',
       pricePerDay: 30,
       rating: 4.8,
-      reviewsCount: 14,
-      image: 'https://images.unsplash.com/photo-1594980596870-8aa52a78d8cd?auto=format&fit=crop&w=600&q=85',
+      reviewsCount: 18,
+      image: itemCasioImg,
       ownerName: 'Sai R.',
       deposit: 200,
       pickupLocation: 'Central Library Ground Floor',
@@ -74,8 +77,8 @@ export const DashboardPage: React.FC = () => {
       category: 'Books',
       pricePerDay: 20,
       rating: 4.7,
-      reviewsCount: 9,
-      image: 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=600&q=85',
+      reviewsCount: 12,
+      image: itemDsaImg,
       ownerName: 'Priya K.',
       deposit: 150,
       pickupLocation: 'Main Canteen Tables',
@@ -86,8 +89,8 @@ export const DashboardPage: React.FC = () => {
       category: 'Project',
       pricePerDay: 80,
       rating: 4.9,
-      reviewsCount: 22,
-      image: 'https://images.unsplash.com/photo-1553406830-ef2513450d76?auto=format&fit=crop&w=600&q=85',
+      reviewsCount: 26,
+      image: itemArduinoImg,
       ownerName: 'Varun T.',
       deposit: 400,
       pickupLocation: 'CSE Block 2nd Floor',
@@ -98,8 +101,8 @@ export const DashboardPage: React.FC = () => {
       category: 'Electronics',
       pricePerDay: 250,
       rating: 4.8,
-      reviewsCount: 31,
-      image: 'https://images.unsplash.com/photo-1516035069371-29a1b244cc32?auto=format&fit=crop&w=600&q=85',
+      reviewsCount: 35,
+      image: itemCanonImg,
       ownerName: 'Aditya M.',
       deposit: 1500,
       pickupLocation: 'Campus Security Gate 1',
@@ -156,7 +159,7 @@ export const DashboardPage: React.FC = () => {
         )}
       </AnimatePresence>
 
-      {/* 1. Hero Welcome Banner (with Ambient Warm Glow & 3D Cards) */}
+      {/* 1. Hero Welcome Banner (Exact match to Mockup: Typography + 3D Render Image) */}
       <motion.div
         variants={itemVariants}
         className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-amber-50/90 via-amber-100/40 to-amber-200/50 p-8 sm:p-12 border border-amber-200/50 shadow-soft"
@@ -165,11 +168,10 @@ export const DashboardPage: React.FC = () => {
         <div className="absolute top-0 right-0 w-[55%] h-full bg-gradient-to-l from-amber-200/40 via-amber-100/30 to-transparent pointer-events-none rounded-r-3xl" />
         <div className="absolute -top-24 -right-24 w-96 h-96 rounded-full bg-brand-yellow/20 blur-3xl pointer-events-none" />
 
-        <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+        <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
           {/* Left Text Column */}
           <div className="lg:col-span-7 space-y-4">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-200/60 text-brand-navy-950 text-xs font-extrabold tracking-widest uppercase">
-              <Sparkles className="w-3.5 h-3.5 text-brand-yellow-600" />
+            <div className="text-xs font-extrabold tracking-widest uppercase text-slate-500 font-display">
               CAMPUS RESOURCE SHARING
             </div>
 
@@ -207,64 +209,26 @@ export const DashboardPage: React.FC = () => {
             </div>
           </div>
 
-          {/* Right Visual 3D Showcase (MacBook, DSA Book Stack, DSLR Camera) */}
-          <div className="hidden lg:flex lg:col-span-5 justify-end relative">
-            <div className="relative w-full max-w-md h-52 flex items-center justify-end select-none">
-              {/* Book Stack Pill */}
-              <motion.div
-                initial={{ rotate: -8, y: 10 }}
-                animate={{ rotate: -5, y: [0, -4, 0] }}
-                transition={{ repeat: Infinity, duration: 4, ease: 'easeInOut' }}
-                className="absolute left-4 top-8 bg-blue-600 text-white px-4 py-3 rounded-2xl shadow-xl z-10 flex items-center gap-2.5 cursor-pointer hover:rotate-0 transition-transform"
-              >
-                <BookOpen className="w-5 h-5 text-blue-200" />
-                <div>
-                  <div className="text-xs font-bold leading-tight">Data Structures</div>
-                  <div className="text-[10px] text-blue-200">Algorithms & OS</div>
-                </div>
-              </motion.div>
-
-              {/* MacBook Pro Glass Container */}
-              <motion.div
-                whileHover={{ scale: 1.04 }}
-                className="w-64 bg-slate-900 text-white rounded-2xl p-4 shadow-2xl border border-slate-800 z-20 cursor-pointer"
-              >
-                <div className="flex items-center justify-between pb-3 border-b border-slate-800">
-                  <div className="flex items-center gap-2">
-                    <Laptop className="w-4 h-4 text-brand-yellow" />
-                    <span className="text-xs font-bold text-slate-200">MacBook Pro 14"</span>
-                  </div>
-                  <span className="text-[10px] bg-brand-yellow text-slate-950 font-bold px-1.5 py-0.5 rounded">
-                    Available
-                  </span>
-                </div>
-                <div className="pt-2 text-[11px] text-slate-400 flex justify-between">
-                  <span>Rent for capstone</span>
-                  <span className="font-bold text-white">₹350/day</span>
-                </div>
-              </motion.div>
-
-              {/* Canon DSLR Camera Pill */}
-              <motion.div
-                initial={{ y: 0 }}
-                animate={{ y: [-3, 3, -3] }}
-                transition={{ repeat: Infinity, duration: 3.5, ease: 'easeInOut' }}
-                className="absolute right-0 -bottom-2 bg-white text-slate-900 px-3.5 py-2.5 rounded-2xl shadow-card border border-slate-100 z-30 flex items-center gap-2.5 hover:scale-105 transition-transform"
-              >
-                <div className="w-8 h-8 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center">
-                  <Camera className="w-4 h-4" />
-                </div>
-                <div>
-                  <div className="text-xs font-bold leading-tight">Canon DSLR</div>
-                  <div className="text-[10px] text-emerald-600 font-semibold">Campus Handover</div>
-                </div>
-              </motion.div>
-            </div>
+          {/* Right Visual: Exact 3D Render of Books, MacBook, and Canon Camera */}
+          <div className="hidden lg:flex lg:col-span-5 justify-end items-center relative select-none">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.96 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.5 }}
+              whileHover={{ scale: 1.02 }}
+              className="relative max-w-md cursor-pointer"
+            >
+              <img
+                src={heroGearImg}
+                alt="Campus Resources: Books, Laptop, Camera"
+                className="w-full h-auto drop-shadow-xl object-contain"
+              />
+            </motion.div>
           </div>
         </div>
       </motion.div>
 
-      {/* 2. Key Metrics Row (4 Floating KPI Cards) */}
+      {/* 2. Key Metrics Row (4 Floating KPI Cards matching Mockup) */}
       <motion.div variants={itemVariants} className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
         {/* Active Rentals */}
         <motion.div whileHover={{ y: -4 }} transition={{ type: 'spring', stiffness: 400, damping: 25 }}>
@@ -348,7 +312,7 @@ export const DashboardPage: React.FC = () => {
             </div>
 
             <div className="flex items-center gap-3">
-              {/* Category Filter Pills with Layout Animation */}
+              {/* Category Filter Pills */}
               <div className="hidden sm:flex items-center gap-1.5 bg-slate-100/80 p-1 rounded-full">
                 {categories.map((cat) => (
                   <button
@@ -375,7 +339,7 @@ export const DashboardPage: React.FC = () => {
             </div>
           </div>
 
-          {/* Cards Grid matching 4 items in mockup */}
+          {/* Cards Grid matching 4 items in mockup with authentic images */}
           <motion.div layout className="grid grid-cols-2 sm:grid-cols-4 gap-4">
             <AnimatePresence>
               {filteredResources.map((item) => {
@@ -390,15 +354,15 @@ export const DashboardPage: React.FC = () => {
                     whileHover={{ y: -6 }}
                     transition={{ type: 'spring', damping: 25, stiffness: 350 }}
                     onClick={() => setActiveDetailItem(item)}
-                    className="bg-white rounded-2xl border border-slate-100 shadow-soft hover:shadow-card-hover transition-all p-3.5 flex flex-col justify-between cursor-pointer group relative"
+                    className="bg-white rounded-2xl border border-slate-100 shadow-soft hover:shadow-card-hover transition-all p-3 flex flex-col justify-between cursor-pointer group relative"
                   >
                     <div>
                       {/* Item Image with Wishlist Button */}
-                      <div className="relative aspect-square w-full rounded-xl overflow-hidden bg-slate-100 mb-3">
+                      <div className="relative aspect-[4/3] w-full rounded-xl overflow-hidden bg-slate-50 mb-3">
                         <img
                           src={item.image}
                           alt={item.title}
-                          className="w-full h-full object-cover group-hover:scale-108 transition-transform duration-500 ease-out"
+                          className="w-full h-full object-contain p-1 group-hover:scale-108 transition-transform duration-500 ease-out"
                           loading="lazy"
                         />
                         {/* Interactive Heart Button */}
@@ -424,7 +388,17 @@ export const DashboardPage: React.FC = () => {
                         {item.title}
                       </h3>
                       <div className="mt-1">
-                        <span className="inline-block px-2 py-0.5 rounded-full text-[10px] font-bold border bg-amber-50 text-amber-800 border-amber-200">
+                        <span
+                          className={`inline-block px-2.5 py-0.5 rounded-full text-[11px] font-bold ${
+                            item.category === 'Calculator'
+                              ? 'bg-amber-100/70 text-amber-900'
+                              : item.category === 'Books'
+                              ? 'bg-blue-100/70 text-blue-900'
+                              : item.category === 'Project'
+                              ? 'bg-rose-100/70 text-rose-900'
+                              : 'bg-sky-100/70 text-sky-900'
+                          }`}
+                        >
                           {item.category}
                         </span>
                       </div>
@@ -436,8 +410,8 @@ export const DashboardPage: React.FC = () => {
                         ₹{item.pricePerDay}{' '}
                         <span className="text-[11px] font-normal text-slate-500">/ day</span>
                       </div>
-                      <div className="flex items-center gap-1 text-xs font-bold text-amber-600 bg-amber-50/80 px-1.5 py-0.5 rounded-md">
-                        <Star className="w-3.5 h-3.5 fill-amber-500 text-amber-500" />
+                      <div className="flex items-center gap-1 text-xs font-bold text-slate-800">
+                        <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
                         <span>{item.rating}</span>
                       </div>
                     </div>
@@ -447,7 +421,7 @@ export const DashboardPage: React.FC = () => {
             </AnimatePresence>
           </motion.div>
 
-          {/* Carousel Pagination Dots Indicator */}
+          {/* Carousel Pagination Dots Indicator (Matching Mockup) */}
           <div className="flex items-center justify-center gap-1.5 pt-3">
             {[0, 1, 2].map((idx) => (
               <button
@@ -464,7 +438,7 @@ export const DashboardPage: React.FC = () => {
           </div>
         </motion.div>
 
-        {/* Sustainability Impact Widget (4 cols) */}
+        {/* Sustainability Impact Widget (4 cols matching Mockup) */}
         <motion.div variants={itemVariants} className="lg:col-span-4 space-y-4">
           <div>
             <h2 className="text-xl font-extrabold text-slate-900 tracking-tight font-display flex items-center gap-2">
@@ -499,7 +473,7 @@ export const DashboardPage: React.FC = () => {
                     strokeDasharray="251.2"
                     initial={{ strokeDashoffset: 251.2 }}
                     animate={{ strokeDashoffset: 251.2 * (1 - 0.78) }}
-                    transition={{ duration: 1.4, ease: [0.22, 1, 0.36, 1] }}
+                    transition={{ duration: 1.4, ease: 'easeOut' }}
                     strokeLinecap="round"
                   />
                 </svg>
