@@ -5,6 +5,7 @@ import { AuthProvider, useAuth } from './context/AuthContext';
 import { AppLayout } from './components/layout/AppLayout';
 import { DashboardPage } from './pages/DashboardPage';
 import { AnalyticsPage } from './pages/AnalyticsPage';
+import { ProfilePage } from './pages/ProfilePage';
 import { PlaceholderPage } from './pages/PlaceholderPage';
 import { LoginPage } from './pages/auth/LoginPage';
 import { RegisterPage } from './pages/auth/RegisterPage';
@@ -181,6 +182,8 @@ export const App: React.FC = () => {
               <Route path="analytics" element={<AnalyticsPage />} />
               <Route path="ai-insights" element={<AnalyticsPage />} />
               <Route path="sustainability" element={<AnalyticsPage />} />
+              <Route path="profile" element={<ProfilePage />} />
+              <Route path="profile/:id" element={<ProfilePage />} />
               <Route
                 path="settings"
                 element={

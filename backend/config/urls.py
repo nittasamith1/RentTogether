@@ -18,11 +18,6 @@ from apps.accounts.views import (
     PasswordResetRequestView,
     PasswordResetConfirmView,
 )
-from apps.profiles.views import (
-    StudentProfileMeView,
-    VerificationStatusView,
-    VerificationResubmitView,
-)
 from apps.administration.views import (
     AdminVerificationListView,
     AdminVerificationDetailView,
@@ -41,12 +36,6 @@ auth_patterns = [
     path('password-reset/confirm/', PasswordResetConfirmView.as_view(), name='password-reset-confirm'),
 ]
 
-profile_patterns = [
-    path('me/', StudentProfileMeView.as_view(), name='profile-me'),
-    path('verification-status/', VerificationStatusView.as_view(), name='verification-status'),
-    path('verification/resubmit/', VerificationResubmitView.as_view(), name='verification-resubmit'),
-]
-
 admin_verification_patterns = [
     path('verifications/', AdminVerificationListView.as_view(), name='admin-verifications-list'),
     path('verifications/<uuid:id>/', AdminVerificationDetailView.as_view(), name='admin-verification-detail'),
@@ -61,9 +50,9 @@ urlpatterns = [
     # Health Check Endpoint
     path('api/v1/health/', HealthCheckView.as_view(), name='health-check'),
 
-    # Phase 02 API Endpoints
+    # Phase 02 & Phase 03 API Endpoints
     path('api/v1/auth/', include(auth_patterns)),
-    path('api/v1/profiles/', include(profile_patterns)),
+    path('api/v1/profiles/', include('apps.profiles.urls')),
     path('api/v1/colleges/active/', ActiveCollegeView.as_view(), name='college-active'),
     path('api/v1/admin/', include(admin_verification_patterns)),
 ]

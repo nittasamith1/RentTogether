@@ -93,6 +93,14 @@ export const Navbar: React.FC = () => {
                 </div>
               </div>
 
+              <Link
+                to="/profile"
+                onClick={() => setShowProfileMenu(false)}
+                className="block px-2.5 py-1.5 rounded-lg text-xs font-semibold text-slate-700 hover:bg-slate-50 transition-colors"
+              >
+                👤 Student Profile & Scores
+              </Link>
+
               {user?.is_staff && (
                 <Link
                   to="/admin/verifications"

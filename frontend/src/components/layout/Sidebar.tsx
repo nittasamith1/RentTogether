@@ -9,6 +9,7 @@ import {
   CreditCard,
   BarChart2,
   ShieldCheck,
+  User,
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { Logo } from '../common/Logo';
@@ -28,6 +29,7 @@ const navItems: NavItem[] = [
   { name: 'My Bookings', path: '/bookings', icon: Calendar },
   { name: 'Payments', path: '/payments', icon: CreditCard },
   { name: 'Insights', path: '/insights', icon: BarChart2 },
+  { name: 'Profile', path: '/profile', icon: User },
 ];
 
 export const Sidebar: React.FC = () => {
