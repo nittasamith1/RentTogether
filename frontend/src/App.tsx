@@ -4,6 +4,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { AppLayout } from './components/layout/AppLayout';
 import { DashboardPage } from './pages/DashboardPage';
+import { AnalyticsPage } from './pages/AnalyticsPage';
 import { PlaceholderPage } from './pages/PlaceholderPage';
 import { LoginPage } from './pages/auth/LoginPage';
 import { RegisterPage } from './pages/auth/RegisterPage';
@@ -176,36 +177,10 @@ export const App: React.FC = () => {
                   />
                 }
               />
-              <Route
-                path="insights"
-                element={
-                  <PlaceholderPage
-                    title="AI Insights & Demand Forecasting"
-                    description="AI-driven fair pricing suggestions and upcoming campus exam/project demand forecasts."
-                    phase="Phase 10 & 11"
-                  />
-                }
-              />
-              <Route
-                path="ai-insights"
-                element={
-                  <PlaceholderPage
-                    title="AI Insights & Demand Forecasting"
-                    description="AI-driven fair pricing suggestions and upcoming campus exam/project demand forecasts."
-                    phase="Phase 10 & 11"
-                  />
-                }
-              />
-              <Route
-                path="sustainability"
-                element={
-                  <PlaceholderPage
-                    title="Campus Sustainability Analytics"
-                    description="View in-depth campus environmental metrics: e-waste avoided and student money saved."
-                    phase="Phase 14"
-                  />
-                }
-              />
+              <Route path="insights" element={<AnalyticsPage />} />
+              <Route path="analytics" element={<AnalyticsPage />} />
+              <Route path="ai-insights" element={<AnalyticsPage />} />
+              <Route path="sustainability" element={<AnalyticsPage />} />
               <Route
                 path="settings"
                 element={
