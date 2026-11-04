@@ -94,3 +94,4 @@ def verify_email_otp(user: User, raw_otp: str) -> tuple[bool, str]:
         user.save(update_fields=['email_verified'])
 
     return success, message
+

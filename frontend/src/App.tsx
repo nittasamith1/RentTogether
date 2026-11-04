@@ -117,6 +117,16 @@ export const App: React.FC = () => {
             >
               <Route index element={<DashboardPage />} />
               <Route
+                path="marketplace"
+                element={
+                  <PlaceholderPage
+                    title="Resource Marketplace"
+                    description="Browse, filter, and discover academic resources across campus."
+                    phase="Phase 04"
+                  />
+                }
+              />
+              <Route
                 path="explore"
                 element={
                   <PlaceholderPage
@@ -153,6 +163,26 @@ export const App: React.FC = () => {
                     title="Rental Bookings & Calendar"
                     description="Manage incoming and outgoing booking requests with conflict-free scheduling."
                     phase="Phase 06 & 07"
+                  />
+                }
+              />
+              <Route
+                path="payments"
+                element={
+                  <PlaceholderPage
+                    title="Campus Payments & Escrow"
+                    description="Track secure rental deposits, UPI disbursements, and refund transactions."
+                    phase="Phase 08"
+                  />
+                }
+              />
+              <Route
+                path="insights"
+                element={
+                  <PlaceholderPage
+                    title="AI Insights & Demand Forecasting"
+                    description="AI-driven fair pricing suggestions and upcoming campus exam/project demand forecasts."
+                    phase="Phase 10 & 11"
                   />
                 }
               />

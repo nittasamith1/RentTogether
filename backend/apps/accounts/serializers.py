@@ -320,3 +320,4 @@ class PasswordResetConfirmSerializer(serializers.Serializer):
         user.save()
         attrs['user'] = user
         return attrs
+

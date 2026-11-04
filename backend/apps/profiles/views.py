@@ -101,3 +101,4 @@ class VerificationResubmitView(views.APIView):
             },
             status=status.HTTP_200_OK
         )
+

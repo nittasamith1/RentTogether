@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { Search, Bell, ChevronDown, ShieldCheck, LogOut, UserCheck } from 'lucide-react';
+import { Search, Bell, ShieldCheck, LogOut, ChevronDown } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 
 export const Navbar: React.FC = () => {
@@ -15,36 +15,34 @@ export const Navbar: React.FC = () => {
   };
 
   const displayName = user?.name || user?.first_name || 'Sai Reddy';
-  const roleLabel = user?.is_staff ? 'Campus Admin' : 'Verified Student';
-  const initial = displayName.charAt(0).toUpperCase();
+  const initial = displayName.charAt(0).toUpperCase() || 'S';
 
   return (
     <header className="h-20 px-8 flex items-center justify-between gap-6 shrink-0 relative z-30 bg-transparent">
-      {/* Global Campus Search Bar matching mockup */}
-      <div className="flex-1 max-w-xl">
+      {/* Global Campus Search Bar matching reference */}
+      <div className="flex-1 max-w-lg">
         <div className="relative">
-          <div className="absolute inset-y-0 left-0 pl-4.5 flex items-center pointer-events-none text-slate-400">
+          <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400">
             <Search className="w-4 h-4 stroke-[2]" />
           </div>
           <input
             type="text"
-            placeholder="Search for books, calculators, laptops..."
-            className="w-full pl-11 pr-5 py-2.5 bg-white border border-slate-200/70 rounded-full text-sm text-slate-800 placeholder-slate-400 shadow-xs focus:outline-none focus:ring-2 focus:ring-brand-yellow focus:border-brand-yellow transition-all"
+            placeholder="Search calculators, books, lab gear"
+            className="w-full pl-11 pr-5 py-2.5 bg-white border border-slate-200/80 rounded-full text-xs text-slate-800 placeholder-slate-400 shadow-xs focus:outline-none focus:ring-2 focus:ring-[#5B4DFF]/30 focus:border-[#5B4DFF] transition-all"
           />
         </div>
       </div>
 
-      {/* Right Controls: Bell + Divider + User Profile Pill */}
-      <div className="flex items-center gap-5">
+      {/* Right Controls: Bell + Verified Student Profile Pill */}
+      <div className="flex items-center gap-3.5">
         {/* Notifications Bell */}
         <div className="relative">
           <button
             onClick={() => setShowNotifications(!showNotifications)}
-            className="relative p-2 text-slate-800 hover:text-black transition-colors"
+            className="w-10 h-10 rounded-xl bg-white border border-slate-200/80 hover:bg-slate-50 flex items-center justify-center text-slate-600 transition-colors shadow-xs"
             aria-label="Notifications"
           >
-            <Bell className="w-5 h-5 stroke-[1.8]" />
-            <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-[#E53E3E] rounded-full ring-2 ring-[#FDFBF9]"></span>
+            <Bell className="w-4 h-4 stroke-[2]" />
           </button>
 
           {/* Quick Notification Dropdown */}
@@ -52,38 +50,35 @@ export const Navbar: React.FC = () => {
             <div className="absolute right-0 mt-3 w-72 bg-white rounded-2xl shadow-card border border-slate-100 p-4 space-y-2.5 z-50 animate-in fade-in slide-in-from-top-2">
               <div className="flex items-center justify-between pb-1.5 border-b border-slate-100">
                 <span className="text-xs font-bold text-slate-900">Campus Alerts</span>
-                <span className="text-[11px] font-semibold text-brand-yellow-600">2 Unread</span>
+                <span className="text-[11px] font-semibold text-indigo-600">2 Unread</span>
               </div>
-              <div className="p-2 rounded-xl bg-amber-50/80 text-xs text-amber-900">
-                <div className="font-bold">Identity Verified!</div>
-                <div className="text-[11px] text-slate-600">Your student membership is active for VNRVJIET.</div>
+              <div className="p-2.5 rounded-xl bg-indigo-50/70 text-xs text-indigo-900 space-y-0.5">
+                <div className="font-bold">Booking Request Confirmed!</div>
+                <div className="text-[11px] text-slate-600">Casio fx-991EX rental is ready for pickup today.</div>
               </div>
             </div>
           )}
         </div>
 
-        {/* Vertical Divider Line matching mockup */}
-        <div className="h-6 w-px bg-slate-200" />
-
-        {/* User Profile Pill matching mockup */}
+        {/* User Profile Pill matching screenshot */}
         <div className="relative">
           <button
             onClick={() => setShowProfileMenu(!showProfileMenu)}
-            className="flex items-center gap-3 cursor-pointer group"
+            className="bg-white border border-slate-200/80 rounded-full py-1.5 pl-2 pr-3.5 flex items-center gap-2.5 shadow-xs hover:bg-slate-50 transition-all cursor-pointer group"
           >
-            <div className="w-9 h-9 rounded-full bg-[#061C3D] text-white flex items-center justify-center font-bold text-sm shadow-xs">
+            {/* Initial Circle in warm amber */}
+            <div className="w-8 h-8 rounded-full bg-[#FDBC1F] text-[#061C3D] font-black text-sm flex items-center justify-center shadow-xs shrink-0">
               {initial}
             </div>
             <div className="text-left hidden sm:block">
-              <div className="text-xs font-bold text-[#061C3D] leading-tight">
+              <div className="text-xs font-bold text-slate-900 leading-tight">
                 {displayName}
               </div>
-              <div className="text-[11px] text-emerald-600 font-semibold leading-tight flex items-center gap-1">
-                <UserCheck className="w-3 h-3 text-emerald-500" />
-                <span>{roleLabel}</span>
+              <div className="text-[10px] font-semibold text-emerald-600 leading-tight">
+                Verified student
               </div>
             </div>
-            <ChevronDown className="w-3.5 h-3.5 text-slate-500 group-hover:text-slate-800 transition-colors" />
+            <ChevronDown className="w-3 h-3 text-slate-400 group-hover:text-slate-600 transition-colors ml-0.5" />
           </button>
 
           {/* Profile Dropdown */}
@@ -94,7 +89,7 @@ export const Navbar: React.FC = () => {
                 <div className="text-[11px] text-slate-500 truncate">{user?.email || 'sai.reddy@vnrvjiet.in'}</div>
                 <div className="mt-1.5 inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-emerald-50 text-[10px] font-bold text-emerald-700 border border-emerald-200/60">
                   <ShieldCheck className="w-3 h-3 text-emerald-600" />
-                  <span>VNRVJIET Verified</span>
+                  <span>VNRVJIET Campus Verified</span>
                 </div>
               </div>
 

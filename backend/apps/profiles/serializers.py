@@ -156,3 +156,4 @@ class VerificationRejectSerializer(serializers.Serializer):
     Administrator payload to reject a verification submission with reason.
     """
     reason = serializers.CharField(required=True, min_length=5, max_length=500)
+

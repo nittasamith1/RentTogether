@@ -1,561 +1,659 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { motion, AnimatePresence, Variants } from 'framer-motion';
+import { useNavigate, Link } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
   ArrowRight,
-  Heart,
-  Star,
+  Sparkles,
   CheckCircle2,
+  Layers,
+  TrendingUp,
 } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
 import { ItemDetailModal, ModalResourceItem } from '../components/common/ItemDetailModal';
 import { ListItemModal } from '../components/common/ListItemModal';
 
-// Authentic visual assets extracted directly from the reference mockup
-import heroWithWaveImg from '../assets/hero_with_wave.png';
-import itemCasioImg from '../assets/item_casio.png';
-import itemDsaImg from '../assets/item_dsa.png';
-import itemArduinoImg from '../assets/item_arduino.png';
-import itemCanonImg from '../assets/item_canon.png';
-
 export const DashboardPage: React.FC = () => {
   const navigate = useNavigate();
-  const [wishlist, setWishlist] = useState<Set<string>>(new Set());
-  const [toastMessage, setToastMessage] = useState<string | null>(null);
-  const [carouselIndex, setCarouselIndex] = useState<number>(0);
+  const { user } = useAuth();
+  const displayName = user?.first_name || user?.name?.split(' ')[0] || 'Sai';
+  const collegeName = user?.college_code || 'VNRVJIET';
 
   // Modal States
   const [activeDetailItem, setActiveDetailItem] = useState<ModalResourceItem | null>(null);
   const [isListModalOpen, setIsListModalOpen] = useState<boolean>(false);
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
+
+  // Active chart hover index for W1 to W6
+  const [hoveredWeek, setHoveredWeek] = useState<number | null>(5);
 
   const showToast = (msg: string) => {
     setToastMessage(msg);
-    setTimeout(() => setToastMessage(null), 3000);
+    setTimeout(() => setToastMessage(null), 3500);
   };
 
-  const toggleWishlist = (id: string, title: string, e: React.MouseEvent) => {
-    e.stopPropagation();
-    const next = new Set(wishlist);
-    if (next.has(id)) {
-      next.delete(id);
-      showToast(`Removed "${title}" from Wishlist`);
-    } else {
-      next.add(id);
-      showToast(`Saved "${title}" to your Wishlist! ❤️`);
-    }
-    setWishlist(next);
-  };
+  // Weekly data for Earnings vs Spending
+  const chartData = [
+    { week: 'W1', earnings: 220, spending: 80 },
+    { week: 'W2', earnings: 490, spending: 160 },
+    { week: 'W3', earnings: 810, spending: 290 },
+    { week: 'W4', earnings: 1180, spending: 390 },
+    { week: 'W5', earnings: 1540, spending: 510 },
+    { week: 'W6', earnings: 1840, spending: 620 },
+  ];
 
-  // Exact 4 Popular Resources matching RentTogether Campus Rental Dashboard.png
-  const popularResources: ModalResourceItem[] = [
+  // 4 Popular Campus Items matching user's screenshot
+  const popularCampusItems: (ModalResourceItem & { tag: string; tagColor: string; bgTint: string })[] = [
     {
-      id: 'casio-991ex',
-      title: 'Casio fx-991EX',
-      category: 'Calculator',
-      pricePerDay: 30,
-      rating: 4.8,
-      reviewsCount: 18,
-      image: itemCasioImg,
+      id: 'scientific-calculator',
+      title: 'Scientific calculator',
+      category: 'Electronics',
+      tag: 'Electronics',
+      tagColor: 'text-indigo-600 bg-indigo-50 border-indigo-100',
+      bgTint: 'bg-indigo-50/70 border-indigo-100/80',
+      pricePerDay: 40,
+      rating: 4.9,
+      reviewsCount: 32,
       ownerName: 'Sai R.',
       deposit: 200,
-      pickupLocation: 'Central Library Ground Floor',
+      pickupLocation: 'Library Ground Floor Counter',
+      image: '',
     },
     {
-      id: 'dsa-book-set',
-      title: 'DSA Book Set',
+      id: 'engineering-textbook',
+      title: 'Engineering textbook',
       category: 'Books',
-      pricePerDay: 20,
-      rating: 4.7,
-      reviewsCount: 12,
-      image: itemDsaImg,
+      tag: 'Books',
+      tagColor: 'text-emerald-700 bg-emerald-50 border-emerald-100',
+      bgTint: 'bg-emerald-50/70 border-emerald-100/80',
+      pricePerDay: 25,
+      rating: 4.8,
+      reviewsCount: 19,
       ownerName: 'Priya K.',
       deposit: 150,
-      pickupLocation: 'Main Canteen Tables',
+      pickupLocation: 'Main Canteen Reception',
+      image: '',
     },
     {
-      id: 'arduino-uno-kit',
-      title: 'Arduino Uno Kit',
-      category: 'Project',
-      pricePerDay: 80,
+      id: 'dslr-camera',
+      title: 'DSLR camera',
+      category: 'Media',
+      tag: 'Media',
+      tagColor: 'text-amber-700 bg-amber-50 border-amber-100',
+      bgTint: 'bg-amber-50/70 border-amber-100/80',
+      pricePerDay: 150,
       rating: 4.9,
-      reviewsCount: 26,
-      image: itemArduinoImg,
+      reviewsCount: 41,
       ownerName: 'Varun T.',
-      deposit: 400,
-      pickupLocation: 'CSE Block 2nd Floor',
+      deposit: 1200,
+      pickupLocation: 'Campus Gate 1 Security Desk',
+      image: '',
     },
     {
-      id: 'canon-dslr',
-      title: 'Canon DSLR',
-      category: 'Electronics',
-      pricePerDay: 250,
-      rating: 4.8,
-      reviewsCount: 35,
-      image: itemCanonImg,
-      ownerName: 'Aditya M.',
-      deposit: 1500,
-      pickupLocation: 'Campus Security Gate 1',
+      id: 'lab-coat',
+      title: 'Lab coat',
+      category: 'Lab gear',
+      tag: 'Lab gear',
+      tagColor: 'text-rose-700 bg-rose-50 border-rose-100',
+      bgTint: 'bg-rose-50/70 border-rose-100/80',
+      pricePerDay: 20,
+      rating: 4.7,
+      reviewsCount: 15,
+      ownerName: 'Neha M.',
+      deposit: 100,
+      pickupLocation: 'Chemistry Lab B-Block 102',
+      image: '',
     },
   ];
 
-  // Premium, subtle cubic-bezier easing [0.16, 1, 0.3, 1] (Apple/Linear standard)
-  const containerVariants: Variants = {
-    hidden: { opacity: 0 },
-    show: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.07,
-        delayChildren: 0.05,
-      },
-    },
-  };
-
-  const fadeUpVariants: Variants = {
-    hidden: { opacity: 0, y: 12 },
-    show: {
-      opacity: 1,
-      y: 0,
-      transition: {
-        duration: 0.5,
-        ease: 'easeOut',
-      },
-    },
-  };
-
   return (
-    <motion.div
-      variants={containerVariants}
-      initial="hidden"
-      animate="show"
-      className="space-y-6 max-w-7xl mx-auto relative pb-6 text-[#061C3D]"
-    >
-      {/* Toast Notification with Elegant Spring Physics */}
+    <div className="space-y-6 max-w-7xl mx-auto pb-8 select-none">
+      {/* Toast Notification */}
       <AnimatePresence>
         {toastMessage && (
           <motion.div
-            initial={{ opacity: 0, y: 15, scale: 0.96 }}
+            initial={{ opacity: 0, y: 16, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 10, scale: 0.96 }}
-            transition={{ duration: 0.25, ease: 'easeOut' }}
-            className="fixed bottom-6 right-6 z-50 bg-[#061C3D] text-white px-5 py-3 rounded-2xl shadow-xl flex items-center gap-3 border border-slate-700/60 backdrop-blur-md"
+            exit={{ opacity: 0, y: 10, scale: 0.95 }}
+            className="fixed bottom-6 right-6 z-50 bg-[#1E1B4B] text-white px-5 py-3 rounded-2xl shadow-xl flex items-center gap-3 border border-indigo-400/30"
           >
-            <CheckCircle2 className="w-4 h-4 text-[#F5A623] shrink-0" />
+            <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
             <span className="text-xs font-semibold">{toastMessage}</span>
           </motion.div>
         )}
       </AnimatePresence>
 
-      {/* 1. Hero Welcome Section (Seamless, Open Canvas matching Mockup 1:1) */}
-      <motion.div variants={fadeUpVariants} className="relative pt-2 pb-2 grid grid-cols-1 lg:grid-cols-12 items-center">
-        {/* Left Text Column */}
-        <div className="lg:col-span-6 space-y-3.5 pr-2 z-10">
-          <div className="text-[11px] font-black tracking-[0.24em] text-[#061C3D] uppercase">
-            CAMPUS RESOURCE SHARING
+      {/* 1. Hero Welcome Banner matching screenshot */}
+      <div className="relative rounded-3xl overflow-hidden bg-gradient-to-r from-[#5046E5] via-[#5B4DFF] to-[#7234E8] text-white p-7 sm:p-9 shadow-sm">
+        {/* Abstract 3D Glowing Overlapping Spheres on the Right */}
+        <div className="absolute -right-10 -top-12 w-80 h-80 pointer-events-none select-none hidden md:block">
+          <svg viewBox="0 0 300 300" className="w-full h-full">
+            <defs>
+              <radialGradient id="cyanOrb" cx="35%" cy="35%" r="65%">
+                <stop offset="0%" stopColor="#22D3EE" />
+                <stop offset="60%" stopColor="#06B6D4" />
+                <stop offset="100%" stopColor="#0891B2" />
+              </radialGradient>
+              <radialGradient id="orangeOrb" cx="30%" cy="30%" r="70%">
+                <stop offset="0%" stopColor="#FDBA74" />
+                <stop offset="55%" stopColor="#FB923C" />
+                <stop offset="100%" stopColor="#EA580C" />
+              </radialGradient>
+              <radialGradient id="yellowOrb" cx="35%" cy="35%" r="65%">
+                <stop offset="0%" stopColor="#FEF08A" />
+                <stop offset="60%" stopColor="#FACC15" />
+                <stop offset="100%" stopColor="#EAB308" />
+              </radialGradient>
+              <radialGradient id="glassOrb" cx="30%" cy="30%" r="70%">
+                <stop offset="0%" stopColor="rgba(255, 255, 255, 0.45)" />
+                <stop offset="70%" stopColor="rgba(255, 255, 255, 0.1)" />
+                <stop offset="100%" stopColor="rgba(255, 255, 255, 0.02)" />
+              </radialGradient>
+            </defs>
+
+            {/* Glowing orbs positioned like the reference */}
+            <circle cx="120" cy="50" r="32" fill="url(#cyanOrb)" className="opacity-95" />
+            <circle cx="210" cy="140" r="64" fill="url(#orangeOrb)" className="opacity-95" />
+            <circle cx="270" cy="150" r="38" fill="url(#yellowOrb)" className="opacity-95" />
+            <circle cx="160" cy="160" r="50" fill="url(#glassOrb)" stroke="rgba(255, 255, 255, 0.25)" strokeWidth="1.5" />
+          </svg>
+        </div>
+
+        {/* Content */}
+        <div className="relative z-10 max-w-xl space-y-4">
+          <div className="inline-block px-3 py-1 rounded-full bg-white/20 text-white/95 text-xs font-semibold backdrop-blur-xs">
+            {collegeName} campus
           </div>
 
-          <h1 className="text-4xl sm:text-[46px] font-black text-[#061C3D] tracking-tight leading-[1.12]">
-            Welcome back, Sai!
+          <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight leading-snug">
+            Hello, {displayName}! Share what you have, borrow what you need.
           </h1>
 
-          <p className="text-slate-600 text-sm sm:text-[15px] leading-relaxed">
-            Rent, lend and share resources within your campus.
-          </p>
-
-          <div className="flex items-center gap-3.5 pt-2">
-            <motion.button
-              whileHover={{ scale: 1.025 }}
-              whileTap={{ scale: 0.975 }}
-              transition={{ duration: 0.15 }}
-              onClick={() => navigate('/explore')}
-              className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full bg-[#F5A623] text-[#061C3D] font-bold text-sm shadow-sm hover:brightness-105 transition-all cursor-pointer"
-            >
-              <span>Explore Resources</span>
-              <ArrowRight className="w-4 h-4 stroke-[2.5]" />
-            </motion.button>
-
-            <motion.button
-              whileHover={{ scale: 1.025 }}
-              whileTap={{ scale: 0.975 }}
-              transition={{ duration: 0.15 }}
-              onClick={() => setIsListModalOpen(true)}
-              className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full bg-white border border-slate-300 text-[#061C3D] font-semibold text-sm shadow-xs hover:bg-slate-50 transition-all cursor-pointer"
-            >
-              <span>+ List an Item</span>
-            </motion.button>
-          </div>
-        </div>
-
-        {/* Right Gear & Wave Image (Seamlessly blended into canvas) */}
-        <div className="lg:col-span-6 flex justify-end items-center select-none relative -mr-4">
-          <motion.img
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.7, ease: 'easeOut' }}
-            src={heroWithWaveImg}
-            alt="Campus Resources: Books, MacBook Laptop, Canon DSLR"
-            className="w-full max-w-lg object-contain pointer-events-none"
-          />
-        </div>
-      </motion.div>
-
-      {/* 2. Key Metrics Row (4 Floating White Cards with Elegant Hover Micro-Interaction) */}
-      <motion.div variants={fadeUpVariants} className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-5">
-        {/* Active Rentals */}
-        <motion.div
-          whileHover={{ y: -3 }}
-          transition={{ duration: 0.2, ease: 'easeOut' }}
-          className="flex items-center gap-4 p-4.5 bg-white rounded-[20px] border border-slate-100/90 shadow-soft hover:shadow-card transition-shadow cursor-default"
-        >
-          <div className="w-12 h-12 rounded-xl bg-[#FFF8EC] flex items-center justify-center shrink-0">
-            <svg
-              className="w-6 h-6 text-[#E68A00]"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2.2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z" />
-              <path d="m3.3 7 8.7 5 8.7-5" />
-              <path d="M12 22V12" />
-            </svg>
-          </div>
-          <div>
-            <div className="text-2xl font-black text-[#061C3D] leading-tight">
-              3
-            </div>
-            <div className="text-xs font-medium text-slate-500 mt-0.5">
-              Active Rentals
-            </div>
-          </div>
-        </motion.div>
-
-        {/* Completed Rentals */}
-        <motion.div
-          whileHover={{ y: -3 }}
-          transition={{ duration: 0.2, ease: 'easeOut' }}
-          className="flex items-center gap-4 p-4.5 bg-white rounded-[20px] border border-slate-100/90 shadow-soft hover:shadow-card transition-shadow cursor-default"
-        >
-          <div className="w-12 h-12 rounded-xl bg-[#EEF5FD] flex items-center justify-center shrink-0">
-            <svg
-              className="w-6 h-6 text-[#2563EB]"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2.2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <rect width="18" height="18" x="3" y="4" rx="2" ry="2" />
-              <line x1="16" x2="16" y1="2" y2="6" />
-              <line x1="8" x2="8" y1="2" y2="6" />
-              <line x1="3" x2="21" y1="10" y2="10" />
-              <path d="m9 16 2 2 4-4" />
-            </svg>
-          </div>
-          <div>
-            <div className="text-2xl font-black text-[#061C3D] leading-tight">
-              8
-            </div>
-            <div className="text-xs font-medium text-slate-500 mt-0.5">
-              Completed Rentals
-            </div>
-          </div>
-        </motion.div>
-
-        {/* Money Saved */}
-        <motion.div
-          whileHover={{ y: -3 }}
-          transition={{ duration: 0.2, ease: 'easeOut' }}
-          className="flex items-center gap-4 p-4.5 bg-white rounded-[20px] border border-slate-100/90 shadow-soft hover:shadow-card transition-shadow cursor-default"
-        >
-          <div className="w-12 h-12 rounded-xl bg-[#FDF0F1] flex items-center justify-center shrink-0">
-            <span className="text-[#DC2626] font-bold text-2xl leading-none font-sans">
-              ₹
-            </span>
-          </div>
-          <div>
-            <div className="text-2xl font-black text-[#061C3D] leading-tight">
-              ₹2,450
-            </div>
-            <div className="text-xs font-medium text-slate-500 mt-0.5">
-              Money Saved
-            </div>
-          </div>
-        </motion.div>
-
-        {/* Waste Avoided */}
-        <motion.div
-          whileHover={{ y: -3 }}
-          transition={{ duration: 0.2, ease: 'easeOut' }}
-          className="flex items-center gap-4 p-4.5 bg-white rounded-[20px] border border-slate-100/90 shadow-soft hover:shadow-card transition-shadow cursor-default"
-        >
-          <div className="w-12 h-12 rounded-xl bg-[#EDF7FD] flex items-center justify-center shrink-0">
-            <svg
-              className="w-6 h-6 text-[#0284C7]"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2.2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z" />
-              <path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12" />
-            </svg>
-          </div>
-          <div>
-            <div className="text-2xl font-black text-[#061C3D] leading-tight">
-              12.4 kg
-            </div>
-            <div className="text-xs font-medium text-slate-500 mt-0.5">
-              Waste Avoided
-            </div>
-          </div>
-        </motion.div>
-      </motion.div>
-
-      {/* 3. Bottom Grid: Popular Resources (8 cols) + Sustainability Impact (4 cols) */}
-      <motion.div variants={fadeUpVariants} className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start pt-2">
-        {/* Popular Resources Section */}
-        <div className="lg:col-span-8 space-y-3.5">
-          <div className="flex items-center justify-between">
-            <div>
-              <h2 className="text-[20px] font-black text-[#061C3D] tracking-tight">
-                Popular Resources
-              </h2>
-              <div className="h-1 w-10 bg-[#F5A623] rounded-full mt-0.5" />
-            </div>
-
+          <div className="flex items-center gap-3 pt-2">
             <button
-              onClick={() => navigate('/explore')}
-              className="text-xs font-bold text-[#061C3D] hover:underline flex items-center gap-1 transition-colors cursor-pointer"
+              onClick={() => setIsListModalOpen(true)}
+              className="bg-white text-[#1E1B4B] px-5 py-2.5 rounded-xl font-bold text-xs hover:bg-slate-100 transition-all shadow-sm active:scale-95 cursor-pointer"
             >
-              <span>View All</span>
-              <ArrowRight className="w-3.5 h-3.5 stroke-[2.5]" />
+              + List an item
+            </button>
+            <button
+              onClick={() => navigate('/marketplace')}
+              className="bg-white/20 hover:bg-white/30 text-white px-5 py-2.5 rounded-xl font-semibold text-xs transition-all backdrop-blur-xs active:scale-95 cursor-pointer"
+            >
+              Browse campus
             </button>
           </div>
+        </div>
+      </div>
 
-          {/* 4 Cards Grid matching Mockup with Smooth Lift */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-            {popularResources.map((item) => {
-              const isWishlisted = wishlist.has(item.id);
-              return (
-                <motion.div
-                  key={item.id}
-                  whileHover={{ y: -4 }}
-                  whileTap={{ scale: 0.99 }}
-                  transition={{ duration: 0.2, ease: 'easeOut' }}
-                  onClick={() => setActiveDetailItem(item)}
-                  className="bg-white rounded-[20px] border border-slate-100/90 shadow-soft hover:shadow-card transition-shadow p-3 flex flex-col justify-between cursor-pointer group relative"
-                >
-                  <div>
-                    {/* Item Image with Heart Button */}
-                    <div className="relative aspect-[4/3] w-full rounded-xl overflow-hidden bg-slate-50 mb-2.5">
-                      <img
-                        src={item.image}
-                        alt={item.title}
-                        className="w-full h-full object-contain p-0.5 group-hover:scale-104 transition-transform duration-300 ease-out"
-                        loading="lazy"
-                      />
-                      {/* Heart Button with Tactile Pop */}
-                      <motion.button
-                        whileTap={{ scale: 0.8 }}
-                        onClick={(e) => toggleWishlist(item.id, item.title, e)}
-                        className={`absolute top-2 right-2 w-7 h-7 rounded-full flex items-center justify-center transition-colors duration-150 ${
-                          isWishlisted
-                            ? 'bg-rose-50 text-rose-500'
-                            : 'bg-white text-slate-700 hover:text-rose-500 shadow-xs'
-                        }`}
-                        aria-label="Wishlist"
-                      >
-                        <Heart
-                          className={`w-3.5 h-3.5 stroke-[2] transition-transform ${
-                            isWishlisted ? 'fill-rose-500 text-rose-500 scale-105' : ''
-                          }`}
-                        />
-                      </motion.button>
-                    </div>
+      {/* 2. 4 KPI Quick Stats Cards in 1 Row matching screenshot */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        {/* Card 1: My Rentals */}
+        <div className="bg-white rounded-2xl p-5 border border-slate-100 shadow-sm hover:shadow-md transition-all flex flex-col justify-between">
+          <div className="flex items-start justify-between">
+            <div className="w-9 h-9 rounded-xl bg-indigo-50 text-[#5B4DFF] flex items-center justify-center">
+              <ArrowRight className="w-4 h-4 stroke-[2.5]" />
+            </div>
+            {/* Purple Mini Sparkline */}
+            <svg className="w-16 h-8 text-[#5B4DFF]" viewBox="0 0 64 24" fill="none">
+              <path
+                d="M 2 16 Q 16 6, 28 14 T 48 8 T 62 12"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                fill="none"
+              />
+            </svg>
+          </div>
+          <div className="mt-4">
+            <div className="text-xs font-medium text-slate-500">My Rentals</div>
+            <div className="text-2xl font-extrabold text-slate-900 mt-0.5">3</div>
+            <div className="text-[11px] font-medium text-slate-400 mt-1">2 due this week</div>
+          </div>
+        </div>
 
-                    {/* Title */}
-                    <h3 className="font-bold text-[13.5px] text-[#061C3D] truncate group-hover:text-amber-600 transition-colors">
-                      {item.title}
-                    </h3>
+        {/* Card 2: My Listings */}
+        <div className="bg-white rounded-2xl p-5 border border-slate-100 shadow-sm hover:shadow-md transition-all flex flex-col justify-between">
+          <div className="flex items-start justify-between">
+            <div className="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
+              <Layers className="w-4 h-4 stroke-[2.5]" />
+            </div>
+            {/* Green Mini Sparkline */}
+            <svg className="w-16 h-8 text-emerald-500" viewBox="0 0 64 24" fill="none">
+              <path
+                d="M 2 18 Q 18 8, 32 14 T 50 10 T 62 6"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                fill="none"
+              />
+            </svg>
+          </div>
+          <div className="mt-4">
+            <div className="text-xs font-medium text-slate-500">My Listings</div>
+            <div className="text-2xl font-extrabold text-slate-900 mt-0.5">7</div>
+            <div className="text-[11px] font-medium text-slate-400 mt-1">5 available now</div>
+          </div>
+        </div>
 
-                    {/* Category Badge matching mockup colors */}
-                    <div className="mt-1">
-                      <span
-                        className={`inline-block px-2.5 py-0.5 rounded-full text-[11px] font-bold ${
-                          item.category === 'Calculator'
-                            ? 'bg-[#FDF3E7] text-[#8C5E28]'
-                            : item.category === 'Books'
-                            ? 'bg-[#EAF2FC] text-[#2F65B9]'
-                            : item.category === 'Project'
-                            ? 'bg-[#FDECEB] text-[#B73838]'
-                            : 'bg-[#E8F4FC] text-[#2F65B9]'
-                        }`}
-                      >
-                        {item.category}
-                      </span>
-                    </div>
-                  </div>
+        {/* Card 3: My Earnings */}
+        <div className="bg-white rounded-2xl p-5 border border-slate-100 shadow-sm hover:shadow-md transition-all flex flex-col justify-between">
+          <div className="flex items-start justify-between">
+            <div className="w-9 h-9 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center font-bold text-sm">
+              ₹
+            </div>
+            {/* Orange Mini Sparkline */}
+            <svg className="w-16 h-8 text-amber-500" viewBox="0 0 64 24" fill="none">
+              <path
+                d="M 2 18 Q 16 16, 30 8 T 48 12 T 62 4"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                fill="none"
+              />
+            </svg>
+          </div>
+          <div className="mt-4">
+            <div className="text-xs font-medium text-slate-500">My Earnings</div>
+            <div className="text-2xl font-extrabold text-slate-900 mt-0.5">₹1,840</div>
+            <div className="text-[11px] font-medium text-slate-400 mt-1">up this semester</div>
+          </div>
+        </div>
 
-                  {/* Price & Star Rating */}
-                  <div className="flex items-center justify-between mt-3 pt-2 border-t border-slate-100">
-                    <div className="text-[14px] font-black text-[#061C3D]">
-                      ₹{item.pricePerDay}{' '}
-                      <span className="text-[11px] font-normal text-slate-500">/ day</span>
-                    </div>
-                    <div className="flex items-center gap-1 text-xs font-bold text-[#061C3D]">
-                      <Star className="w-3.5 h-3.5 fill-[#F5A623] text-[#F5A623]" />
-                      <span>{item.rating}</span>
-                    </div>
-                  </div>
-                </motion.div>
-              );
-            })}
+        {/* Card 4: My Spending */}
+        <div className="bg-white rounded-2xl p-5 border border-slate-100 shadow-sm hover:shadow-md transition-all flex flex-col justify-between">
+          <div className="flex items-start justify-between">
+            <div className="w-9 h-9 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center">
+              <CreditCardIcon className="w-4 h-4 stroke-[2.5]" />
+            </div>
+            {/* Pink Mini Sparkline */}
+            <svg className="w-16 h-8 text-rose-500" viewBox="0 0 64 24" fill="none">
+              <path
+                d="M 2 14 Q 14 6, 30 16 T 48 10 T 62 12"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                fill="none"
+              />
+            </svg>
+          </div>
+          <div className="mt-4">
+            <div className="text-xs font-medium text-slate-500">My Spending</div>
+            <div className="text-2xl font-extrabold text-slate-900 mt-0.5">₹620</div>
+            <div className="text-[11px] font-medium text-slate-400 mt-1">3 rentals</div>
+          </div>
+        </div>
+      </div>
+
+      {/* 3. Middle Row 1: Earnings vs Spending & Sustainability */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-stretch">
+        {/* Earnings vs Spending Area Chart (8 columns) */}
+        <div className="lg:col-span-8 bg-white rounded-2xl p-6 border border-slate-100 shadow-sm flex flex-col justify-between">
+          <div className="flex items-center justify-between pb-4">
+            <h2 className="text-sm font-bold text-slate-900">Earnings vs Spending</h2>
+            <div className="flex items-center gap-4 text-xs">
+              <div className="flex items-center gap-1.5 text-slate-600 font-medium">
+                <span className="w-2.5 h-2.5 rounded-full bg-[#5B4DFF]" />
+                <span>Earnings</span>
+              </div>
+              <div className="flex items-center gap-1.5 text-slate-600 font-medium">
+                <span className="w-2.5 h-2.5 rounded-full bg-[#FB7185]" />
+                <span>Spending</span>
+              </div>
+            </div>
           </div>
 
-          {/* Carousel Pagination Dots matching mockup with Fluid Width */}
-          <div className="flex items-center justify-center gap-1.5 pt-3">
-            {[0, 1, 2].map((idx) => (
-              <button
-                key={idx}
-                onClick={() => setCarouselIndex(idx)}
-                className={`transition-all duration-300 rounded-full cursor-pointer ${
-                  carouselIndex === idx
-                    ? 'w-5 h-1.5 bg-[#F5A623]'
-                    : 'w-1.5 h-1.5 bg-slate-300 hover:bg-slate-400'
-                }`}
-                aria-label={`Slide ${idx + 1}`}
+          {/* Dual Spline SVG Chart */}
+          <div className="relative h-44 w-full flex items-end">
+            <svg className="w-full h-full overflow-visible" viewBox="0 0 500 130" preserveAspectRatio="none">
+              <defs>
+                <linearGradient id="earningsGrad" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="#5B4DFF" stopOpacity="0.22" />
+                  <stop offset="100%" stopColor="#5B4DFF" stopOpacity="0.0" />
+                </linearGradient>
+                <linearGradient id="spendingGrad" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="#FB7185" stopOpacity="0.22" />
+                  <stop offset="100%" stopColor="#FB7185" stopOpacity="0.0" />
+                </linearGradient>
+              </defs>
+
+              {/* Grid guide lines */}
+              <line x1="0" y1="20" x2="500" y2="20" stroke="#F1F5F9" strokeWidth="1" strokeDasharray="4 4" />
+              <line x1="0" y1="65" x2="500" y2="65" stroke="#F1F5F9" strokeWidth="1" strokeDasharray="4 4" />
+              <line x1="0" y1="110" x2="500" y2="110" stroke="#F1F5F9" strokeWidth="1" />
+
+              {/* Area fills */}
+              <path
+                d="M 10 100 Q 100 85, 190 60 T 370 28 T 490 15 L 490 110 L 10 110 Z"
+                fill="url(#earningsGrad)"
               />
+              <path
+                d="M 10 105 Q 100 95, 190 85 T 370 75 T 490 62 L 490 110 L 10 110 Z"
+                fill="url(#spendingGrad)"
+              />
+
+              {/* Spline Lines */}
+              <path
+                d="M 10 100 Q 100 85, 190 60 T 370 28 T 490 15"
+                fill="none"
+                stroke="#5B4DFF"
+                strokeWidth="2.5"
+                strokeLinecap="round"
+              />
+              <path
+                d="M 10 105 Q 100 95, 190 85 T 370 75 T 490 62"
+                fill="none"
+                stroke="#FB7185"
+                strokeWidth="2.5"
+                strokeLinecap="round"
+              />
+
+              {/* Point Markers */}
+              <circle cx="10" cy="100" r="3.5" fill="#5B4DFF" />
+              <circle cx="100" cy="85" r="3.5" fill="#5B4DFF" />
+              <circle cx="190" cy="60" r="3.5" fill="#5B4DFF" />
+              <circle cx="280" cy="45" r="3.5" fill="#5B4DFF" />
+              <circle cx="370" cy="28" r="4.5" fill="#5B4DFF" stroke="#FFFFFF" strokeWidth="2" />
+              <circle cx="490" cy="15" r="4.5" fill="#5B4DFF" stroke="#FFFFFF" strokeWidth="2" />
+
+              <circle cx="10" cy="105" r="3" fill="#FB7185" />
+              <circle cx="100" cy="95" r="3" fill="#FB7185" />
+              <circle cx="190" cy="85" r="3" fill="#FB7185" />
+              <circle cx="280" cy="80" r="3" fill="#FB7185" />
+              <circle cx="370" cy="75" r="3.5" fill="#FB7185" />
+              <circle cx="490" cy="62" r="3.5" fill="#FB7185" />
+            </svg>
+          </div>
+
+          {/* X Axis Labels */}
+          <div className="grid grid-cols-6 text-center text-xs text-slate-400 font-medium pt-3 border-t border-slate-50">
+            {chartData.map((d, i) => (
+              <button
+                key={d.week}
+                onClick={() => setHoveredWeek(i)}
+                className={`py-1 rounded-lg transition-all cursor-pointer ${
+                  hoveredWeek === i ? 'font-bold text-[#5B4DFF] bg-indigo-50/50' : 'hover:text-slate-700'
+                }`}
+              >
+                {d.week}
+              </button>
             ))}
           </div>
         </div>
 
-        {/* Sustainability Impact Card with Calm Circular SVG Animation */}
-        <div className="lg:col-span-4 bg-white rounded-[20px] border border-slate-100/90 shadow-soft p-6 space-y-5">
-          {/* Header */}
-          <div className="flex items-center gap-2">
-            <svg
-              className="w-5 h-5 text-[#F5A623]"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2.4"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z" />
-              <path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12" />
-            </svg>
-            <h2 className="text-[18px] font-black text-[#061C3D]">
-              Sustainability Impact
-            </h2>
-          </div>
+        {/* Sustainability Ring Gauge (4 columns) */}
+        <div className="lg:col-span-4 bg-white rounded-2xl p-6 border border-slate-100 shadow-sm flex flex-col justify-between">
+          <h2 className="text-sm font-bold text-slate-900">Sustainability</h2>
 
-          {/* Donut Chart + Vertical Metrics Row */}
-          <div className="grid grid-cols-2 gap-4 items-center">
-            {/* Donut Ring Chart with Soft Draw-in */}
-            <div className="relative w-32 h-32 mx-auto flex items-center justify-center">
-              <svg className="w-full h-full -rotate-90" viewBox="0 0 100 100">
-                <circle
-                  cx="50"
-                  cy="50"
-                  r="38"
-                  fill="transparent"
-                  stroke="#EDF2F7"
-                  strokeWidth="9"
-                />
-                <motion.circle
-                  cx="50"
-                  cy="50"
-                  r="38"
-                  fill="transparent"
-                  stroke="#F5A623"
-                  strokeWidth="9"
-                  strokeDasharray="238.76"
-                  initial={{ strokeDashoffset: 238.76 }}
-                  animate={{ strokeDashoffset: 238.76 * (1 - 0.78) }}
-                  transition={{ duration: 1.1, delay: 0.15, ease: 'easeOut' }}
-                  strokeLinecap="round"
-                />
-              </svg>
-              <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
-                <span className="text-2xl font-black text-[#061C3D]">78%</span>
-                <span className="text-[10px] text-slate-500 font-medium">Your Contribution</span>
+          {/* Circular Badge with Emerald Progress */}
+          <div className="my-auto py-2 flex flex-col items-center">
+            <div className="relative w-36 h-36 rounded-full bg-emerald-50 border-4 border-emerald-100/60 flex items-center justify-center p-3 shadow-inner">
+              <div className="w-full h-full rounded-full bg-gradient-to-tr from-emerald-500 to-teal-400 text-white flex flex-col items-center justify-center shadow-lg shadow-emerald-500/25">
+                <span className="text-2xl font-black tracking-tight">18 kg</span>
+                <span className="text-[11px] font-semibold text-white/90">CO₂ avoided</span>
               </div>
             </div>
+          </div>
 
-            {/* 3 Metrics Column matching mockup */}
-            <div className="space-y-3.5">
-              {/* Stat 1: Money Saved */}
-              <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-lg bg-[#FFF8EC] flex items-center justify-center shrink-0">
-                  <svg className="w-4 h-4 text-[#E68A00]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                    <circle cx="8" cy="8" r="6"/>
-                    <path d="M18.09 10.37A6 6 0 1 1 10.34 18"/>
-                    <path d="m7 6 5 5"/>
-                    <path d="m12 6-2 8"/>
-                  </svg>
+          <p className="text-xs text-slate-500 font-medium text-center">
+            12 items reused instead of bought new. Nice work!
+          </p>
+        </div>
+      </div>
+
+      {/* 4. Middle Row 2: My Bookings & AI Recommendations */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-stretch">
+        {/* My Bookings (7 columns) */}
+        <div className="lg:col-span-7 bg-white rounded-2xl p-6 border border-slate-100 shadow-sm flex flex-col justify-between">
+          <div className="flex items-center justify-between pb-3">
+            <h2 className="text-sm font-bold text-slate-900">My Bookings</h2>
+            <Link
+              to="/bookings"
+              className="text-xs font-semibold text-indigo-600 hover:text-indigo-800 transition-colors"
+            >
+              View all
+            </Link>
+          </div>
+
+          {/* Bookings List matching screenshot */}
+          <div className="space-y-3 pt-1">
+            {/* 1. Scientific calculator */}
+            <div className="flex items-center justify-between p-3 rounded-xl hover:bg-slate-50 transition-colors">
+              <div className="flex items-center gap-3">
+                <div className="w-9 h-9 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center shrink-0">
+                  <CalculatorIcon className="w-4 h-4 stroke-[2]" />
                 </div>
                 <div>
-                  <div className="text-sm font-black text-[#061C3D] leading-none">₹2,450</div>
-                  <div className="text-[10px] text-slate-500 mt-0.5">Total Money Saved</div>
+                  <h4 className="text-xs font-bold text-slate-900">Scientific calculator</h4>
+                  <p className="text-[11px] text-slate-400">Incoming request · 2 days</p>
                 </div>
               </div>
+              <span className="px-3 py-1 rounded-full text-[11px] font-bold bg-amber-50 text-amber-800 border border-amber-200/60">
+                Pending
+              </span>
+            </div>
 
-              {/* Stat 2: Resources Reused */}
-              <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-lg bg-[#FDF0F1] flex items-center justify-center shrink-0">
-                  <svg className="w-4 h-4 text-[#DC2626]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M7 19H4.815a1.83 1.83 0 0 1-1.57-.881 1.785 1.785 0 0 1-.004-1.784L7.196 9.5"/>
-                    <path d="M11 19h8.2a1.8 1.8 0 0 0 1.565-.914 1.78 1.78 0 0 0 .034-1.783L17.5 11"/>
-                    <path d="m14 14 3-3 3 3"/>
-                    <path d="m3 14 3-3 3 3"/>
-                  </svg>
+            {/* 2. Engineering drafter */}
+            <div className="flex items-center justify-between p-3 rounded-xl hover:bg-slate-50 transition-colors">
+              <div className="flex items-center gap-3">
+                <div className="w-9 h-9 rounded-xl bg-teal-50 text-teal-600 flex items-center justify-center shrink-0">
+                  <DrafterIcon className="w-4 h-4 stroke-[2]" />
                 </div>
                 <div>
-                  <div className="text-sm font-black text-[#061C3D] leading-none">12</div>
-                  <div className="text-[10px] text-slate-500 mt-0.5">Resources Reused</div>
+                  <h4 className="text-xs font-bold text-slate-900">Engineering drafter</h4>
+                  <p className="text-[11px] text-slate-400">Outgoing · return Friday</p>
                 </div>
               </div>
+              <span className="px-3 py-1 rounded-full text-[11px] font-bold bg-teal-50 text-teal-800 border border-teal-200/60">
+                Confirmed
+              </span>
+            </div>
 
-              {/* Stat 3: Waste Avoided */}
-              <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-lg bg-[#FFF8EC] flex items-center justify-center shrink-0">
-                  <svg className="w-4 h-4 text-[#E68A00]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z" />
-                    <path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12" />
-                  </svg>
+            {/* 3. Lab coat */}
+            <div className="flex items-center justify-between p-3 rounded-xl hover:bg-slate-50 transition-colors">
+              <div className="flex items-center gap-3">
+                <div className="w-9 h-9 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center shrink-0">
+                  <LabCoatIcon className="w-4 h-4 stroke-[2]" />
                 </div>
                 <div>
-                  <div className="text-sm font-black text-[#061C3D] leading-none">12.4 kg</div>
-                  <div className="text-[10px] text-slate-500 mt-0.5">Estimated Waste Reduced</div>
+                  <h4 className="text-xs font-bold text-slate-900">Lab coat</h4>
+                  <p className="text-[11px] text-slate-400">Incoming · pickup today</p>
                 </div>
               </div>
+              <span className="px-3 py-1 rounded-full text-[11px] font-bold bg-indigo-50 text-indigo-800 border border-indigo-200/60">
+                Ready
+              </span>
             </div>
           </div>
         </div>
-      </motion.div>
 
-      {/* Interactive Item Detail Modal */}
+        {/* AI Recommendations Gradient Card (5 columns) */}
+        <div className="lg:col-span-5 bg-gradient-to-br from-[#4F46E5] via-[#5B4DFF] to-[#7C3AED] rounded-2xl p-6 text-white shadow-sm flex flex-col justify-between">
+          <div className="flex items-center gap-2 pb-2">
+            <span className="text-[#FACC15]">
+              <Sparkles className="w-4 h-4 fill-[#FACC15]" />
+            </span>
+            <h2 className="text-sm font-bold text-white">AI Recommendations</h2>
+          </div>
+
+          <div className="space-y-3.5 my-2">
+            {/* Block 1: Fair price */}
+            <div className="p-3.5 rounded-xl bg-white/10 backdrop-blur-xs border border-white/10">
+              <div className="text-[11px] font-bold text-[#FACC15] tracking-wide">
+                Fair price
+              </div>
+              <p className="text-xs text-white/95 mt-1 leading-relaxed">
+                Scientific calculator: try <span className="font-bold underline decoration-amber-300">₹35–45 / day</span> to rent faster.
+              </p>
+            </div>
+
+            {/* Block 2: Demand forecast */}
+            <div className="p-3.5 rounded-xl bg-white/10 backdrop-blur-xs border border-white/10">
+              <div className="text-[11px] font-bold text-teal-200 tracking-wide">
+                Demand forecast
+              </div>
+              <p className="text-xs text-white/95 mt-1 leading-relaxed">
+                Lab coats and drafters will be in high demand next week for mid-terms.
+              </p>
+            </div>
+          </div>
+
+          <div className="text-[11px] text-white/70 flex items-center gap-1.5 pt-1">
+            <TrendingUp className="w-3.5 h-3.5 text-teal-300" />
+            <span>Updated 2 hours ago from campus rental trends</span>
+          </div>
+        </div>
+      </div>
+
+      {/* 5. Bottom Section: Popular on your campus matching screenshot */}
+      <div className="space-y-4 pt-2">
+        <div className="flex items-center justify-between">
+          <h2 className="text-sm font-bold text-slate-900">Popular on your campus</h2>
+          <Link
+            to="/marketplace"
+            className="text-xs font-semibold text-indigo-600 hover:text-indigo-800 transition-colors"
+          >
+            See marketplace
+          </Link>
+        </div>
+
+        {/* 4 Items Grid matching screenshot */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          {popularCampusItems.map((item) => (
+            <motion.div
+              key={item.id}
+              whileHover={{ y: -4 }}
+              onClick={() => setActiveDetailItem(item)}
+              className="bg-white rounded-2xl p-4 border border-slate-100 shadow-sm hover:shadow-md transition-all cursor-pointer group flex flex-col justify-between"
+            >
+              {/* Product Illustration Box */}
+              <div
+                className={`w-full h-36 rounded-xl flex items-center justify-center transition-all ${item.bgTint} group-hover:scale-[1.02]`}
+              >
+                {item.id === 'scientific-calculator' && (
+                  <svg viewBox="0 0 64 64" className="w-16 h-16 text-indigo-500" fill="none" stroke="currentColor" strokeWidth="2">
+                    <rect x="16" y="8" width="32" height="48" rx="6" className="fill-indigo-100/60 stroke-indigo-500" />
+                    <rect x="20" y="14" width="24" height="10" rx="2" className="fill-indigo-200/80 stroke-indigo-500" />
+                    <line x1="24" y1="28" x2="28" y2="28" strokeLinecap="round" strokeWidth="2" />
+                    <line x1="32" y1="28" x2="36" y2="28" strokeLinecap="round" strokeWidth="2" />
+                    <line x1="40" y1="28" x2="44" y2="28" strokeLinecap="round" strokeWidth="2" />
+                    <line x1="24" y1="34" x2="28" y2="34" strokeLinecap="round" strokeWidth="2" />
+                    <line x1="32" y1="34" x2="36" y2="34" strokeLinecap="round" strokeWidth="2" />
+                    <line x1="40" y1="34" x2="44" y2="34" strokeLinecap="round" strokeWidth="2" />
+                    <line x1="24" y1="40" x2="28" y2="40" strokeLinecap="round" strokeWidth="2" />
+                    <line x1="32" y1="40" x2="36" y2="40" strokeLinecap="round" strokeWidth="2" />
+                    <line x1="40" y1="40" x2="44" y2="40" strokeLinecap="round" strokeWidth="2" />
+                    <line x1="24" y1="46" x2="40" y2="46" strokeLinecap="round" strokeWidth="2" />
+                  </svg>
+                )}
+
+                {item.id === 'engineering-textbook' && (
+                  <svg viewBox="0 0 64 64" className="w-16 h-16 text-emerald-500" fill="none" stroke="currentColor" strokeWidth="2">
+                    <rect x="16" y="10" width="32" height="44" rx="4" className="fill-emerald-100/60 stroke-emerald-500" />
+                    <line x1="24" y1="10" x2="24" y2="54" className="stroke-emerald-400" strokeWidth="1.5" />
+                    <line x1="30" y1="20" x2="42" y2="20" strokeLinecap="round" strokeWidth="2" />
+                    <line x1="30" y1="26" x2="40" y2="26" strokeLinecap="round" strokeWidth="2" />
+                    <line x1="30" y1="32" x2="38" y2="32" strokeLinecap="round" strokeWidth="2" />
+                  </svg>
+                )}
+
+                {item.id === 'dslr-camera' && (
+                  <svg viewBox="0 0 64 64" className="w-16 h-16 text-amber-500" fill="none" stroke="currentColor" strokeWidth="2">
+                    <rect x="10" y="20" width="44" height="32" rx="6" className="fill-amber-100/60 stroke-amber-500" />
+                    <path d="M22 20 L26 14 L38 14 L42 20 Z" className="fill-amber-200/60 stroke-amber-500" />
+                    <circle cx="32" cy="36" r="10" className="fill-amber-200/80 stroke-amber-500" />
+                    <circle cx="32" cy="36" r="5" className="fill-amber-400 stroke-amber-600" />
+                  </svg>
+                )}
+
+                {item.id === 'lab-coat' && (
+                  <svg viewBox="0 0 64 64" className="w-16 h-16 text-rose-500" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M20 14 L26 10 L38 10 L44 14 L50 24 L42 28 L40 54 L24 54 L22 28 L14 24 Z" className="fill-rose-100/60 stroke-rose-500" />
+                    <line x1="32" y1="22" x2="32" y2="54" strokeWidth="1.5" className="stroke-rose-400" />
+                    <circle cx="32" cy="28" r="1.5" className="fill-rose-500" stroke="none" />
+                    <circle cx="32" cy="36" r="1.5" className="fill-rose-500" stroke="none" />
+                    <circle cx="32" cy="44" r="1.5" className="fill-rose-500" stroke="none" />
+                  </svg>
+                )}
+              </div>
+
+              {/* Title, Price and Category */}
+              <div className="mt-3">
+                <h3 className="text-xs font-bold text-slate-900 group-hover:text-[#5B4DFF] transition-colors">
+                  {item.title}
+                </h3>
+                <div className="flex items-center justify-between mt-1">
+                  <span className="text-xs font-extrabold text-slate-900">
+                    ₹{item.pricePerDay} <span className="text-[10px] text-slate-400 font-normal">/ day</span>
+                  </span>
+                  <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${item.tagColor}`}>
+                    {item.tag}
+                  </span>
+                </div>
+              </div>
+            </motion.div>
+          ))}
+        </div>
+      </div>
+
+      {/* Item Detail Modal */}
       <ItemDetailModal
         item={activeDetailItem}
         onClose={() => setActiveDetailItem(null)}
         onRequestBooking={(item) => {
-          showToast(`Rental request submitted for "${item.title}"! 🎉`);
+          setActiveDetailItem(null);
+          showToast(`Rental request submitted for ${item.title}!`);
         }}
       />
 
-      {/* Interactive "+ List an Item" Modal */}
+      {/* List Item Modal */}
       <ListItemModal
         isOpen={isListModalOpen}
         onClose={() => setIsListModalOpen(false)}
-        onItemCreated={(title, _category, price) => {
-          showToast(`Listed "${title}" for ₹${price}/day! 🚀`);
+        onItemCreated={(title) => {
+          showToast(`"${title}" listed successfully!`);
         }}
       />
-    </motion.div>
+    </div>
   );
 };
+
+// Reusable SVG Micro-Icons for the Booking section
+function CreditCardIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor">
+      <rect x="2" y="5" width="20" height="14" rx="3" strokeWidth="2" />
+      <line x1="2" y1="10" x2="22" y2="10" strokeWidth="2" />
+    </svg>
+  );
+}
+
+function CalculatorIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor">
+      <rect x="4" y="2" width="16" height="20" rx="3" strokeWidth="2" />
+      <line x1="8" y1="6" x2="16" y2="6" strokeWidth="2" strokeLinecap="round" />
+      <line x1="8" y1="11" x2="10" y2="11" strokeWidth="2" strokeLinecap="round" />
+      <line x1="14" y1="11" x2="16" y2="11" strokeWidth="2" strokeLinecap="round" />
+      <line x1="8" y1="16" x2="10" y2="16" strokeWidth="2" strokeLinecap="round" />
+      <line x1="14" y1="16" x2="16" y2="16" strokeWidth="2" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+function DrafterIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor">
+      <path d="M12 2 L3 21 L8 21 L12 11 L16 21 L21 21 Z" strokeWidth="2" strokeLinejoin="round" />
+      <circle cx="12" cy="6" r="1.5" fill="currentColor" stroke="none" />
+    </svg>
+  );
+}
+
+function LabCoatIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor">
+      <path d="M6 4 L10 2 L14 2 L18 4 L20 9 L17 11 L16 22 L8 22 L7 11 L4 9 Z" strokeWidth="2" strokeLinejoin="round" />
+      <line x1="12" y1="7" x2="12" y2="22" strokeWidth="1.5" />
+    </svg>
+  );
+}

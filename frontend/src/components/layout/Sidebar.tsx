@@ -1,18 +1,16 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
 import {
-  Home,
-  Search,
-  Package,
-  Layers,
+  LayoutGrid,
+  Store,
+  ArrowRight,
+  AlignLeft,
   Calendar,
-  Sparkles,
+  CreditCard,
   BarChart2,
-  Settings,
   ShieldCheck,
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
-import sidebarWaveImg from '../../assets/sidebar_wave.png';
 
 interface NavItem {
   name: string;
@@ -21,48 +19,45 @@ interface NavItem {
 }
 
 const navItems: NavItem[] = [
-  { name: 'Dashboard', path: '/', icon: Home },
-  { name: 'Explore', path: '/explore', icon: Search },
-  { name: 'My Rentals', path: '/rentals', icon: Package },
-  { name: 'My Listings', path: '/listings', icon: Layers },
-  { name: 'Bookings', path: '/bookings', icon: Calendar },
-  { name: 'AI Insights', path: '/ai-insights', icon: Sparkles },
-  { name: 'Sustainability', path: '/sustainability', icon: BarChart2 },
+  { name: 'Dashboard', path: '/', icon: LayoutGrid },
+  { name: 'Marketplace', path: '/marketplace', icon: Store },
+  { name: 'My Rentals', path: '/rentals', icon: ArrowRight },
+  { name: 'My Listings', path: '/listings', icon: AlignLeft },
+  { name: 'My Bookings', path: '/bookings', icon: Calendar },
+  { name: 'Payments', path: '/payments', icon: CreditCard },
+  { name: 'Insights', path: '/insights', icon: BarChart2 },
 ];
 
 export const Sidebar: React.FC = () => {
   const { user } = useAuth();
 
   return (
-    <aside className="w-64 bg-[#061C3D] text-slate-300 flex flex-col justify-between shrink-0 relative overflow-hidden select-none">
-      {/* Top Section */}
-      <div className="relative z-10 pt-6">
-        {/* Brand Logo matching mockup: Rent in White + Together in Yellow */}
+    <aside className="w-64 bg-white border-r border-slate-100/90 text-slate-600 flex flex-col justify-between shrink-0 relative select-none py-6 z-20">
+      {/* Top Branding & Navigation */}
+      <div>
+        {/* Brand Logo matching the screenshot */}
         <div className="px-6 flex items-center gap-3 pb-8">
-          <div className="w-9 h-9 rounded-xl bg-brand-yellow flex items-center justify-center text-brand-navy shadow-sm">
+          <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-[#5B4DFF] to-[#7C3AED] flex items-center justify-center text-white shadow-sm shadow-indigo-500/25">
             <svg
-              className="w-5 h-5 text-brand-navy"
+              className="w-4.5 h-4.5 text-white"
               viewBox="0 0 24 24"
               fill="none"
               stroke="currentColor"
-              strokeWidth="2.3"
+              strokeWidth="2.4"
               strokeLinecap="round"
               strokeLinejoin="round"
             >
-              <path d="m7.5 4.27 9 5.15" />
-              <path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z" />
-              <path d="m3.3 7 8.7 5 8.7-5" />
-              <path d="M12 22V12" />
-              <circle cx="12" cy="7" r="1.2" fill="currentColor" stroke="none" />
+              <path d="M9 17H7A5 5 0 0 1 7 7h2" />
+              <path d="M15 7h2a5 5 0 1 1 0 10h-2" />
+              <line x1="8" y1="12" x2="16" y2="12" />
             </svg>
           </div>
-          <div className="text-xl font-bold tracking-tight">
-            <span className="text-white font-black">Rent</span>
-            <span className="text-brand-yellow font-black">Together</span>
-          </div>
+          <span className="text-xl font-bold tracking-tight text-[#1E1B4B]">
+            RentTogether
+          </span>
         </div>
 
-        {/* Navigation Items */}
+        {/* Navigation List */}
         <nav className="px-4 space-y-1.5">
           {navItems.map((item) => {
             const Icon = item.icon;
@@ -70,21 +65,20 @@ export const Sidebar: React.FC = () => {
               <NavLink
                 key={item.path}
                 to={item.path}
+                end={item.path === '/'}
                 className={({ isActive }) =>
-                  `flex items-center gap-3.5 px-4 py-3 rounded-2xl text-sm font-semibold transition-all duration-150 ${
+                  `flex items-center gap-3.5 px-4 py-2.5 rounded-xl text-sm font-semibold transition-all duration-150 ${
                     isActive
-                      ? 'bg-brand-yellow text-brand-navy font-bold shadow-md shadow-brand-yellow/20'
-                      : 'text-slate-300/80 hover:text-white hover:bg-white/5'
+                      ? 'bg-[#5B4DFF] text-white font-bold shadow-md shadow-indigo-500/25'
+                      : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
                   }`
                 }
               >
                 {({ isActive }) => (
                   <>
                     <Icon
-                      className={`w-4 h-4 shrink-0 ${
-                        isActive
-                          ? 'text-brand-navy fill-brand-navy stroke-[2.2]'
-                          : 'text-slate-300/80'
+                      className={`w-4 h-4 shrink-0 stroke-[2] ${
+                        isActive ? 'text-white' : 'text-slate-400 group-hover:text-slate-600'
                       }`}
                     />
                     <span>{item.name}</span>
@@ -94,60 +88,41 @@ export const Sidebar: React.FC = () => {
             );
           })}
 
-          {/* Admin Verifications Link (if user has admin rights) */}
+          {/* Admin Link if staff */}
           {user?.is_staff && (
             <NavLink
               to="/admin/verifications"
               className={({ isActive }) =>
-                `flex items-center gap-3.5 px-4 py-3 rounded-2xl text-sm font-semibold transition-all duration-150 ${
+                `flex items-center gap-3.5 px-4 py-2.5 rounded-xl text-sm font-semibold transition-all duration-150 ${
                   isActive
-                    ? 'bg-brand-yellow text-brand-navy font-bold shadow-md shadow-brand-yellow/20'
-                    : 'text-indigo-300/90 hover:text-white hover:bg-white/5'
+                    ? 'bg-[#5B4DFF] text-white font-bold shadow-md shadow-indigo-500/25'
+                    : 'text-indigo-600 hover:text-indigo-900 hover:bg-indigo-50/60'
                 }`
               }
             >
               {({ isActive }) => (
                 <>
                   <ShieldCheck
-                    className={`w-4 h-4 shrink-0 ${
-                      isActive ? 'text-brand-navy' : 'text-indigo-400'
+                    className={`w-4 h-4 shrink-0 stroke-[2] ${
+                      isActive ? 'text-white' : 'text-indigo-500'
                     }`}
                   />
-                  <span>ID Verifications</span>
+                  <span>Verifications</span>
                 </>
               )}
             </NavLink>
           )}
-
-          {/* Thin Divider Line matching mockup */}
-          <div className="pt-2 pb-1">
-            <div className="h-px bg-slate-700/60 mx-1" />
-          </div>
-
-          {/* Settings Nav Item */}
-          <NavLink
-            to="/settings"
-            className={({ isActive }) =>
-              `flex items-center gap-3.5 px-4 py-3 rounded-2xl text-sm font-semibold transition-all duration-150 ${
-                isActive
-                  ? 'bg-brand-yellow text-brand-navy font-bold'
-                  : 'text-slate-300/80 hover:text-white hover:bg-white/5'
-              }`
-            }
-          >
-            <Settings className="w-4 h-4 shrink-0 text-slate-300/80" />
-            <span>Settings</span>
-          </NavLink>
         </nav>
       </div>
 
-      {/* Signature Brand Overlapping Curved Wave at Bottom Left (Exact Mockup Match) */}
-      <div className="absolute bottom-0 left-0 right-0 h-48 pointer-events-none select-none overflow-hidden z-0">
-        <img
-          src={sidebarWaveImg}
-          alt=""
-          className="w-full h-full object-cover object-bottom"
-        />
+      {/* Bottom Tagline matching screenshot */}
+      <div className="px-6 pt-6 border-t border-slate-100/80">
+        <div className="text-xs font-bold text-[#E11D48] tracking-tight">
+          Share Smart.
+        </div>
+        <div className="text-xs font-medium text-slate-400 mt-0.5">
+          Save More. Live Better.
+        </div>
       </div>
     </aside>
   );
