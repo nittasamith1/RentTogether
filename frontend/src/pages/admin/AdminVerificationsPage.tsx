@@ -151,15 +151,15 @@ export const AdminVerificationsPage: React.FC = () => {
 
       {/* Filter Tabs and Search Bar */}
       <div className="flex flex-col sm:flex-row gap-3 items-center justify-between">
-        <div className="flex items-center gap-1.5 p-1 rounded-xl bg-neutral-100/80 border border-neutral-200/60 w-full sm:w-auto">
+        <div className="flex items-center gap-1.5 p-1 rounded-xl bg-slate-100 border border-slate-200/60 w-full sm:w-auto">
           {(['PENDING', 'VERIFIED', 'REJECTED', 'ALL'] as const).map((tab) => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
-              className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all capitalize ${
+              className={`px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all capitalize cursor-pointer ${
                 activeTab === tab
-                  ? 'bg-white text-[#0E131F] shadow-sm'
-                  : 'text-neutral-500 hover:text-neutral-800'
+                  ? 'bg-[#5B4DFF] text-white shadow-xs'
+                  : 'text-slate-500 hover:text-slate-900'
               }`}
             >
               {tab.toLowerCase()}

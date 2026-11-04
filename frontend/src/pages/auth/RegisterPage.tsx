@@ -17,6 +17,7 @@ import {
 } from 'lucide-react';
 import { authService } from '../../services/auth';
 import { College } from '../../types';
+import { Logo } from '../../components/common/Logo';
 
 const DEPARTMENTS = [
   'Computer Science and Engineering (CSE)',
@@ -60,7 +61,6 @@ export const RegisterPage: React.FC = () => {
         const data = await authService.getActiveCollege();
         setCollege(data);
       } catch {
-        // Fallback info if offline
         setCollege({
           id: 'vnr-id',
           name: 'VNR Vignana Jyothi Institute of Engineering & Technology',
@@ -75,7 +75,6 @@ export const RegisterPage: React.FC = () => {
     fetchCollege();
   }, []);
 
-  // Validate email domain in real time
   const handleEmailChange = (val: string) => {
     setEmail(val);
     const trimmed = val.trim().toLowerCase();
@@ -144,7 +143,6 @@ export const RegisterPage: React.FC = () => {
         id_card_image: idCardFile,
       });
 
-      // Navigate to OTP verification page with pre-filled email
       navigate(`/verify-email?email=${encodeURIComponent(res.email || email.trim().toLowerCase())}`);
     } catch (err: any) {
       const data = err.response?.data;
@@ -165,43 +163,41 @@ export const RegisterPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#FDFBF9] flex flex-col justify-center items-center py-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
-      {/* Decorative campus wave background elements */}
-      <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-[#F5A623]/5 rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-[#0E131F]/5 rounded-full blur-3xl pointer-events-none" />
+    <div className="min-h-screen bg-[#F7F8FA] flex flex-col justify-center items-center py-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden font-sans text-slate-800">
+      {/* Soft Ambient Background Blooms */}
+      <div className="absolute top-0 right-1/4 w-[500px] h-[500px] bg-[#5B4DFF]/5 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute bottom-0 left-1/4 w-[500px] h-[500px] bg-[#10B981]/5 rounded-full blur-3xl pointer-events-none" />
 
       <motion.div
-        initial={{ opacity: 0, y: 16 }}
+        initial={{ opacity: 0, y: 14 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-        className="w-full max-w-xl"
+        transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
+        className="w-full max-w-xl relative z-10"
       >
-        {/* Header */}
-        <div className="text-center mb-8">
-          <Link to="/" className="inline-flex items-center gap-1.5 group mb-3">
-            <span className="text-3xl font-extrabold tracking-tight text-[#0E131F]">
-              Rent<span className="text-[#F5A623]">Together</span>
-            </span>
+        {/* Header with Authentic Logo */}
+        <div className="text-center mb-8 flex flex-col items-center">
+          <Link to="/" className="inline-block mb-3 hover:opacity-95 transition-opacity">
+            <Logo size="lg" />
           </Link>
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-200/60 text-emerald-700 text-xs font-semibold mb-2">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-indigo-50 border border-indigo-100/80 text-[#5B4DFF] text-xs font-semibold mb-2">
             <ShieldCheck className="w-3.5 h-3.5" />
             <span>Institutional Identity Registration</span>
           </div>
-          <h2 className="text-2xl font-bold text-[#0E131F]">Join Campus Network</h2>
-          <p className="text-xs text-neutral-500 mt-1 max-w-md mx-auto">
+          <h2 className="text-2xl font-extrabold text-[#1E1B4B]">Join Campus Network</h2>
+          <p className="text-xs text-slate-500 mt-1 max-w-md mx-auto">
             {collegeLoading
               ? 'Loading active campus configuration...'
               : `One account for renting & lending exclusively for ${college?.name || 'VNRVJIET'} students.`}
           </p>
         </div>
 
-        {/* Registration Card */}
-        <div className="bg-white rounded-2xl shadow-card border border-neutral-100 p-8 sm:p-9">
+        {/* Card */}
+        <div className="bg-white rounded-3xl shadow-sm border border-slate-100 p-8 sm:p-9">
           {formError && (
             <motion.div
               initial={{ opacity: 0, y: -6 }}
               animate={{ opacity: 1, y: 0 }}
-              className="mb-6 p-3.5 rounded-xl bg-red-50 border border-red-200 flex items-start gap-2.5 text-xs text-red-700"
+              className="mb-6 p-3.5 rounded-xl bg-red-50 border border-red-200/80 flex items-start gap-2.5 text-xs text-red-700"
             >
               <AlertCircle className="w-4 h-4 text-red-500 shrink-0 mt-0.5" />
               <span>{formError}</span>
@@ -211,40 +207,40 @@ export const RegisterPage: React.FC = () => {
           <form onSubmit={handleSubmit} className="space-y-5">
             {/* 1. Academic Credentials */}
             <div className="space-y-4">
-              <h3 className="text-xs font-bold text-neutral-400 uppercase tracking-wider">
+              <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider">
                 1. Institutional Identity
               </h3>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-semibold text-neutral-700 mb-1.5">
+                  <label className="block text-xs font-bold text-slate-700 mb-1.5">
                     Full Student Name
                   </label>
                   <div className="relative">
-                    <UserIcon className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-400" />
+                    <UserIcon className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                     <input
                       type="text"
                       value={fullName}
                       onChange={(e) => setFullName(e.target.value)}
                       placeholder="e.g. Sai Reddy"
-                      className="w-full pl-10 pr-3.5 py-2.5 rounded-xl border border-neutral-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#F5A623]/40"
+                      className="w-full pl-10 pr-3.5 py-2.5 rounded-xl border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-[#5B4DFF]/30 focus:border-[#5B4DFF] bg-white"
                       required
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-neutral-700 mb-1.5">
+                  <label className="block text-xs font-bold text-slate-700 mb-1.5">
                     Roll Number
                   </label>
                   <div className="relative">
-                    <IdCard className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-400" />
+                    <IdCard className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                     <input
                       type="text"
                       value={rollNumber}
                       onChange={(e) => setRollNumber(e.target.value)}
                       placeholder="e.g. 21071A05B8"
-                      className="w-full pl-10 pr-3.5 py-2.5 rounded-xl border border-neutral-200 text-sm uppercase focus:outline-none focus:ring-2 focus:ring-[#F5A623]/40 font-mono"
+                      className="w-full pl-10 pr-3.5 py-2.5 rounded-xl border border-slate-200 text-xs uppercase focus:outline-none focus:ring-2 focus:ring-[#5B4DFF]/30 focus:border-[#5B4DFF] bg-white font-mono"
                       required
                     />
                   </div>
@@ -252,17 +248,17 @@ export const RegisterPage: React.FC = () => {
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-neutral-700 mb-1.5">
+                <label className="block text-xs font-bold text-slate-700 mb-1.5">
                   Institutional Email Address
                 </label>
                 <div className="relative">
-                  <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-400" />
+                  <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                   <input
                     type="email"
                     value={email}
                     onChange={(e) => handleEmailChange(e.target.value)}
                     placeholder="student.name@vnrvjiet.in"
-                    className="w-full pl-10 pr-10 py-2.5 rounded-xl border border-neutral-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#F5A623]/40"
+                    className="w-full pl-10 pr-10 py-2.5 rounded-xl border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-[#5B4DFF]/30 focus:border-[#5B4DFF] bg-white"
                     required
                   />
                   {emailDomainValid === true && (
@@ -272,9 +268,9 @@ export const RegisterPage: React.FC = () => {
                     <AlertCircle className="absolute right-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-red-500" />
                   )}
                 </div>
-                <p className="text-[11px] text-neutral-400 mt-1">
+                <p className="text-[11px] text-slate-400 mt-1">
                   Must be an institutional address ending in{' '}
-                  <span className="font-semibold text-neutral-600">
+                  <span className="font-semibold text-slate-600">
                     {college?.domain_whitelist?.join(' or ')}
                   </span>
                 </p>
@@ -282,15 +278,15 @@ export const RegisterPage: React.FC = () => {
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-semibold text-neutral-700 mb-1.5">
+                  <label className="block text-xs font-bold text-slate-700 mb-1.5">
                     Department
                   </label>
                   <div className="relative">
-                    <Building className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-400 pointer-events-none" />
+                    <Building className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
                     <select
                       value={department}
                       onChange={(e) => setDepartment(e.target.value)}
-                      className="w-full pl-10 pr-3.5 py-2.5 rounded-xl border border-neutral-200 text-xs focus:outline-none focus:ring-2 focus:ring-[#F5A623]/40 bg-white"
+                      className="w-full pl-10 pr-3.5 py-2.5 rounded-xl border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-[#5B4DFF]/30 bg-white"
                     >
                       {DEPARTMENTS.map((dept) => (
                         <option key={dept} value={dept}>
@@ -302,7 +298,7 @@ export const RegisterPage: React.FC = () => {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-neutral-700 mb-1.5">
+                  <label className="block text-xs font-bold text-slate-700 mb-1.5">
                     Year of Study
                   </label>
                   <div className="grid grid-cols-4 gap-1.5">
@@ -311,10 +307,10 @@ export const RegisterPage: React.FC = () => {
                         key={yr}
                         type="button"
                         onClick={() => setYearOfStudy(yr)}
-                        className={`py-2 rounded-xl text-xs font-semibold border transition-all ${
+                        className={`py-2 rounded-xl text-xs font-bold border transition-all cursor-pointer ${
                           yearOfStudy === yr
-                            ? 'bg-[#0E131F] text-white border-[#0E131F] shadow-sm'
-                            : 'bg-neutral-50 text-neutral-600 border-neutral-200 hover:bg-neutral-100'
+                            ? 'bg-[#5B4DFF] text-white border-[#5B4DFF] shadow-xs'
+                            : 'bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100'
                         }`}
                       >
                         {yr}
@@ -329,15 +325,15 @@ export const RegisterPage: React.FC = () => {
             </div>
 
             {/* 2. College ID Card Upload */}
-            <div className="space-y-2 pt-2 border-t border-neutral-100">
+            <div className="space-y-2 pt-2 border-t border-slate-100">
               <div className="flex items-center justify-between">
-                <h3 className="text-xs font-bold text-neutral-400 uppercase tracking-wider">
+                <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider">
                   2. Student ID Card Photo
                 </h3>
-                <span className="text-[11px] text-neutral-400">Required for campus verification</span>
+                <span className="text-[11px] text-slate-400">Required for campus verification</span>
               </div>
 
-              <div className="relative border-2 border-dashed border-neutral-200 hover:border-[#F5A623] rounded-2xl p-5 text-center transition-all bg-neutral-50/50">
+              <div className="relative border-2 border-dashed border-slate-200 hover:border-[#5B4DFF] rounded-2xl p-5 text-center transition-all bg-slate-50/50">
                 <input
                   type="file"
                   id="id-card-upload"
@@ -350,24 +346,24 @@ export const RegisterPage: React.FC = () => {
                     <img
                       src={idCardPreview}
                       alt="ID Preview"
-                      className="w-48 h-28 object-cover rounded-xl border border-neutral-200 shadow-sm mb-3"
+                      className="w-48 h-28 object-cover rounded-xl border border-slate-200 shadow-sm mb-3"
                     />
                     <label
                       htmlFor="id-card-upload"
-                      className="cursor-pointer text-xs font-semibold text-[#F5A623] hover:underline"
+                      className="cursor-pointer text-xs font-bold text-[#5B4DFF] hover:underline"
                     >
                       Change photo
                     </label>
                   </div>
                 ) : (
                   <label htmlFor="id-card-upload" className="cursor-pointer flex flex-col items-center">
-                    <div className="w-10 h-10 rounded-full bg-amber-50 flex items-center justify-center text-[#F5A623] mb-2">
+                    <div className="w-10 h-10 rounded-xl bg-indigo-50 flex items-center justify-center text-[#5B4DFF] mb-2">
                       <UploadCloud className="w-5 h-5" />
                     </div>
-                    <span className="text-xs font-semibold text-neutral-700">
+                    <span className="text-xs font-bold text-slate-700">
                       Upload College ID Card
                     </span>
-                    <span className="text-[11px] text-neutral-400 mt-0.5">
+                    <span className="text-[11px] text-slate-400 mt-0.5">
                       Clear photo showing name, photo, and roll number (PNG/JPG, max 5MB)
                     </span>
                   </label>
@@ -376,31 +372,31 @@ export const RegisterPage: React.FC = () => {
             </div>
 
             {/* 3. Account Security */}
-            <div className="space-y-4 pt-2 border-t border-neutral-100">
-              <h3 className="text-xs font-bold text-neutral-400 uppercase tracking-wider">
+            <div className="space-y-4 pt-2 border-t border-slate-100">
+              <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider">
                 3. Password
               </h3>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-semibold text-neutral-700 mb-1.5">
+                  <label className="block text-xs font-bold text-slate-700 mb-1.5">
                     Password (min 8 chars)
                   </label>
                   <div className="relative">
-                    <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-400" />
+                    <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                     <input
                       type={showPassword ? 'text' : 'password'}
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       placeholder="••••••••••••"
-                      className="w-full pl-10 pr-10 py-2.5 rounded-xl border border-neutral-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#F5A623]/40"
+                      className="w-full pl-10 pr-10 py-2.5 rounded-xl border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-[#5B4DFF]/30 bg-white"
                       required
                       minLength={8}
                     />
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-3.5 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-neutral-600"
+                      className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 cursor-pointer"
                     >
                       {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                     </button>
@@ -408,17 +404,17 @@ export const RegisterPage: React.FC = () => {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-neutral-700 mb-1.5">
+                  <label className="block text-xs font-bold text-slate-700 mb-1.5">
                     Confirm Password
                   </label>
                   <div className="relative">
-                    <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-400" />
+                    <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                     <input
                       type={showPassword ? 'text' : 'password'}
                       value={confirmPassword}
                       onChange={(e) => setConfirmPassword(e.target.value)}
                       placeholder="••••••••••••"
-                      className="w-full pl-10 pr-3.5 py-2.5 rounded-xl border border-neutral-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#F5A623]/40"
+                      className="w-full pl-10 pr-3.5 py-2.5 rounded-xl border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-[#5B4DFF]/30 bg-white"
                       required
                       minLength={8}
                     />
@@ -430,22 +426,22 @@ export const RegisterPage: React.FC = () => {
             <button
               type="submit"
               disabled={submitting || emailDomainValid === false}
-              className="w-full mt-4 py-3.5 px-4 rounded-xl bg-[#0E131F] text-white font-semibold text-sm hover:bg-[#1a233a] active:scale-[0.98] transition-all duration-200 flex items-center justify-center gap-2 shadow-sm disabled:opacity-50"
+              className="w-full mt-4 py-3.5 px-4 rounded-xl bg-[#5B4DFF] hover:bg-[#4F46E5] text-white font-bold text-xs shadow-md shadow-indigo-500/20 active:scale-[0.98] transition-all duration-150 flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
             >
               {submitting ? (
                 <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
               ) : (
                 <>
                   <span>Create Account & Verify Email</span>
-                  <ArrowRight className="w-4 h-4 text-[#F5A623]" />
+                  <ArrowRight className="w-4 h-4" />
                 </>
               )}
             </button>
           </form>
 
-          <div className="mt-6 text-center text-xs text-neutral-500">
+          <div className="mt-6 text-center text-xs text-slate-500">
             Already registered?{' '}
-            <Link to="/login" className="font-semibold text-[#0E131F] hover:text-[#F5A623] transition-colors">
+            <Link to="/login" className="font-bold text-[#5B4DFF] hover:underline">
               Sign In
             </Link>
           </div>

@@ -11,6 +11,7 @@ import {
   ShieldCheck,
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
+import { Logo } from '../common/Logo';
 
 interface NavItem {
   name: string;
@@ -35,26 +36,11 @@ export const Sidebar: React.FC = () => {
     <aside className="w-64 bg-white border-r border-slate-100/90 text-slate-600 flex flex-col justify-between shrink-0 relative select-none py-6 z-20">
       {/* Top Branding & Navigation */}
       <div>
-        {/* Brand Logo matching the screenshot */}
-        <div className="px-6 flex items-center gap-3 pb-8">
-          <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-[#5B4DFF] to-[#7C3AED] flex items-center justify-center text-white shadow-sm shadow-indigo-500/25">
-            <svg
-              className="w-4.5 h-4.5 text-white"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2.4"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <path d="M9 17H7A5 5 0 0 1 7 7h2" />
-              <path d="M15 7h2a5 5 0 1 1 0 10h-2" />
-              <line x1="8" y1="12" x2="16" y2="12" />
-            </svg>
-          </div>
-          <span className="text-xl font-bold tracking-tight text-[#1E1B4B]">
-            RentTogether
-          </span>
+        {/* Authentic Brand Logo matching user reference image */}
+        <div className="px-6 pb-8 flex items-center">
+          <NavLink to="/" className="inline-block">
+            <Logo size="md" />
+          </NavLink>
         </div>
 
         {/* Navigation List */}

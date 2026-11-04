@@ -1,9 +1,20 @@
 import React, { useState } from 'react';
 import { useNavigate, Link, useSearchParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Mail, Lock, Eye, EyeOff, ArrowRight, ShieldCheck, AlertCircle, KeyRound, CheckCircle2 } from 'lucide-react';
+import {
+  Mail,
+  Lock,
+  Eye,
+  EyeOff,
+  ArrowRight,
+  ShieldCheck,
+  AlertCircle,
+  KeyRound,
+  CheckCircle2,
+} from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { authService } from '../../services/auth';
+import { Logo } from '../../components/common/Logo';
 
 export const LoginPage: React.FC = () => {
   const navigate = useNavigate();
@@ -53,7 +64,10 @@ export const LoginPage: React.FC = () => {
         navigate(`/verification-pending?email=${encodeURIComponent(resp.email || email)}`);
         return;
       }
-      const msg = resp?.detail || resp?.message || (typeof resp === 'string' ? resp : 'Invalid credentials. Please verify your email and password.');
+      const msg =
+        resp?.detail ||
+        resp?.message ||
+        (typeof resp === 'string' ? resp : 'Invalid credentials. Please verify your email and password.');
       setErrorMessage(msg);
     } finally {
       setLoading(false);
@@ -130,7 +144,7 @@ export const LoginPage: React.FC = () => {
         setForgotStep('EMAIL');
         setForgotOtp('');
         setForgotNewPassword('');
-      }, 2000);
+      }, 1800);
     } catch (err: any) {
       setForgotMsg({
         text: err.response?.data?.otp?.[0] || err.response?.data?.detail || 'Password reset failed.',
@@ -142,39 +156,37 @@ export const LoginPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#FDFBF9] flex flex-col justify-center items-center py-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
-      {/* Decorative campus wave background elements */}
-      <div className="absolute top-0 left-0 w-96 h-96 bg-[#F5A623]/5 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2 pointer-events-none" />
-      <div className="absolute bottom-0 right-0 w-96 h-96 bg-[#0E131F]/5 rounded-full blur-3xl translate-x-1/2 translate-y-1/2 pointer-events-none" />
+    <div className="min-h-screen bg-[#F7F8FA] flex flex-col justify-center items-center py-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden font-sans text-slate-800">
+      {/* Soft Ambient Background Blooms */}
+      <div className="absolute top-0 right-1/4 w-96 h-96 bg-[#5B4DFF]/5 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute bottom-0 left-1/4 w-96 h-96 bg-[#10B981]/5 rounded-full blur-3xl pointer-events-none" />
 
       <motion.div
-        initial={{ opacity: 0, y: 16 }}
+        initial={{ opacity: 0, y: 14 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-        className="w-full max-w-md"
+        transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
+        className="w-full max-w-md relative z-10"
       >
-        {/* Brand Header */}
-        <div className="text-center mb-8">
-          <Link to="/" className="inline-flex items-center gap-1.5 group mb-3">
-            <span className="text-3xl font-extrabold tracking-tight text-[#0E131F]">
-              Rent<span className="text-[#F5A623]">Together</span>
-            </span>
+        {/* Brand Header with Authentic Logo */}
+        <div className="text-center mb-8 flex flex-col items-center">
+          <Link to="/" className="inline-block mb-3 hover:opacity-95 transition-opacity">
+            <Logo size="lg" />
           </Link>
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-200/60 text-emerald-700 text-xs font-semibold mb-2">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-indigo-50 border border-indigo-100/80 text-[#5B4DFF] text-xs font-semibold mb-2">
             <ShieldCheck className="w-3.5 h-3.5" />
             <span>VNRVJIET Campus Network</span>
           </div>
-          <h2 className="text-2xl font-bold text-[#0E131F]">Student & Faculty Login</h2>
-          <p className="text-xs text-neutral-500 mt-1">
-            Access verified peer-to-peer campus rentals, academic kits, and tools.
+          <h2 className="text-xl font-extrabold text-[#1E1B4B]">Student & Faculty Portal</h2>
+          <p className="text-xs text-slate-500 mt-1 max-w-xs">
+            Access verified campus equipment, academic tools, and lab gear.
           </p>
         </div>
 
         {/* Card */}
-        <div className="bg-white rounded-2xl shadow-card border border-neutral-100 p-8">
+        <div className="bg-white rounded-3xl shadow-sm border border-slate-100 p-8">
           {errorMessage && (
             <motion.div
-              initial={{ opacity: 0, y: -8 }}
+              initial={{ opacity: 0, y: -6 }}
               animate={{ opacity: 1, y: 0 }}
               className="mb-5 p-3.5 rounded-xl bg-red-50 border border-red-200/80 flex items-start gap-2.5 text-xs text-red-700"
             >
@@ -185,17 +197,17 @@ export const LoginPage: React.FC = () => {
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block text-xs font-semibold text-neutral-700 mb-1.5">
+              <label className="block text-xs font-bold text-slate-700 mb-1.5">
                 Institutional Email
               </label>
               <div className="relative">
-                <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-400" />
+                <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                 <input
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="name@vnrvjiet.in"
-                  className="w-full pl-10 pr-3.5 py-2.5 rounded-xl border border-neutral-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#F5A623]/40 focus:border-[#F5A623] transition-all bg-neutral-50/50 hover:bg-white"
+                  placeholder="student.name@vnrvjiet.in"
+                  className="w-full pl-10 pr-3.5 py-2.5 rounded-xl border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-[#5B4DFF]/30 focus:border-[#5B4DFF] transition-all bg-white"
                   required
                 />
               </div>
@@ -203,32 +215,32 @@ export const LoginPage: React.FC = () => {
 
             <div>
               <div className="flex justify-between items-center mb-1.5">
-                <label className="text-xs font-semibold text-neutral-700">Password</label>
+                <label className="text-xs font-bold text-slate-700">Password</label>
                 <button
                   type="button"
                   onClick={() => {
                     setForgotEmail(email);
                     setShowForgotModal(true);
                   }}
-                  className="text-xs font-semibold text-[#F5A623] hover:underline"
+                  className="text-xs font-semibold text-[#5B4DFF] hover:underline"
                 >
                   Forgot password?
                 </button>
               </div>
               <div className="relative">
-                <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-400" />
+                <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                 <input
                   type={showPassword ? 'text' : 'password'}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••••••"
-                  className="w-full pl-10 pr-10 py-2.5 rounded-xl border border-neutral-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#F5A623]/40 focus:border-[#F5A623] transition-all bg-neutral-50/50 hover:bg-white"
+                  className="w-full pl-10 pr-10 py-2.5 rounded-xl border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-[#5B4DFF]/30 focus:border-[#5B4DFF] transition-all bg-white"
                   required
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3.5 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-neutral-600"
+                  className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 cursor-pointer"
                 >
                   {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </button>
@@ -238,47 +250,47 @@ export const LoginPage: React.FC = () => {
             <button
               type="submit"
               disabled={loading}
-              className="w-full mt-2 py-3 px-4 rounded-xl bg-[#0E131F] text-white font-semibold text-sm hover:bg-[#1a233a] active:scale-[0.98] transition-all duration-200 flex items-center justify-center gap-2 shadow-sm disabled:opacity-50"
+              className="w-full mt-2 py-3 px-4 rounded-xl bg-[#5B4DFF] hover:bg-[#4F46E5] text-white font-bold text-xs shadow-md shadow-indigo-500/20 active:scale-[0.98] transition-all duration-150 flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
             >
               {loading ? (
                 <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
               ) : (
                 <>
                   <span>Sign In</span>
-                  <ArrowRight className="w-4 h-4 text-[#F5A623]" />
+                  <ArrowRight className="w-4 h-4" />
                 </>
               )}
             </button>
           </form>
 
-          {/* Quick Demo Logins for Pair Programming / Evaluation */}
-          <div className="mt-6 pt-5 border-t border-neutral-100 space-y-2">
-            <p className="text-[11px] font-semibold text-neutral-400 uppercase tracking-wider text-center">
-              Quick 1-Click Demo Accounts
+          {/* Quick Demo Login Buttons */}
+          <div className="mt-6 pt-5 border-t border-slate-100 space-y-2">
+            <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider text-center">
+              Quick 1-Click Evaluation Accounts
             </p>
             <div className="grid grid-cols-2 gap-2 pt-1">
               <button
                 type="button"
                 onClick={handleDemoStudentLogin}
-                className="py-2 px-2.5 rounded-lg border border-amber-200 bg-amber-50/60 hover:bg-amber-100/70 text-amber-900 text-xs font-semibold transition-all text-center"
+                className="py-2.5 px-3 rounded-xl border border-indigo-100 bg-indigo-50/60 hover:bg-indigo-100/80 text-indigo-900 text-xs font-bold transition-all text-center cursor-pointer"
               >
                 🎓 Demo Student
-                <span className="block text-[10px] font-normal text-amber-700/80">Sai Reddy (VNR)</span>
+                <span className="block text-[10px] font-medium text-indigo-600/90 mt-0.5">Sai Reddy (VNR)</span>
               </button>
               <button
                 type="button"
                 onClick={handleDemoAdminLogin}
-                className="py-2 px-2.5 rounded-lg border border-indigo-200 bg-indigo-50/60 hover:bg-indigo-100/70 text-indigo-900 text-xs font-semibold transition-all text-center"
+                className="py-2.5 px-3 rounded-xl border border-amber-100 bg-amber-50/60 hover:bg-amber-100/80 text-amber-900 text-xs font-bold transition-all text-center cursor-pointer"
               >
                 🛡️ Campus Admin
-                <span className="block text-[10px] font-normal text-indigo-700/80">Identity Approver</span>
+                <span className="block text-[10px] font-medium text-amber-700/90 mt-0.5">ID Card Reviewer</span>
               </button>
             </div>
           </div>
 
-          <div className="mt-6 text-center text-xs text-neutral-500">
+          <div className="mt-6 text-center text-xs text-slate-500">
             Don't have an account?{' '}
-            <Link to="/register" className="font-semibold text-[#0E131F] hover:text-[#F5A623] transition-colors">
+            <Link to="/register" className="font-bold text-[#5B4DFF] hover:underline">
               Register with College ID
             </Link>
           </div>
@@ -288,18 +300,18 @@ export const LoginPage: React.FC = () => {
       {/* Forgot Password Modal */}
       <AnimatePresence>
         {showForgotModal && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-xs">
             <motion.div
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
-              className="bg-white rounded-2xl max-w-sm w-full p-6 shadow-xl border border-neutral-100"
+              className="bg-white rounded-3xl max-w-sm w-full p-6 shadow-xl border border-slate-100"
             >
               <div className="flex items-center gap-2 mb-3">
-                <div className="w-8 h-8 rounded-full bg-amber-50 flex items-center justify-center text-[#F5A623]">
+                <div className="w-8 h-8 rounded-xl bg-indigo-50 flex items-center justify-center text-[#5B4DFF]">
                   <KeyRound className="w-4 h-4" />
                 </div>
-                <h3 className="text-base font-bold text-[#0E131F]">Reset Password</h3>
+                <h3 className="text-base font-bold text-[#1E1B4B]">Reset Password</h3>
               </div>
 
               {forgotMsg && (
@@ -315,7 +327,7 @@ export const LoginPage: React.FC = () => {
 
               {forgotStep === 'EMAIL' ? (
                 <form onSubmit={handleSendResetCode} className="space-y-3">
-                  <p className="text-xs text-neutral-500">
+                  <p className="text-xs text-slate-500">
                     Enter your institutional email. We will dispatch a 6-digit verification code.
                   </p>
                   <div>
@@ -324,7 +336,7 @@ export const LoginPage: React.FC = () => {
                       value={forgotEmail}
                       onChange={(e) => setForgotEmail(e.target.value)}
                       placeholder="student@vnrvjiet.in"
-                      className="w-full px-3.5 py-2.5 rounded-xl border border-neutral-200 text-xs focus:outline-none focus:ring-2 focus:ring-[#F5A623]/40"
+                      className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-[#5B4DFF]/30"
                       required
                     />
                   </div>
@@ -332,14 +344,14 @@ export const LoginPage: React.FC = () => {
                     <button
                       type="button"
                       onClick={() => setShowForgotModal(false)}
-                      className="flex-1 py-2 rounded-xl border border-neutral-200 text-xs font-semibold text-neutral-600 hover:bg-neutral-50"
+                      className="flex-1 py-2 rounded-xl border border-slate-200 text-xs font-semibold text-slate-600 hover:bg-slate-50 cursor-pointer"
                     >
                       Cancel
                     </button>
                     <button
                       type="submit"
                       disabled={forgotLoading}
-                      className="flex-1 py-2 rounded-xl bg-[#0E131F] text-white text-xs font-semibold hover:bg-[#1a233a] disabled:opacity-50"
+                      className="flex-1 py-2 rounded-xl bg-[#5B4DFF] hover:bg-[#4F46E5] text-white text-xs font-bold cursor-pointer disabled:opacity-50"
                     >
                       {forgotLoading ? 'Sending...' : 'Send OTP'}
                     </button>
@@ -347,29 +359,29 @@ export const LoginPage: React.FC = () => {
                 </form>
               ) : (
                 <form onSubmit={handleConfirmReset} className="space-y-3">
-                  <p className="text-xs text-neutral-500">
-                    Enter the 6-digit code received at <span className="font-semibold text-neutral-700">{forgotEmail}</span> and your new password.
+                  <p className="text-xs text-slate-500">
+                    Enter the 6-digit code received at <span className="font-semibold text-slate-700">{forgotEmail}</span> and your new password.
                   </p>
                   <div>
-                    <label className="text-[11px] font-semibold text-neutral-700">6-Digit Code</label>
+                    <label className="text-[11px] font-semibold text-slate-700">6-Digit Code</label>
                     <input
                       type="text"
                       maxLength={6}
                       value={forgotOtp}
                       onChange={(e) => setForgotOtp(e.target.value)}
                       placeholder="123456"
-                      className="w-full px-3.5 py-2 rounded-xl border border-neutral-200 text-sm font-mono tracking-widest text-center focus:outline-none focus:ring-2 focus:ring-[#F5A623]/40"
+                      className="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-sm font-mono tracking-widest text-center focus:outline-none focus:ring-2 focus:ring-[#5B4DFF]/30"
                       required
                     />
                   </div>
                   <div>
-                    <label className="text-[11px] font-semibold text-neutral-700">New Password (min 8 chars)</label>
+                    <label className="text-[11px] font-semibold text-slate-700">New Password (min 8 chars)</label>
                     <input
                       type="password"
                       value={forgotNewPassword}
                       onChange={(e) => setForgotNewPassword(e.target.value)}
                       placeholder="••••••••••••"
-                      className="w-full px-3.5 py-2 rounded-xl border border-neutral-200 text-xs focus:outline-none focus:ring-2 focus:ring-[#F5A623]/40"
+                      className="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-[#5B4DFF]/30"
                       required
                       minLength={8}
                     />
@@ -378,14 +390,14 @@ export const LoginPage: React.FC = () => {
                     <button
                       type="button"
                       onClick={() => setForgotStep('EMAIL')}
-                      className="flex-1 py-2 rounded-xl border border-neutral-200 text-xs font-semibold text-neutral-600 hover:bg-neutral-50"
+                      className="flex-1 py-2 rounded-xl border border-slate-200 text-xs font-semibold text-slate-600 hover:bg-slate-50 cursor-pointer"
                     >
                       Back
                     </button>
                     <button
                       type="submit"
                       disabled={forgotLoading}
-                      className="flex-1 py-2 rounded-xl bg-[#0E131F] text-white text-xs font-semibold hover:bg-[#1a233a] disabled:opacity-50"
+                      className="flex-1 py-2 rounded-xl bg-[#5B4DFF] hover:bg-[#4F46E5] text-white text-xs font-bold cursor-pointer disabled:opacity-50"
                     >
                       {forgotLoading ? 'Resetting...' : 'Set Password'}
                     </button>
@@ -399,4 +411,3 @@ export const LoginPage: React.FC = () => {
     </div>
   );
 };
-
