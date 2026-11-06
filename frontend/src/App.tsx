@@ -6,6 +6,7 @@ import { AppLayout } from './components/layout/AppLayout';
 import { DashboardPage } from './pages/DashboardPage';
 import { AnalyticsPage } from './pages/AnalyticsPage';
 import { ProfilePage } from './pages/ProfilePage';
+import { MarketplacePage } from './pages/MarketplacePage';
 import { PlaceholderPage } from './pages/PlaceholderPage';
 import { LoginPage } from './pages/auth/LoginPage';
 import { RegisterPage } from './pages/auth/RegisterPage';
@@ -118,26 +119,8 @@ export const App: React.FC = () => {
               }
             >
               <Route index element={<DashboardPage />} />
-              <Route
-                path="marketplace"
-                element={
-                  <PlaceholderPage
-                    title="Resource Marketplace"
-                    description="Browse, filter, and discover academic resources across campus."
-                    phase="Phase 04"
-                  />
-                }
-              />
-              <Route
-                path="explore"
-                element={
-                  <PlaceholderPage
-                    title="Resource Marketplace"
-                    description="Browse, filter, and discover academic resources across campus."
-                    phase="Phase 04"
-                  />
-                }
-              />
+              <Route path="marketplace" element={<MarketplacePage />} />
+              <Route path="explore" element={<MarketplacePage />} />
               <Route
                 path="rentals"
                 element={

@@ -30,6 +30,14 @@ class Booking(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     booking_reference = models.CharField(max_length=20, unique=True, editable=False, db_index=True)
     item_title = models.CharField(max_length=200, help_text="Title of the rented resource")
+    item = models.ForeignKey(
+        'listings.Item',
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="bookings",
+        help_text="Reference to the listed resource item"
+    )
     
     owner = models.ForeignKey(
         settings.AUTH_USER_MODEL,

@@ -106,7 +106,14 @@ ASGI_APPLICATION = 'config.asgi.application'
 # Supports Neon PostgreSQL with SSL mode, falls back to local SQLite when DATABASE_URL is not provided.
 DATABASE_URL = os.getenv('DATABASE_URL', '').strip()
 
-if DATABASE_URL:
+if 'test' in sys.argv:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': ':memory:',
+        }
+    }
+elif DATABASE_URL:
     DATABASES = {
         'default': dj_database_url.parse(
             DATABASE_URL,
