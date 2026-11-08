@@ -27,3 +27,4 @@ export function useWishlist() {
     isLoading: toggleMutation.isPending,
   };
 }
+

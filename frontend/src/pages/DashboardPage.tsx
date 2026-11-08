@@ -159,7 +159,7 @@ export const DashboardPage: React.FC = () => {
 
           <div className="flex items-center gap-3 pt-2">
             <button
-              onClick={() => setIsListModalOpen(true)}
+              onClick={() => navigate('/listings/create')}
               className="bg-white text-[#1E1B4B] px-5 py-2.5 rounded-xl font-bold text-xs hover:bg-slate-100 transition-all shadow-sm active:scale-95 cursor-pointer"
             >
               + List an item
@@ -393,7 +393,7 @@ export const DashboardPage: React.FC = () => {
 
           <div className="pt-2 border-t border-white/10 flex items-center justify-between text-xs">
             <button
-              onClick={() => setIsListModalOpen(true)}
+              onClick={() => navigate('/listings/create')}
               className="text-white font-bold hover:underline flex items-center gap-1 cursor-pointer"
             >
               <span>List high-demand item</span>

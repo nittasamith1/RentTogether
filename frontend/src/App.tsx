@@ -7,6 +7,8 @@ import { DashboardPage } from './pages/DashboardPage';
 import { AnalyticsPage } from './pages/AnalyticsPage';
 import { ProfilePage } from './pages/ProfilePage';
 import { MarketplacePage } from './pages/MarketplacePage';
+import { MyListingsPage } from './pages/listings/MyListingsPage';
+import { CreateListingPage } from './pages/listings/CreateListingPage';
 import { PlaceholderPage } from './pages/PlaceholderPage';
 import { LoginPage } from './pages/auth/LoginPage';
 import { RegisterPage } from './pages/auth/RegisterPage';
@@ -131,16 +133,9 @@ export const App: React.FC = () => {
                   />
                 }
               />
-              <Route
-                path="listings"
-                element={
-                  <PlaceholderPage
-                    title="My Listings & Inventory"
-                    description="Manage your shared resources, toggle availability, and track rental earnings."
-                    phase="Phase 05"
-                  />
-                }
-              />
+              <Route path="listings" element={<MyListingsPage />} />
+              <Route path="listings/create" element={<CreateListingPage />} />
+              <Route path="listings/new" element={<CreateListingPage />} />
               <Route
                 path="bookings"
                 element={
