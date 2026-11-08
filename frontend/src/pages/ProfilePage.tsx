@@ -337,166 +337,216 @@ export const ProfilePage: React.FC = () => {
         )}
       </div>
 
-      {/* 2. DUAL REPUTATION SCORECARDS */}
+      {/* 2. DUAL REPUTATION SCORECARDS (Simple & Clean) */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Card A: Lender (Owner) Reputation */}
         <div
-          className="rounded-3xl p-6 shadow-xs border space-y-5"
+          className="rounded-3xl p-6 shadow-xs border flex flex-col justify-between space-y-5"
           style={{ backgroundColor: '#FFFCF7', borderColor: '#EAE6E1' }}
         >
+          {/* Header */}
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2.5">
-              <div className="w-9 h-9 rounded-xl flex items-center justify-center font-bold" style={{ backgroundColor: '#E9E3FF', color: '#7563D9' }}>
+              <div
+                className="w-10 h-10 rounded-2xl flex items-center justify-center font-bold"
+                style={{ backgroundColor: '#E9E3FF', color: '#7563D9' }}
+              >
                 <Package className="w-5 h-5 stroke-[2]" />
               </div>
               <div>
-                <h2 className="text-sm font-bold leading-tight" style={{ color: '#303653' }}>
-                  Lender Reputation (Owner)
+                <h2 className="text-base font-bold leading-tight" style={{ color: '#303653' }}>
+                  Lender Reputation
                 </h2>
-                <p className="text-[11px]" style={{ color: '#85899B' }}>
-                  Evaluated by students who rented equipment from {displayName}
+                <p className="text-xs" style={{ color: '#85899B' }}>
+                  As equipment owner
                 </p>
               </div>
             </div>
             <span
-              className="px-2.5 py-1 rounded-full text-xs font-bold border"
+              className="px-3 py-1 rounded-full text-xs font-bold border"
               style={getBadgeStyle(ownerBadge)}
             >
-              {ownerBadge}
+              {ownerBadge || 'New Member'}
             </span>
           </div>
 
-          <div className="flex items-end gap-3 pb-2" style={{ borderBottom: '1px solid #EAE6E1' }}>
-            <div className="text-3xl font-black flex items-center gap-1.5" style={{ color: '#303653' }}>
-              <span>{ownerScore ? Number(ownerScore).toFixed(2) : '5.00'}</span>
-              <Star className="w-6 h-6 fill-[#E8A447]" style={{ color: '#E8A447' }} />
+          {/* Big Rating Display */}
+          <div className="flex items-baseline gap-2.5 pb-2" style={{ borderBottom: '1px solid #EAE6E1' }}>
+            <span className="text-3xl font-black" style={{ color: '#303653' }}>
+              {ownerReviewCount > 0 && ownerScore ? Number(ownerScore).toFixed(2) : '5.00'}
+            </span>
+            <div className="flex items-center gap-1.5">
+              <Star className="w-5 h-5 fill-[#E8A447]" style={{ color: '#E8A447' }} />
+              <span className="text-xs" style={{ color: '#85899B' }}>
+                {ownerReviewCount > 0
+                  ? `(${ownerReviewCount} verified reviews)`
+                  : '· New Member (No reviews yet)'}
+              </span>
             </div>
-            <span className="text-xs mb-1" style={{ color: '#85899B' }}>
-              based on <strong style={{ color: '#303653' }}>{ownerReviewCount}</strong> verified reviews
-            </span>
           </div>
 
-          {/* Criteria Weighting Breakdown */}
+          {/* Simple Performance Factors */}
           <div className="space-y-3">
             <div>
-              <div className="flex justify-between text-xs font-semibold mb-1">
-                <span style={{ color: '#303653' }}>Item Condition Accuracy (70% Weight)</span>
-                <span className="font-bold" style={{ color: '#303653' }}>
-                  {ownerReviewCount > 0 ? '4.9 ★' : '5.0 ★'}
+              <div className="flex justify-between text-xs font-medium mb-1.5">
+                <span style={{ color: '#303653' }}>Item Condition Accuracy</span>
+                <span className="font-bold" style={{ color: '#42A879' }}>
+                  {ownerReviewCount > 0 ? '4.9 ★' : '100% Verified'}
                 </span>
               </div>
-              <div className="w-full h-2 rounded-full overflow-hidden" style={{ backgroundColor: '#FFF8ED', border: '1px solid #EAE6E1' }}>
-                <div className="h-full rounded-full" style={{ width: '98%', backgroundColor: '#42A879' }} />
+              <div
+                className="w-full h-1.5 rounded-full overflow-hidden"
+                style={{ backgroundColor: '#FFF8ED', border: '1px solid #EAE6E1' }}
+              >
+                <div className="h-full rounded-full" style={{ width: '100%', backgroundColor: '#42A879' }} />
               </div>
             </div>
 
             <div>
-              <div className="flex justify-between text-xs font-semibold mb-1">
-                <span style={{ color: '#303653' }}>Communication & Punctuality (30% Weight)</span>
-                <span className="font-bold" style={{ color: '#303653' }}>
-                  {ownerReviewCount > 0 ? '4.8 ★' : '5.0 ★'}
+              <div className="flex justify-between text-xs font-medium mb-1.5">
+                <span style={{ color: '#303653' }}>Communication & Handover</span>
+                <span className="font-bold" style={{ color: '#7563D9' }}>
+                  {ownerReviewCount > 0 ? '4.8 ★' : '100% Responsive'}
                 </span>
               </div>
-              <div className="w-full h-2 rounded-full overflow-hidden" style={{ backgroundColor: '#FFF8ED', border: '1px solid #EAE6E1' }}>
-                <div className="h-full rounded-full" style={{ width: '95%', backgroundColor: '#7563D9' }} />
+              <div
+                className="w-full h-1.5 rounded-full overflow-hidden"
+                style={{ backgroundColor: '#FFF8ED', border: '1px solid #EAE6E1' }}
+              >
+                <div className="h-full rounded-full" style={{ width: '100%', backgroundColor: '#7563D9' }} />
               </div>
             </div>
           </div>
 
           {/* Owner Quick Stats */}
           <div className="grid grid-cols-2 gap-3 pt-2 text-center">
-            <div className="p-3 rounded-2xl border" style={{ backgroundColor: '#E9E3FF', borderColor: '#D8D0F5' }}>
-              <div className="text-lg font-black" style={{ color: '#303653' }}>
+            <div
+              className="p-3.5 rounded-2xl border"
+              style={{ backgroundColor: '#E9E3FF', borderColor: '#D8D0F5' }}
+            >
+              <div className="text-xl font-black" style={{ color: '#303653' }}>
                 {isOwnProfile ? detailedProfile?.total_items_lent || 0 : 'Verified'}
               </div>
-              <div className="text-[11px] font-semibold" style={{ color: '#7563D9' }}>Items Shared</div>
-            </div>
-            <div className="p-3 rounded-2xl border" style={{ backgroundColor: '#DDF3E7', borderColor: '#B8E5CC' }}>
-              <div className="text-lg font-black" style={{ color: '#42A879' }}>
-                ₹{isOwnProfile ? detailedProfile?.total_earnings_inr || '0.00' : 'Confidential'}
+              <div className="text-xs font-semibold mt-0.5" style={{ color: '#7563D9' }}>
+                Items Shared
               </div>
-              <div className="text-[11px] font-semibold" style={{ color: '#2D7A5B' }}>Total Rental Earnings</div>
+            </div>
+            <div
+              className="p-3.5 rounded-2xl border"
+              style={{ backgroundColor: '#DDF3E7', borderColor: '#B8E5CC' }}
+            >
+              <div className="text-xl font-black" style={{ color: '#42A879' }}>
+                ₹{isOwnProfile ? Math.round(Number(detailedProfile?.total_earnings_inr || 0)).toLocaleString() : 'Confidential'}
+              </div>
+              <div className="text-xs font-semibold mt-0.5" style={{ color: '#2D7A5B' }}>
+                Total Earned
+              </div>
             </div>
           </div>
         </div>
 
         {/* Card B: Borrower (Renter) Reputation */}
         <div
-          className="rounded-3xl p-6 shadow-xs border space-y-5"
+          className="rounded-3xl p-6 shadow-xs border flex flex-col justify-between space-y-5"
           style={{ backgroundColor: '#FFFCF7', borderColor: '#EAE6E1' }}
         >
+          {/* Header */}
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2.5">
-              <div className="w-9 h-9 rounded-xl flex items-center justify-center font-bold" style={{ backgroundColor: '#FFE5D6', color: '#C45C20' }}>
+              <div
+                className="w-10 h-10 rounded-2xl flex items-center justify-center font-bold"
+                style={{ backgroundColor: '#DFEDFF', color: '#6398D6' }}
+              >
                 <Clock className="w-5 h-5 stroke-[2]" />
               </div>
               <div>
-                <h2 className="text-sm font-bold leading-tight" style={{ color: '#303653' }}>
-                  Borrower Reputation (Renter)
+                <h2 className="text-base font-bold leading-tight" style={{ color: '#303653' }}>
+                  Borrower Reputation
                 </h2>
-                <p className="text-[11px]" style={{ color: '#85899B' }}>
-                  Evaluated by equipment owners on punctual returns and gear care
+                <p className="text-xs" style={{ color: '#85899B' }}>
+                  As resource borrower
                 </p>
               </div>
             </div>
             <span
-              className="px-2.5 py-1 rounded-full text-xs font-bold border"
+              className="px-3 py-1 rounded-full text-xs font-bold border"
               style={getBadgeStyle(renterBadge)}
             >
-              {renterBadge}
+              {renterBadge || 'New Member'}
             </span>
           </div>
 
-          <div className="flex items-end gap-3 pb-2" style={{ borderBottom: '1px solid #EAE6E1' }}>
-            <div className="text-3xl font-black flex items-center gap-1.5" style={{ color: '#303653' }}>
-              <span>{renterScore ? Number(renterScore).toFixed(2) : '5.00'}</span>
-              <Star className="w-6 h-6 fill-[#E8A447]" style={{ color: '#E8A447' }} />
+          {/* Big Rating Display */}
+          <div className="flex items-baseline gap-2.5 pb-2" style={{ borderBottom: '1px solid #EAE6E1' }}>
+            <span className="text-3xl font-black" style={{ color: '#303653' }}>
+              {renterReviewCount > 0 && renterScore ? Number(renterScore).toFixed(2) : '5.00'}
+            </span>
+            <div className="flex items-center gap-1.5">
+              <Star className="w-5 h-5 fill-[#E8A447]" style={{ color: '#E8A447' }} />
+              <span className="text-xs" style={{ color: '#85899B' }}>
+                {renterReviewCount > 0
+                  ? `(${renterReviewCount} verified reviews)`
+                  : '· New Member (No reviews yet)'}
+              </span>
             </div>
-            <span className="text-xs mb-1" style={{ color: '#85899B' }}>
-              based on <strong style={{ color: '#303653' }}>{renterReviewCount}</strong> verified reviews
-            </span>
           </div>
 
-          {/* Criteria Weighting Breakdown */}
+          {/* Simple Performance Factors */}
           <div className="space-y-3">
             <div>
-              <div className="flex justify-between text-xs font-semibold mb-1">
-                <span style={{ color: '#303653' }}>On-Time Return (60% Weight)</span>
-                <span className="font-bold" style={{ color: '#303653' }}>
-                  {renterReviewCount > 0 ? '4.9 ★' : '5.0 ★'}
+              <div className="flex justify-between text-xs font-medium mb-1.5">
+                <span style={{ color: '#303653' }}>On-Time Return Rate</span>
+                <span className="font-bold" style={{ color: '#42A879' }}>
+                  {renterReviewCount > 0 ? '4.9 ★' : '100% On-Time'}
                 </span>
               </div>
-              <div className="w-full h-2 rounded-full overflow-hidden" style={{ backgroundColor: '#FFF8ED', border: '1px solid #EAE6E1' }}>
-                <div className="h-full rounded-full" style={{ width: '97%', backgroundColor: '#42A879' }} />
+              <div
+                className="w-full h-1.5 rounded-full overflow-hidden"
+                style={{ backgroundColor: '#FFF8ED', border: '1px solid #EAE6E1' }}
+              >
+                <div className="h-full rounded-full" style={{ width: '100%', backgroundColor: '#42A879' }} />
               </div>
             </div>
 
             <div>
-              <div className="flex justify-between text-xs font-semibold mb-1">
-                <span style={{ color: '#303653' }}>Item Care & Cleanliness (40% Weight)</span>
-                <span className="font-bold" style={{ color: '#303653' }}>
-                  {renterReviewCount > 0 ? '4.8 ★' : '5.0 ★'}
+              <div className="flex justify-between text-xs font-medium mb-1.5">
+                <span style={{ color: '#303653' }}>Item Care & Safety</span>
+                <span className="font-bold" style={{ color: '#E8A447' }}>
+                  {renterReviewCount > 0 ? '4.8 ★' : '100% Care'}
                 </span>
               </div>
-              <div className="w-full h-2 rounded-full overflow-hidden" style={{ backgroundColor: '#FFF8ED', border: '1px solid #EAE6E1' }}>
-                <div className="h-full rounded-full" style={{ width: '94%', backgroundColor: '#E8A447' }} />
+              <div
+                className="w-full h-1.5 rounded-full overflow-hidden"
+                style={{ backgroundColor: '#FFF8ED', border: '1px solid #EAE6E1' }}
+              >
+                <div className="h-full rounded-full" style={{ width: '100%', backgroundColor: '#E8A447' }} />
               </div>
             </div>
           </div>
 
           {/* Renter Quick Stats */}
           <div className="grid grid-cols-2 gap-3 pt-2 text-center">
-            <div className="p-3 rounded-2xl border" style={{ backgroundColor: '#DFEDFF', borderColor: '#C5DCFA' }}>
-              <div className="text-lg font-black" style={{ color: '#303653' }}>
+            <div
+              className="p-3.5 rounded-2xl border"
+              style={{ backgroundColor: '#DFEDFF', borderColor: '#C5DCFA' }}
+            >
+              <div className="text-xl font-black" style={{ color: '#303653' }}>
                 {isOwnProfile ? detailedProfile?.total_items_borrowed || 0 : 'Verified'}
               </div>
-              <div className="text-[11px] font-semibold" style={{ color: '#6398D6' }}>Items Rented</div>
-            </div>
-            <div className="p-3 rounded-2xl border" style={{ backgroundColor: '#FFE5D6', borderColor: '#F5CDB8' }}>
-              <div className="text-lg font-black" style={{ color: '#C45C20' }}>
-                ₹{isOwnProfile ? detailedProfile?.total_savings_inr || '0.00' : 'Significant'}
+              <div className="text-xs font-semibold mt-0.5" style={{ color: '#6398D6' }}>
+                Items Rented
               </div>
-              <div className="text-[11px] font-semibold" style={{ color: '#C45C20' }}>Savings vs Buying New</div>
+            </div>
+            <div
+              className="p-3.5 rounded-2xl border"
+              style={{ backgroundColor: '#FFE5D6', borderColor: '#F5CDB8' }}
+            >
+              <div className="text-xl font-black" style={{ color: '#C45C20' }}>
+                ₹{isOwnProfile ? Math.round(Number(detailedProfile?.total_savings_inr || 0)).toLocaleString() : 'Significant'}
+              </div>
+              <div className="text-xs font-semibold mt-0.5" style={{ color: '#C45C20' }}>
+                Campus Savings
+              </div>
             </div>
           </div>
         </div>
