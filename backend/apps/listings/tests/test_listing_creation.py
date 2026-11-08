@@ -147,3 +147,13 @@ class ListingCreationAPITests(APITestCase):
         response = self.client.post(self.create_url, payload, format='multipart')
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
+    def test_my_listings_endpoint_without_query_params(self):
+        self.client.force_authenticate(user=self.verified_student)
+        url = reverse('listing-my-listings')
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertIn('stats', response.data)
+        self.assertIn('results', response.data)
+
+
+

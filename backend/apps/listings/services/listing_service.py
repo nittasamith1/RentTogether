@@ -95,18 +95,21 @@ def get_owner_listings(owner, filters: Optional[Dict[str, Any]] = None):
     if not filters:
         filters = {}
 
-    status_filter = filters.get('status', '').strip().upper()
+    status_val = filters.get('status') or ''
+    status_filter = status_val.strip().upper()
     if status_filter in [Item.STATUS_ACTIVE, Item.STATUS_PAUSED, Item.STATUS_REMOVED]:
         qs = qs.filter(status=status_filter)
     else:
         # Exclude soft-deleted items by default unless explicitly requested
         qs = qs.exclude(status=Item.STATUS_REMOVED)
 
-    category_slug = filters.get('category', '').strip().lower()
+    category_val = filters.get('category') or ''
+    category_slug = category_val.strip().lower()
     if category_slug:
         qs = qs.filter(category__slug=category_slug)
 
-    search_query = filters.get('search', '').strip()
+    search_val = filters.get('search') or ''
+    search_query = search_val.strip()
     if search_query:
         qs = qs.filter(
             Q(title__icontains=search_query) |
