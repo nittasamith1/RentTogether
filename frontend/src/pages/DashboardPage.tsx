@@ -256,10 +256,10 @@ export const DashboardPage: React.FC = () => {
               ₹
             </div>
             <Link
-              to="/insights"
+              to="/analytics"
               className="text-[11px] font-bold text-indigo-600 hover:text-indigo-800 flex items-center gap-0.5 group"
             >
-              <span>Insights</span>
+              <span>Analytics</span>
               <ArrowRight className="w-3 h-3 group-hover:translate-x-0.5 transition-transform" />
             </Link>
           </div>
@@ -267,7 +267,7 @@ export const DashboardPage: React.FC = () => {
             <div className="text-xs font-medium text-slate-500">Campus Savings</div>
             <div className="text-2xl font-extrabold text-slate-900 mt-0.5">₹8,450</div>
             <Link
-              to="/insights"
+              to="/analytics"
               className="text-[11px] font-bold text-indigo-600 hover:underline mt-1 block"
             >
               View full analytics & CO₂ impact →
@@ -399,7 +399,7 @@ export const DashboardPage: React.FC = () => {
               <span>List high-demand item</span>
               <ArrowRight className="w-3.5 h-3.5" />
             </button>
-            <Link to="/insights" className="text-white/80 hover:text-white font-medium">
+            <Link to="/analytics" className="text-white/80 hover:text-white font-medium">
               View Analytics →
             </Link>
           </div>

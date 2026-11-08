@@ -3,7 +3,6 @@ import { motion } from 'framer-motion';
 import {
   TrendingUp,
   CreditCard,
-  Leaf,
   PiggyBank,
   ArrowUpRight,
   Sparkles,
@@ -18,7 +17,7 @@ export const AnalyticsPage: React.FC = () => {
 
   // Time filter state
   const [timeRange, setTimeRange] = useState<'WEEKLY' | 'MONTHLY' | 'SEMESTER'>('WEEKLY');
-  const [hoveredIndex, setHoveredIndex] = useState<number>(5);
+  const [selectedWeek, setSelectedWeek] = useState<number>(5); // Default to W6 (index 5) matching screenshot
 
   // Weekly data for Earnings vs Spending
   const weeklyData = [
@@ -29,8 +28,6 @@ export const AnalyticsPage: React.FC = () => {
     { label: 'W5', earnings: 1540, spending: 510, date: 'Oct 29 - Nov 04' },
     { label: 'W6', earnings: 1840, spending: 620, date: 'Nov 05 - Nov 11' },
   ];
-
-  const current = weeklyData[hoveredIndex] || weeklyData[weeklyData.length - 1];
 
   // Category breakdown
   const categoryStats = [
@@ -45,7 +42,7 @@ export const AnalyticsPage: React.FC = () => {
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
-      className="space-y-6 max-w-7xl mx-auto pb-12"
+      className="space-y-6 max-w-7xl mx-auto pb-12 select-none"
     >
       {/* Page Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-slate-200/60">
@@ -152,152 +149,185 @@ export const AnalyticsPage: React.FC = () => {
         </div>
       </div>
 
-      {/* Main Analytics Visualizations: Earnings vs Spending + Sustainability */}
+      {/* Main Analytics Visualizations: Earnings vs Spending + Sustainability (Exact User Screenshot Design) */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-stretch">
         {/* Earnings vs Spending Area Chart (8 columns) */}
-        <div className="lg:col-span-8 bg-white rounded-2xl p-6 border border-slate-100 shadow-sm flex flex-col justify-between">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-100">
-            <div>
-              <h2 className="text-base font-bold text-slate-900">Earnings vs Spending</h2>
-              <p className="text-xs text-slate-400 mt-0.5">
-                Semester trend comparing rental income generated vs borrowing costs.
-              </p>
-            </div>
+        <div className="lg:col-span-8 bg-white rounded-2xl p-6 sm:p-7 border border-slate-100 shadow-sm flex flex-col justify-between">
+          {/* Header matching screenshot */}
+          <div className="flex items-center justify-between pb-2">
+            <h2 className="text-base sm:text-lg font-bold text-slate-900 tracking-tight">
+              Earnings vs Spending
+            </h2>
 
-            {/* Legend & Selected Week Detail */}
-            <div className="flex items-center gap-4 text-xs">
-              <div className="flex items-center gap-1.5 text-slate-600 font-semibold">
-                <span className="w-3 h-3 rounded-full bg-[#5B4DFF]" />
-                <span>Earnings: ₹{current.earnings}</span>
+            {/* Legend: Earnings (Purple) & Spending (Pink/Coral) */}
+            <div className="flex items-center gap-4 text-xs font-medium text-slate-600">
+              <div className="flex items-center gap-2">
+                <span className="w-2.5 h-2.5 rounded-full bg-[#5046E5]" />
+                <span>Earnings</span>
               </div>
-              <div className="flex items-center gap-1.5 text-slate-600 font-semibold">
-                <span className="w-3 h-3 rounded-full bg-[#FB7185]" />
-                <span>Spending: ₹{current.spending}</span>
+              <div className="flex items-center gap-2">
+                <span className="w-2.5 h-2.5 rounded-full bg-[#FB7185]" />
+                <span>Spending</span>
               </div>
             </div>
           </div>
 
-          {/* Interactive Dual Spline SVG Chart */}
-          <div className="relative h-60 w-full flex items-end pt-4">
-            <svg className="w-full h-full overflow-visible" viewBox="0 0 500 150" preserveAspectRatio="none">
+          {/* Dual Spline SVG Chart matching user's exact curve, gradient, and scatter points */}
+          <div className="relative h-56 sm:h-64 w-full flex items-end pt-2 pb-1">
+            <svg
+              className="w-full h-full overflow-visible"
+              viewBox="0 0 600 200"
+              preserveAspectRatio="none"
+            >
               <defs>
-                <linearGradient id="analyticsEarningsGrad" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="#5B4DFF" stopOpacity="0.25" />
-                  <stop offset="100%" stopColor="#5B4DFF" stopOpacity="0.0" />
+                {/* Purple gradient fading to pink/transparent at the bottom */}
+                <linearGradient id="earningsGradientArea" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="#5046E5" stopOpacity="0.28" />
+                  <stop offset="60%" stopColor="#818CF8" stopOpacity="0.14" />
+                  <stop offset="90%" stopColor="#F472B6" stopOpacity="0.08" />
+                  <stop offset="100%" stopColor="#FFF1F2" stopOpacity="0.0" />
                 </linearGradient>
-                <linearGradient id="analyticsSpendingGrad" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="#FB7185" stopOpacity="0.25" />
+
+                {/* Coral/Pink gradient */}
+                <linearGradient id="spendingGradientArea" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="#FB7185" stopOpacity="0.22" />
                   <stop offset="100%" stopColor="#FB7185" stopOpacity="0.0" />
                 </linearGradient>
               </defs>
 
-              {/* Grid Guide Lines */}
-              <line x1="0" y1="20" x2="500" y2="20" stroke="#F1F5F9" strokeWidth="1" strokeDasharray="4 4" />
-              <line x1="0" y1="65" x2="500" y2="65" stroke="#F1F5F9" strokeWidth="1" strokeDasharray="4 4" />
-              <line x1="0" y1="110" x2="500" y2="110" stroke="#F1F5F9" strokeWidth="1" strokeDasharray="4 4" />
-              <line x1="0" y1="140" x2="500" y2="140" stroke="#E2E8F0" strokeWidth="1" />
-
-              {/* Area Fills */}
-              <path
-                d="M 10 120 Q 100 100, 190 70 T 370 35 T 490 18 L 490 140 L 10 140 Z"
-                fill="url(#analyticsEarningsGrad)"
-              />
-              <path
-                d="M 10 125 Q 100 115, 190 100 T 370 85 T 490 70 L 490 140 L 10 140 Z"
-                fill="url(#analyticsSpendingGrad)"
+              {/* Middle horizontal dashed guideline */}
+              <line
+                x1="20"
+                y1="90"
+                x2="580"
+                y2="90"
+                stroke="#F1F5F9"
+                strokeWidth="1.2"
+                strokeDasharray="5 5"
               />
 
-              {/* Spline Lines */}
+              {/* Bottom solid baseline */}
+              <line
+                x1="20"
+                y1="175"
+                x2="580"
+                y2="175"
+                stroke="#F8FAFC"
+                strokeWidth="1"
+              />
+
+              {/* Area under Earnings Curve */}
               <path
-                d="M 10 120 Q 100 100, 190 70 T 370 35 T 490 18"
+                d="M 50 145 C 100 138, 120 125, 150 125 C 180 125, 220 105, 250 100 C 280 95, 320 80, 350 78 C 380 75, 420 65, 450 62 C 480 60, 520 50, 550 48 L 550 175 L 50 175 Z"
+                fill="url(#earningsGradientArea)"
+              />
+
+              {/* Area under Spending Curve */}
+              <path
+                d="M 50 155 C 100 150, 120 145, 150 145 C 180 145, 220 138, 250 136 C 280 134, 320 130, 350 130 C 380 130, 420 126, 450 124 C 480 122, 520 115, 550 110 L 550 175 L 50 175 Z"
+                fill="url(#spendingGradientArea)"
+              />
+
+              {/* Earnings Spline Stroke */}
+              <path
+                d="M 50 145 C 100 138, 120 125, 150 125 C 180 125, 220 105, 250 100 C 280 95, 320 80, 350 78 C 380 75, 420 65, 450 62 C 480 60, 520 50, 550 48"
                 fill="none"
-                stroke="#5B4DFF"
-                strokeWidth="3"
+                stroke="#5046E5"
+                strokeWidth="3.5"
                 strokeLinecap="round"
               />
+
+              {/* Spending Spline Stroke */}
               <path
-                d="M 10 125 Q 100 115, 190 100 T 370 85 T 490 70"
+                d="M 50 155 C 100 150, 120 145, 150 145 C 180 145, 220 138, 250 136 C 280 134, 320 130, 350 130 C 380 130, 420 126, 450 124 C 480 122, 520 115, 550 110"
                 fill="none"
                 stroke="#FB7185"
                 strokeWidth="3"
                 strokeLinecap="round"
               />
 
-              {/* Interactive Point Markers */}
-              <circle cx="10" cy="120" r="4" fill="#5B4DFF" />
-              <circle cx="100" cy="100" r="4" fill="#5B4DFF" />
-              <circle cx="190" cy="70" r="4" fill="#5B4DFF" />
-              <circle cx="280" cy="50" r="4" fill="#5B4DFF" />
-              <circle cx="370" cy="35" r="5" fill="#5B4DFF" stroke="#FFFFFF" strokeWidth="2.5" />
-              <circle cx="490" cy="18" r="5" fill="#5B4DFF" stroke="#FFFFFF" strokeWidth="2.5" />
+              {/* Spending Dots (Coral/Pink) */}
+              <circle cx="50" cy="155" r="4" fill="#FB7185" />
+              <circle cx="150" cy="145" r="4" fill="#FB7185" />
+              <circle cx="250" cy="136" r="4" fill="#FB7185" />
+              <circle cx="350" cy="130" r="4" fill="#FB7185" />
+              <circle cx="450" cy="124" r="4" fill="#FB7185" />
+              <circle cx="550" cy="110" r="4.5" fill="#FB7185" />
 
-              <circle cx="10" cy="125" r="3.5" fill="#FB7185" />
-              <circle cx="100" cy="115" r="3.5" fill="#FB7185" />
-              <circle cx="190" cy="100" r="3.5" fill="#FB7185" />
-              <circle cx="280" cy="92" r="3.5" fill="#FB7185" />
-              <circle cx="370" cy="85" r="4" fill="#FB7185" stroke="#FFFFFF" strokeWidth="2" />
-              <circle cx="490" cy="70" r="4" fill="#FB7185" stroke="#FFFFFF" strokeWidth="2" />
+              {/* Earnings Dots (Purple/Blue) - Matching exact screenshot positions */}
+              <circle cx="50" cy="145" r="4.5" fill="#5046E5" />
+              <circle cx="150" cy="133" r="4.5" fill="#5046E5" />
+              <circle cx="250" cy="100" r="4.5" fill="#5046E5" />
+              <circle cx="350" cy="85" r="4.5" fill="#5046E5" />
+
+              {/* W5: Purple Dot with White Border Ring (matching screenshot) */}
+              <circle
+                cx="450"
+                cy="62"
+                r="6"
+                fill="#5046E5"
+                stroke="#FFFFFF"
+                strokeWidth="2.5"
+              />
+
+              {/* W6: End Peak Dot */}
+              <circle cx="550" cy="48" r="5" fill="#5046E5" />
             </svg>
           </div>
 
-          {/* Interactive X-Axis Timeline Selectors */}
-          <div className="grid grid-cols-6 text-center text-xs pt-4 border-t border-slate-100 gap-1">
-            {weeklyData.map((d, i) => (
-              <button
-                key={d.label}
-                onClick={() => setHoveredIndex(i)}
-                className={`py-1.5 px-1 rounded-xl transition-all cursor-pointer ${
-                  hoveredIndex === i
-                    ? 'font-black text-[#5B4DFF] bg-indigo-50 border border-indigo-200/60 shadow-xs'
-                    : 'text-slate-400 font-semibold hover:text-slate-700 hover:bg-slate-50'
-                }`}
-              >
-                <div>{d.label}</div>
-                <div className="text-[10px] font-normal text-slate-400 hidden sm:block">
-                  ₹{d.earnings}
+          {/* Timeline Axis (W1 to W6) with W6 Pill matching screenshot */}
+          <div className="grid grid-cols-6 text-center text-xs sm:text-sm font-medium pt-3 items-center">
+            {weeklyData.map((d, index) => {
+              const isSelected = selectedWeek === index;
+              return (
+                <div key={d.label} className="flex justify-center">
+                  <button
+                    onClick={() => setSelectedWeek(index)}
+                    className={`transition-all cursor-pointer ${
+                      isSelected
+                        ? 'bg-[#EEF2FF] text-[#5046E5] font-bold px-4 sm:px-5 py-1.5 rounded-xl shadow-xs'
+                        : 'text-slate-400 hover:text-slate-600 font-medium py-1.5'
+                    }`}
+                  >
+                    {d.label}
+                  </button>
                 </div>
-              </button>
-            ))}
+              );
+            })}
           </div>
         </div>
 
-        {/* Sustainability Ring Gauge (4 columns) */}
-        <div className="lg:col-span-4 bg-white rounded-2xl p-6 border border-slate-100 shadow-sm flex flex-col justify-between">
-          <div className="flex items-center justify-between">
-            <h2 className="text-base font-bold text-slate-900">Sustainability</h2>
-            <span className="p-1.5 rounded-lg bg-emerald-50 text-emerald-600">
-              <Leaf className="w-4 h-4 stroke-[2]" />
-            </span>
+        {/* Sustainability Ring Gauge (4 columns) - Exact User Screenshot Design */}
+        <div className="lg:col-span-4 bg-white rounded-2xl p-6 sm:p-7 border border-slate-100 shadow-sm flex flex-col justify-between items-center text-center">
+          {/* Header */}
+          <div className="w-full flex items-center justify-between pb-1">
+            <h2 className="text-base sm:text-lg font-bold text-slate-900 tracking-tight text-left">
+              Sustainability
+            </h2>
           </div>
 
-          {/* Circular Badge with Emerald Progress */}
-          <div className="my-auto py-6 flex flex-col items-center">
-            <div className="relative w-40 h-40 rounded-full bg-emerald-50 border-8 border-emerald-100/70 flex items-center justify-center p-3 shadow-inner group hover:scale-105 transition-transform duration-300">
-              <div className="w-full h-full rounded-full bg-gradient-to-tr from-emerald-500 to-teal-400 text-white flex flex-col items-center justify-center shadow-lg shadow-emerald-500/25">
-                <span className="text-3xl font-black tracking-tight">18 kg</span>
-                <span className="text-xs font-bold text-white/95 uppercase tracking-wider mt-0.5">
+          {/* Circular Badge with Mint Halo and Emerald Core matching screenshot */}
+          <div className="my-auto py-6 sm:py-8 flex flex-col items-center justify-center">
+            <div className="relative w-44 h-44 sm:w-48 sm:h-48 rounded-full bg-[#E6F9F3] flex items-center justify-center p-3.5 shadow-xs">
+              {/* Outer soft mint translucent border ring */}
+              <div className="absolute inset-0 rounded-full border-[9px] border-[#DCF7ED]/80 pointer-events-none" />
+
+              {/* Inner vivid solid emerald circle */}
+              <div className="w-32 h-32 sm:w-36 sm:h-36 rounded-full bg-[#00C292] text-white flex flex-col items-center justify-center shadow-lg shadow-emerald-500/20">
+                <span className="text-3xl sm:text-4xl font-black tracking-tight leading-none">
+                  18 kg
+                </span>
+                <span className="text-xs sm:text-sm font-medium text-white/95 mt-1 leading-tight">
                   CO₂ avoided
                 </span>
               </div>
             </div>
           </div>
 
-          {/* Impact Breakdown */}
-          <div className="space-y-2 pt-2 border-t border-slate-100 text-center">
-            <p className="text-xs text-slate-600 font-bold">
-              12 items reused instead of bought new. Nice work!
-            </p>
-            <div className="grid grid-cols-2 gap-2 text-left pt-2">
-              <div className="p-2 rounded-xl bg-slate-50 text-[11px] text-slate-600">
-                <span className="text-slate-400 block text-[10px]">Landfill Avoided</span>
-                <span className="font-bold text-slate-800">4.2 kg e-waste</span>
-              </div>
-              <div className="p-2 rounded-xl bg-slate-50 text-[11px] text-slate-600">
-                <span className="text-slate-400 block text-[10px]">Campus Rank</span>
-                <span className="font-bold text-emerald-600">Top 10% Eco</span>
-              </div>
-            </div>
-          </div>
+          {/* Clean Subtitle matching user screenshot */}
+          <p className="text-xs sm:text-sm text-slate-600 font-normal text-center max-w-xs mt-2">
+            12 items reused instead of bought new. Nice work!
+          </p>
         </div>
       </div>
 

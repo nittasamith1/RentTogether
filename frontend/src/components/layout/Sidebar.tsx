@@ -28,7 +28,7 @@ const navItems: NavItem[] = [
   { name: 'My Listings', path: '/listings', icon: AlignLeft },
   { name: 'My Bookings', path: '/bookings', icon: Calendar },
   { name: 'Payments', path: '/payments', icon: CreditCard },
-  { name: 'Insights', path: '/insights', icon: BarChart2 },
+  { name: 'Analytics', path: '/analytics', icon: BarChart2 },
   { name: 'Profile', path: '/profile', icon: User },
 ];
 
