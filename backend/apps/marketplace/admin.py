@@ -16,3 +16,4 @@ class WishlistAdmin(admin.ModelAdmin):
     list_display = ('user', 'item', 'created_at')
     search_fields = ('user__email', 'item__title')
     list_select_related = ('user', 'item')
+

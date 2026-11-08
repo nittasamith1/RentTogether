@@ -2,13 +2,12 @@ import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import {
   MapPin,
-  PauseCircle,
-  PlayCircle,
   Edit3,
   Trash2,
   Layers,
   AlertTriangle,
   Loader2,
+  History,
 } from 'lucide-react';
 import { OwnerListingSummary } from '../../services/listingService';
 import { ListingStatusBadge } from './ListingStatusBadge';
@@ -18,12 +17,14 @@ interface ListingCardProps {
   item: OwnerListingSummary;
   onEdit: (item: OwnerListingSummary) => void;
   onViewDetails?: (itemId: string) => void;
+  onViewHistory?: (item: OwnerListingSummary) => void;
 }
 
 export const ListingCard: React.FC<ListingCardProps> = ({
   item,
   onEdit,
   onViewDetails,
+  onViewHistory,
 }) => {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState<boolean>(false);
   const statusMutation = useUpdateListingStatus();
@@ -172,58 +173,70 @@ export const ListingCard: React.FC<ListingCardProps> = ({
             </div>
           </div>
         ) : (
-          <div className="flex items-center justify-between gap-2 pt-2">
-            {/* Pause / Resume Button */}
-            <button
-              type="button"
-              onClick={handleToggleStatus}
-              disabled={statusMutation.isPending}
-              className={`flex-1 py-1.5 px-3 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
-                item.status === 'ACTIVE'
-                  ? 'bg-amber-50 text-amber-800 hover:bg-amber-100 border border-amber-200/70'
-                  : 'bg-emerald-50 text-emerald-800 hover:bg-emerald-100 border border-emerald-200/70'
-              }`}
-            >
-              {statusMutation.isPending ? (
-                <Loader2 className="w-3.5 h-3.5 animate-spin" />
-              ) : item.status === 'ACTIVE' ? (
-                <>
-                  <PauseCircle className="w-3.5 h-3.5" />
-                  <span>Pause</span>
-                </>
-              ) : (
-                <>
-                  <PlayCircle className="w-3.5 h-3.5" />
-                  <span>Resume</span>
-                </>
-              )}
-            </button>
+          <div className="flex items-center justify-between gap-2 pt-2.5">
+            {/* Quick Pause / Resume Toggle Switch */}
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={handleToggleStatus}
+                disabled={statusMutation.isPending}
+                className={`relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-hidden ${
+                  item.status === 'ACTIVE' ? 'bg-emerald-500' : 'bg-slate-300'
+                }`}
+                title={item.status === 'ACTIVE' ? 'Click to Pause listing' : 'Click to Resume listing'}
+              >
+                <span
+                  className={`pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow-sm ring-0 transition duration-200 ease-in-out ${
+                    item.status === 'ACTIVE' ? 'translate-x-4' : 'translate-x-0'
+                  }`}
+                />
+              </button>
+              <span className="text-[11px] font-bold text-slate-600">
+                {statusMutation.isPending ? 'Updating...' : item.status === 'ACTIVE' ? 'Live' : 'Paused'}
+              </span>
+            </div>
 
-            {/* Edit Button */}
-            <button
-              type="button"
-              onClick={(e) => {
-                e.stopPropagation();
-                onEdit(item);
-              }}
-              title="Edit listing details"
-              className="p-1.5 rounded-xl border border-slate-200 hover:bg-slate-50 text-slate-600 hover:text-slate-900 transition-colors cursor-pointer"
-            >
-              <Edit3 className="w-4 h-4" />
-            </button>
+            <div className="flex items-center gap-1.5">
+              {/* Rental History Button */}
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  if (onViewHistory) onViewHistory(item);
+                }}
+                title="View rental transaction history"
+                className="p-1.5 px-2 rounded-xl border border-slate-200 hover:bg-indigo-50 hover:border-indigo-200 text-slate-600 hover:text-[#5B4DFF] transition-colors flex items-center gap-1 text-[11px] font-bold cursor-pointer"
+              >
+                <History className="w-3.5 h-3.5" />
+                <span>History</span>
+              </button>
 
-            {/* Delete Button */}
-            <button
-              type="button"
-              onClick={(e) => {
-                e.stopPropagation();
-                setShowDeleteConfirm(true);
-              }}
-              title="Delete or unpublish item"
-              className="p-1.5 rounded-xl border border-slate-200 hover:bg-rose-50 text-slate-400 hover:text-rose-600 transition-colors cursor-pointer"
-            >
-              <Trash2 className="w-4 h-4" />
-            </button>
+              {/* Edit Button */}
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onEdit(item);
+                }}
+                title="Edit listing details"
+                className="p-1.5 rounded-xl border border-slate-200 hover:bg-slate-50 text-slate-600 hover:text-slate-900 transition-colors cursor-pointer"
+              >
+                <Edit3 className="w-3.5 h-3.5" />
+              </button>
+
+              {/* Delete Button */}
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setShowDeleteConfirm(true);
+                }}
+                title="Delete or unpublish item"
+                className="p-1.5 rounded-xl border border-slate-200 hover:bg-rose-50 text-slate-400 hover:text-rose-600 transition-colors cursor-pointer"
+              >
+                <Trash2 className="w-3.5 h-3.5" />
+              </button>
+            </div>
           </div>
         )}
       </div>

@@ -80,6 +80,28 @@ export interface PriceRecommendationResponse {
   formula_used: string;
 }
 
+export interface RentalHistoryRecord {
+  id: string;
+  booking_reference: string;
+  renter_name: string;
+  renter_avatar: string;
+  status: string;
+  start_date: string;
+  end_date: string;
+  actual_return_date: string | null;
+  rental_price_inr: number;
+  deposit_amount_inr: number;
+  pickup_spot: string;
+  created_at: string;
+}
+
+export interface ItemRentalHistoryResponse {
+  item_id: string;
+  item_title: string;
+  total_rentals: number;
+  rental_history: RentalHistoryRecord[];
+}
+
 export const listingService = {
   // Fetch owner's inventory listings with filters and KPI stats
   async getMyListings(filters: MyListingsFilters = {}): Promise<MyListingsResponse> {
@@ -173,4 +195,13 @@ export const listingService = {
     );
     return response.data;
   },
+
+  // Fetch rental booking history for an item
+  async getRentalHistory(itemId: string): Promise<ItemRentalHistoryResponse> {
+    const response = await apiClient.get<ItemRentalHistoryResponse>(
+      `/api/v1/listings/${itemId}/rental-history/`
+    );
+    return response.data;
+  },
 };
+

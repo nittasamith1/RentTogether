@@ -25,3 +25,4 @@ urlpatterns = [
     # Popular / Trending intra-campus resources
     path('popular/', PopularItemsView.as_view(), name='marketplace-popular'),
 ]
+

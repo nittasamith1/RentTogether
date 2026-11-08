@@ -6,6 +6,7 @@ import {
   OwnerListingDetail,
   PriceRecommendationRequest,
   PriceRecommendationResponse,
+  ItemRentalHistoryResponse,
 } from '../services/listingService';
 import { marketplaceService, Category } from '../services/marketplace';
 
@@ -112,5 +113,14 @@ export function useDeleteListingImage() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [LISTINGS_QUERY_KEY] });
     },
+  });
+}
+
+export function useListingRentalHistory(itemId: string | null) {
+  return useQuery<ItemRentalHistoryResponse>({
+    queryKey: ['listing-rental-history', itemId],
+    queryFn: () => listingService.getRentalHistory(itemId!),
+    enabled: Boolean(itemId),
+    staleTime: 1000 * 30,
   });
 }

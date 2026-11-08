@@ -14,6 +14,7 @@ import {
 import { useMyListings } from '../../hooks/useListings';
 import { ListingCard } from '../../components/listings/ListingCard';
 import { EditListingModal } from '../../components/listings/EditListingModal';
+import { RentalHistoryModal } from '../../components/listings/RentalHistoryModal';
 import { OwnerListingSummary } from '../../services/listingService';
 
 export const MyListingsPage: React.FC = () => {
@@ -23,6 +24,7 @@ export const MyListingsPage: React.FC = () => {
   const [search, setSearch] = useState<string>('');
   const [statusFilter, setStatusFilter] = useState<'ALL' | 'ACTIVE' | 'PAUSED'>('ALL');
   const [editingItem, setEditingItem] = useState<OwnerListingSummary | null>(null);
+  const [historyItem, setHistoryItem] = useState<OwnerListingSummary | null>(null);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
   const showToast = (msg: string) => {
@@ -257,6 +259,7 @@ export const MyListingsPage: React.FC = () => {
               key={item.id}
               item={item}
               onEdit={(it) => setEditingItem(it)}
+              onViewHistory={(it) => setHistoryItem(it)}
               onViewDetails={() => navigate(`/marketplace/${item.id}`)}
             />
           ))}
@@ -271,6 +274,12 @@ export const MyListingsPage: React.FC = () => {
           showToast('Listing updated successfully!');
           refetch();
         }}
+      />
+
+      {/* Rental History Modal */}
+      <RentalHistoryModal
+        item={historyItem}
+        onClose={() => setHistoryItem(null)}
       />
     </div>
   );

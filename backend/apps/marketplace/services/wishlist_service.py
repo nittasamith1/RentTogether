@@ -52,3 +52,4 @@ def get_user_wishlist_items(user):
         owner__college_id=user.college_id,
         is_published=True
     ).select_related('owner', 'category', 'owner__profile').prefetch_related('images').order_by('-wishlist_entries__created_at')
+

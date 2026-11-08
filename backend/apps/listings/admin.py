@@ -14,3 +14,4 @@ class ItemAdmin(admin.ModelAdmin):
     search_fields = ('title', 'description', 'brand', 'model_name', 'owner__email')
     list_select_related = ('owner', 'category')
     inlines = [ItemImageInline]
+

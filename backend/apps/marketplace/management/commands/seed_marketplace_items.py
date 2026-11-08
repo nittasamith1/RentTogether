@@ -318,3 +318,4 @@ class Command(BaseCommand):
                 )
 
         self.stdout.write(self.style.SUCCESS(f"Successfully seeded {created_count} marketplace items for {college.name}."))
+

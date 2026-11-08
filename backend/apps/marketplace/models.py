@@ -62,3 +62,4 @@ class Wishlist(models.Model):
 
     def __str__(self):
         return f"{self.user.email} saved {self.item.title}"
+

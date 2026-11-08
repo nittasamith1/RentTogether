@@ -143,3 +143,4 @@ class PopularItemsView(views.APIView):
             context={"request": request}
         )
         return Response(serializer.data, status=status.HTTP_200_OK)
+

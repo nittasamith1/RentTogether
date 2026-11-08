@@ -17,3 +17,4 @@ class IsVerifiedStudent(BasePermission):
             return True
 
         return bool(user.email_verified and user.is_college_verified and user.college_id)
+

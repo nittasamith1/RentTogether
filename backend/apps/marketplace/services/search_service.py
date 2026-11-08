@@ -56,3 +56,4 @@ def apply_full_text_search(queryset, search_query: str):
         q_filter &= term_filter
 
     return queryset.filter(q_filter)
+
