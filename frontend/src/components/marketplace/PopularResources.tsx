@@ -22,21 +22,30 @@ export const PopularResources: React.FC<PopularResourcesProps> = ({ items, onSel
   };
 
   return (
-    <div className="bg-gradient-to-r from-amber-500/10 via-orange-500/5 to-transparent border border-amber-200/70 rounded-3xl p-5 mb-8">
+    <div
+      className="rounded-3xl p-5 mb-8 border"
+      style={{ backgroundColor: '#E9E3FF', borderColor: '#D8D0F5' }}
+    >
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
-          <div className="p-2 rounded-xl bg-amber-500 text-white shadow-xs">
+          <div
+            className="p-2 rounded-xl text-white shadow-xs"
+            style={{ backgroundColor: '#7563D9' }}
+          >
             <Flame className="w-5 h-5 fill-white" />
           </div>
           <div>
-            <h2 className="text-base font-bold text-neutral-900 flex items-center gap-1.5">
+            <h2 className="text-base font-bold flex items-center gap-1.5" style={{ color: '#303653' }}>
               Campus Favorites & Trending
-              <span className="text-[11px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 border border-amber-300">
+              <span
+                className="text-[11px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full border"
+                style={{ backgroundColor: '#DDF3E7', color: '#42A879', borderColor: '#B8E5CC' }}
+              >
                 Top Rated
               </span>
             </h2>
-            <p className="text-xs text-neutral-600">
+            <p className="text-xs" style={{ color: '#85899B' }}>
               Most requested resources and peer recommendations on campus this week
             </p>
           </div>
@@ -46,14 +55,16 @@ export const PopularResources: React.FC<PopularResourcesProps> = ({ items, onSel
         <div className="flex items-center gap-1">
           <button
             onClick={() => handleScroll('left')}
-            className="p-2 rounded-full border border-neutral-200 bg-white hover:bg-neutral-50 text-neutral-700 transition shadow-2xs"
+            className="p-2 rounded-full border transition shadow-2xs cursor-pointer"
+            style={{ backgroundColor: '#FFFCF7', borderColor: '#EAE6E1', color: '#303653' }}
             aria-label="Scroll left"
           >
             <ChevronLeft className="w-4 h-4" />
           </button>
           <button
             onClick={() => handleScroll('right')}
-            className="p-2 rounded-full border border-neutral-200 bg-white hover:bg-neutral-50 text-neutral-700 transition shadow-2xs"
+            className="p-2 rounded-full border transition shadow-2xs cursor-pointer"
+            style={{ backgroundColor: '#FFFCF7', borderColor: '#EAE6E1', color: '#303653' }}
             aria-label="Scroll right"
           >
             <ChevronRight className="w-4 h-4" />
@@ -71,9 +82,10 @@ export const PopularResources: React.FC<PopularResourcesProps> = ({ items, onSel
           <div
             key={item.id}
             onClick={() => onSelect(item)}
-            className="shrink-0 w-64 bg-white rounded-2xl border border-neutral-200/90 shadow-2xs hover:shadow-md transition-all duration-200 overflow-hidden cursor-pointer snap-start flex flex-col justify-between group"
+            className="shrink-0 w-64 rounded-2xl border shadow-2xs hover:shadow-card-hover transition-all duration-200 overflow-hidden cursor-pointer snap-start flex flex-col justify-between group"
+            style={{ backgroundColor: '#FFFCF7', borderColor: '#EAE6E1' }}
           >
-            <div className="relative aspect-16/10 w-full bg-neutral-100 overflow-hidden">
+            <div className="relative aspect-16/10 w-full overflow-hidden" style={{ backgroundColor: '#E9E3FF' }}>
               <img
                 src={item.primary_image_url}
                 alt={item.title}
@@ -83,7 +95,10 @@ export const PopularResources: React.FC<PopularResourcesProps> = ({ items, onSel
                     'https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=600&q=80';
                 }}
               />
-              <span className="absolute top-2 left-2 px-2 py-0.5 rounded-full text-[10px] font-bold bg-neutral-900/80 text-white backdrop-blur-md">
+              <span
+                className="absolute top-2 left-2 px-2 py-0.5 rounded-full text-[10px] font-bold text-white backdrop-blur-md"
+                style={{ backgroundColor: 'rgba(48, 54, 83, 0.85)' }}
+              >
                 {item.category_name}
               </span>
               <button
@@ -94,11 +109,11 @@ export const PopularResources: React.FC<PopularResourcesProps> = ({ items, onSel
                     toggleWishlist(item.id, item.is_wishlisted);
                   }
                 }}
-                className={`absolute top-2 right-2 p-1.5 rounded-full backdrop-blur-md transition ${
-                  item.is_wishlisted
-                    ? 'bg-rose-500 text-white'
-                    : 'bg-white/80 text-neutral-600 hover:bg-white hover:text-rose-500'
-                }`}
+                className="absolute top-2 right-2 p-1.5 rounded-full backdrop-blur-md transition cursor-pointer"
+                style={{
+                  backgroundColor: item.is_wishlisted ? '#F28B82' : 'rgba(255, 255, 255, 0.85)',
+                  color: item.is_wishlisted ? '#fff' : '#85899B',
+                }}
               >
                 <Heart className={`w-3.5 h-3.5 ${item.is_wishlisted ? 'fill-current' : ''}`} />
               </button>
@@ -106,25 +121,28 @@ export const PopularResources: React.FC<PopularResourcesProps> = ({ items, onSel
 
             <div className="p-3.5 flex-1 flex flex-col justify-between">
               <div>
-                <h4 className="text-xs font-semibold text-neutral-900 line-clamp-1 group-hover:text-amber-600 transition-colors">
+                <h4
+                  className="text-xs font-bold line-clamp-1 transition-colors group-hover:text-[#7563D9]"
+                  style={{ color: '#303653' }}
+                >
                   {item.title}
                 </h4>
-                <div className="flex items-center gap-1 mt-1 text-[11px] text-neutral-500 font-medium">
-                  <Star className="w-3 h-3 fill-amber-400 text-amber-400" />
-                  <span>{item.owner.reputation.toFixed(1)}</span>
+                <div className="flex items-center gap-1 mt-1 text-[11px] font-medium" style={{ color: '#85899B' }}>
+                  <Star className="w-3 h-3 fill-[#E8A447]" style={{ color: '#E8A447' }} />
+                  <span style={{ color: '#303653' }}>{item.owner.reputation.toFixed(1)}</span>
                   <span>•</span>
                   <span className="truncate">{item.owner.display_name}</span>
                 </div>
               </div>
 
-              <div className="mt-3 pt-2 border-t border-neutral-100 flex items-center justify-between">
+              <div className="mt-3 pt-2 flex items-center justify-between" style={{ borderTop: '1px solid #EAE6E1' }}>
                 <div>
-                  <span className="text-sm font-bold text-neutral-900">
+                  <span className="text-sm font-bold" style={{ color: '#303653' }}>
                     ₹{parseFloat(String(item.daily_rental_price))}
                   </span>
-                  <span className="text-[10px] text-neutral-500"> / day</span>
+                  <span className="text-[10px]" style={{ color: '#85899B' }}> / day</span>
                 </div>
-                <span className="text-[11px] text-amber-600 font-semibold group-hover:translate-x-0.5 transition-transform">
+                <span className="text-[11px] font-bold group-hover:translate-x-0.5 transition-transform" style={{ color: '#7563D9' }}>
                   Rent &rarr;
                 </span>
               </div>

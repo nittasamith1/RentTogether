@@ -78,33 +78,38 @@ export const EditListingModal: React.FC<EditListingModalProps> = ({
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           onClick={onClose}
-          className="fixed inset-0 bg-[#0F172A]/60 backdrop-blur-xs"
+          className="fixed inset-0 bg-[#303653]/60 backdrop-blur-xs"
         />
 
         <motion.div
           initial={{ opacity: 0, scale: 0.95, y: 16 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.95, y: 16 }}
-          className="relative w-full max-w-lg bg-white rounded-3xl shadow-2xl border border-slate-100 overflow-hidden z-10 p-6 sm:p-7 space-y-5"
+          className="relative w-full max-w-lg rounded-3xl shadow-2xl border overflow-hidden z-10 p-6 sm:p-7 space-y-5"
+          style={{ backgroundColor: '#FFFCF7', borderColor: '#EAE6E1' }}
         >
           {/* Header */}
-          <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+          <div className="flex items-center justify-between pb-3" style={{ borderBottom: '1px solid #EAE6E1' }}>
             <div>
-              <h2 className="text-lg font-bold text-slate-900">Edit Listing</h2>
-              <p className="text-xs text-slate-400 mt-0.5">
+              <h2 className="text-lg font-bold" style={{ color: '#303653' }}>Edit Listing</h2>
+              <p className="text-xs mt-0.5" style={{ color: '#85899B' }}>
                 Active bookings and agreed rates will be safely preserved.
               </p>
             </div>
             <button
               onClick={onClose}
-              className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-400 hover:text-slate-700 transition-colors cursor-pointer"
+              className="w-8 h-8 rounded-full flex items-center justify-center transition-colors cursor-pointer"
+              style={{ backgroundColor: '#FFF8ED', color: '#85899B' }}
             >
               <X className="w-4 h-4" />
             </button>
           </div>
 
           {errorMessage && (
-            <div className="p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs flex items-center gap-2">
+            <div
+              className="p-3 rounded-xl border text-xs flex items-center gap-2"
+              style={{ backgroundColor: '#FFF0F0', borderColor: '#F28B82', color: '#E87575' }}
+            >
               <AlertCircle className="w-4 h-4 shrink-0" />
               <span>{errorMessage}</span>
             </div>
@@ -113,26 +118,36 @@ export const EditListingModal: React.FC<EditListingModalProps> = ({
           <form onSubmit={handleSubmit} className="space-y-4">
             {/* Title */}
             <div>
-              <label className="block text-xs font-bold text-slate-700 mb-1">Item Title</label>
+              <label className="block text-xs font-bold mb-1" style={{ color: '#303653' }}>Item Title</label>
               <input
                 type="text"
                 required
                 maxLength={150}
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
-                className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-hidden focus:ring-2 focus:ring-[#5B4DFF]/20 focus:border-[#5B4DFF]"
+                className="w-full px-3.5 py-2.5 rounded-xl text-sm focus:outline-hidden transition-all"
+                style={{
+                  backgroundColor: '#FFF8ED',
+                  border: '1px solid #EAE6E1',
+                  color: '#303653',
+                }}
               />
             </div>
 
             {/* Condition */}
             <div>
-              <label className="block text-xs font-bold text-slate-700 mb-1">Condition</label>
+              <label className="block text-xs font-bold mb-1" style={{ color: '#303653' }}>Condition</label>
               <select
                 value={condition}
                 onChange={(e) =>
                   setCondition(e.target.value as 'BRAND_NEW' | 'LIKE_NEW' | 'GOOD' | 'FAIR')
                 }
-                className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm bg-white focus:outline-hidden focus:ring-2 focus:ring-[#5B4DFF]/20 focus:border-[#5B4DFF]"
+                className="w-full px-3.5 py-2.5 rounded-xl text-sm focus:outline-hidden"
+                style={{
+                  backgroundColor: '#FFF8ED',
+                  border: '1px solid #EAE6E1',
+                  color: '#303653',
+                }}
               >
                 <option value="BRAND_NEW">Brand New (Never used / original box)</option>
                 <option value="LIKE_NEW">Like New (Immaculate, barely used)</option>
@@ -144,7 +159,7 @@ export const EditListingModal: React.FC<EditListingModalProps> = ({
             {/* Pricing Grid */}
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">
+                <label className="block text-xs font-bold mb-1" style={{ color: '#303653' }}>
                   Daily Rental (₹)
                 </label>
                 <input
@@ -154,11 +169,16 @@ export const EditListingModal: React.FC<EditListingModalProps> = ({
                   required
                   value={rentalPrice}
                   onChange={(e) => setRentalPrice(e.target.value)}
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-hidden focus:ring-2 focus:ring-[#5B4DFF]/20 focus:border-[#5B4DFF]"
+                  className="w-full px-3.5 py-2.5 rounded-xl text-sm focus:outline-hidden"
+                  style={{
+                    backgroundColor: '#FFF8ED',
+                    border: '1px solid #EAE6E1',
+                    color: '#303653',
+                  }}
                 />
               </div>
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">
+                <label className="block text-xs font-bold mb-1" style={{ color: '#303653' }}>
                   Security Deposit (₹)
                 </label>
                 <input
@@ -168,20 +188,30 @@ export const EditListingModal: React.FC<EditListingModalProps> = ({
                   required
                   value={deposit}
                   onChange={(e) => setDeposit(e.target.value)}
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-hidden focus:ring-2 focus:ring-[#5B4DFF]/20 focus:border-[#5B4DFF]"
+                  className="w-full px-3.5 py-2.5 rounded-xl text-sm focus:outline-hidden"
+                  style={{
+                    backgroundColor: '#FFF8ED',
+                    border: '1px solid #EAE6E1',
+                    color: '#303653',
+                  }}
                 />
               </div>
             </div>
 
             {/* Pickup Location */}
             <div>
-              <label className="block text-xs font-bold text-slate-700 mb-1">
+              <label className="block text-xs font-bold mb-1" style={{ color: '#303653' }}>
                 Campus Pickup Location
               </label>
               <select
                 value={pickupLocation}
                 onChange={(e) => setPickupLocation(e.target.value)}
-                className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm bg-white focus:outline-hidden focus:ring-2 focus:ring-[#5B4DFF]/20 focus:border-[#5B4DFF]"
+                className="w-full px-3.5 py-2.5 rounded-xl text-sm focus:outline-hidden"
+                style={{
+                  backgroundColor: '#FFF8ED',
+                  border: '1px solid #EAE6E1',
+                  color: '#303653',
+                }}
               >
                 <option value="Central Library Ground Floor Counter">Central Library Ground Floor Counter</option>
                 <option value="Main Campus Canteen Reception">Main Campus Canteen Reception</option>
@@ -192,18 +222,22 @@ export const EditListingModal: React.FC<EditListingModalProps> = ({
             </div>
 
             {/* Buttons */}
-            <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-100">
+            <div className="flex items-center justify-end gap-3 pt-3" style={{ borderTop: '1px solid #EAE6E1' }}>
               <button
                 type="button"
                 onClick={onClose}
-                className="px-4 py-2 rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-100 cursor-pointer"
+                className="px-4 py-2 rounded-xl text-xs font-semibold cursor-pointer"
+                style={{ color: '#85899B' }}
               >
                 Cancel
               </button>
               <button
                 type="submit"
                 disabled={updateMutation.isPending}
-                className="px-5 py-2 rounded-xl bg-[#5B4DFF] hover:bg-[#4E3FE6] text-white text-xs font-bold flex items-center gap-1.5 shadow-md shadow-indigo-500/20 cursor-pointer"
+                className="px-5 py-2 rounded-xl text-white text-xs font-bold flex items-center gap-1.5 shadow-md cursor-pointer transition-all"
+                style={{ backgroundColor: '#7563D9' }}
+                onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#6552C5')}
+                onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#7563D9')}
               >
                 {updateMutation.isPending ? (
                   <Loader2 className="w-4 h-4 animate-spin" />

@@ -156,10 +156,10 @@ export const LoginPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#F7F8FA] flex flex-col justify-center items-center py-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden font-sans text-slate-800">
+    <div className="min-h-screen flex flex-col justify-center items-center py-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden font-sans" style={{ backgroundColor: '#FFF8ED', color: '#303653' }}>
       {/* Soft Ambient Background Blooms */}
-      <div className="absolute top-0 right-1/4 w-96 h-96 bg-[#5B4DFF]/5 rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute bottom-0 left-1/4 w-96 h-96 bg-[#10B981]/5 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute top-0 right-1/4 w-96 h-96 rounded-full blur-3xl pointer-events-none" style={{ backgroundColor: 'rgba(117,99,217,0.06)' }} />
+      <div className="absolute bottom-0 left-1/4 w-96 h-96 rounded-full blur-3xl pointer-events-none" style={{ backgroundColor: 'rgba(66,168,121,0.06)' }} />
 
       <motion.div
         initial={{ opacity: 0, y: 14 }}
@@ -172,18 +172,18 @@ export const LoginPage: React.FC = () => {
           <Link to="/" className="inline-block mb-3 hover:opacity-95 transition-opacity">
             <Logo size="lg" />
           </Link>
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-indigo-50 border border-indigo-100/80 text-[#5B4DFF] text-xs font-semibold mb-2">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold mb-2" style={{ backgroundColor: '#E9E3FF', border: '1px solid #D8D0F5', color: '#7563D9' }}>
             <ShieldCheck className="w-3.5 h-3.5" />
             <span>Aditya University Campus Network</span>
           </div>
-          <h2 className="text-xl font-extrabold text-[#1E1B4B]">Student & Faculty Portal</h2>
-          <p className="text-xs text-slate-500 mt-1 max-w-xs">
+          <h2 className="text-xl font-extrabold" style={{ color: '#303653' }}>Student &amp; Faculty Portal</h2>
+          <p className="text-xs mt-1 max-w-xs" style={{ color: '#85899B' }}>
             Access verified campus equipment, academic tools, and lab gear.
           </p>
         </div>
 
         {/* Card */}
-        <div className="bg-white rounded-3xl shadow-sm border border-slate-100 p-8">
+        <div className="rounded-3xl shadow-sm p-8" style={{ backgroundColor: '#FFFCF7', border: '1px solid #EAE6E1' }}>
           {errorMessage && (
             <motion.div
               initial={{ opacity: 0, y: -6 }}
@@ -197,17 +197,30 @@ export const LoginPage: React.FC = () => {
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block text-xs font-bold text-slate-700 mb-1.5">
+              <label className="block text-xs font-bold mb-1.5" style={{ color: '#303653' }}>
                 Institutional Email
               </label>
               <div className="relative">
-                <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4" style={{ color: '#85899B' }} />
                 <input
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="student.name@adityauniversity.in"
-                  className="w-full pl-10 pr-3.5 py-2.5 rounded-xl border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-[#5B4DFF]/30 focus:border-[#5B4DFF] transition-all bg-white"
+                  className="w-full pl-10 pr-3.5 py-2.5 rounded-xl text-xs focus:outline-none focus:ring-2 transition-all"
+                  style={{
+                    backgroundColor: '#FFFCF7',
+                    border: '1px solid #EAE6E1',
+                    color: '#303653',
+                  }}
+                  onFocus={e => {
+                    e.currentTarget.style.borderColor = '#7563D9';
+                    e.currentTarget.style.boxShadow = '0 0 0 3px rgba(117,99,217,0.12)';
+                  }}
+                  onBlur={e => {
+                    e.currentTarget.style.borderColor = '#EAE6E1';
+                    e.currentTarget.style.boxShadow = 'none';
+                  }}
                   required
                 />
               </div>
@@ -215,32 +228,47 @@ export const LoginPage: React.FC = () => {
 
             <div>
               <div className="flex justify-between items-center mb-1.5">
-                <label className="text-xs font-bold text-slate-700">Password</label>
+                <label className="text-xs font-bold" style={{ color: '#303653' }}>Password</label>
                 <button
                   type="button"
                   onClick={() => {
                     setForgotEmail(email);
                     setShowForgotModal(true);
                   }}
-                  className="text-xs font-semibold text-[#5B4DFF] hover:underline"
+                  className="text-xs font-semibold hover:underline"
+                  style={{ color: '#7563D9' }}
                 >
                   Forgot password?
                 </button>
               </div>
               <div className="relative">
-                <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4" style={{ color: '#85899B' }} />
                 <input
                   type={showPassword ? 'text' : 'password'}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••••••"
-                  className="w-full pl-10 pr-10 py-2.5 rounded-xl border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-[#5B4DFF]/30 focus:border-[#5B4DFF] transition-all bg-white"
+                  className="w-full pl-10 pr-10 py-2.5 rounded-xl text-xs focus:outline-none focus:ring-2 transition-all"
+                  style={{
+                    backgroundColor: '#FFFCF7',
+                    border: '1px solid #EAE6E1',
+                    color: '#303653',
+                  }}
+                  onFocus={e => {
+                    e.currentTarget.style.borderColor = '#7563D9';
+                    e.currentTarget.style.boxShadow = '0 0 0 3px rgba(117,99,217,0.12)';
+                  }}
+                  onBlur={e => {
+                    e.currentTarget.style.borderColor = '#EAE6E1';
+                    e.currentTarget.style.boxShadow = 'none';
+                  }}
                   required
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 cursor-pointer"
+                  className="absolute right-3.5 top-1/2 -translate-y-1/2 cursor-pointer"
+                  style={{ color: '#85899B' }}
                 >
                   {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </button>
@@ -250,7 +278,10 @@ export const LoginPage: React.FC = () => {
             <button
               type="submit"
               disabled={loading}
-              className="w-full mt-2 py-3 px-4 rounded-xl bg-[#5B4DFF] hover:bg-[#4F46E5] text-white font-bold text-xs shadow-md shadow-indigo-500/20 active:scale-[0.98] transition-all duration-150 flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+              className="w-full mt-2 py-3 px-4 rounded-xl text-white font-bold text-xs active:scale-[0.98] transition-all duration-150 flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+              style={{ backgroundColor: '#7563D9', boxShadow: '0 4px 16px rgba(117,99,217,0.30)' }}
+              onMouseEnter={e => !loading && (e.currentTarget.style.backgroundColor = '#6552C5')}
+              onMouseLeave={e => (e.currentTarget.style.backgroundColor = '#7563D9')}
             >
               {loading ? (
                 <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
@@ -264,18 +295,21 @@ export const LoginPage: React.FC = () => {
           </form>
 
           {/* Quick Demo Login Buttons */}
-          <div className="mt-6 pt-5 border-t border-slate-100 space-y-2">
-            <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider text-center">
+          <div className="mt-6 pt-5 space-y-2" style={{ borderTop: '1px solid #EAE6E1' }}>
+            <p className="text-[11px] font-bold uppercase tracking-wider text-center" style={{ color: '#85899B' }}>
               Quick 1-Click Evaluation Accounts
             </p>
             <div className="grid grid-cols-2 gap-2 pt-1">
               <button
                 type="button"
                 onClick={handleDemoStudentLogin}
-                className="py-2.5 px-3 rounded-xl border border-indigo-100 bg-indigo-50/60 hover:bg-indigo-100/80 text-indigo-900 text-xs font-bold transition-all text-center cursor-pointer"
+                className="py-2.5 px-3 rounded-xl text-xs font-bold transition-all text-center cursor-pointer"
+                style={{ border: '1px solid #D8D0F5', backgroundColor: 'rgba(233,227,255,0.6)', color: '#303653' }}
+                onMouseEnter={e => (e.currentTarget.style.backgroundColor = '#E9E3FF')}
+                onMouseLeave={e => (e.currentTarget.style.backgroundColor = 'rgba(233,227,255,0.6)')}
               >
                 🎓 Demo Student
-                <span className="block text-[10px] font-medium text-indigo-600/90 mt-0.5">Sai Reddy (Aditya Univ)</span>
+                <span className="block text-[10px] font-medium mt-0.5" style={{ color: '#7563D9' }}>Sai Reddy (Aditya Univ)</span>
               </button>
               <button
                 type="button"
@@ -288,9 +322,9 @@ export const LoginPage: React.FC = () => {
             </div>
           </div>
 
-          <div className="mt-6 text-center text-xs text-slate-500">
+          <div className="mt-6 text-center text-xs" style={{ color: '#85899B' }}>
             Don't have an account?{' '}
-            <Link to="/register" className="font-bold text-[#5B4DFF] hover:underline">
+            <Link to="/register" className="font-bold hover:underline" style={{ color: '#7563D9' }}>
               Register with College ID
             </Link>
           </div>
@@ -305,13 +339,14 @@ export const LoginPage: React.FC = () => {
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
-              className="bg-white rounded-3xl max-w-sm w-full p-6 shadow-xl border border-slate-100"
+              className="rounded-3xl max-w-sm w-full p-6 shadow-xl"
+              style={{ backgroundColor: '#FFFCF7', border: '1px solid #EAE6E1' }}
             >
               <div className="flex items-center gap-2 mb-3">
-                <div className="w-8 h-8 rounded-xl bg-indigo-50 flex items-center justify-center text-[#5B4DFF]">
+                <div className="w-8 h-8 rounded-xl flex items-center justify-center" style={{ backgroundColor: '#E9E3FF', color: '#7563D9' }}>
                   <KeyRound className="w-4 h-4" />
                 </div>
-                <h3 className="text-base font-bold text-[#1E1B4B]">Reset Password</h3>
+                <h3 className="text-base font-bold" style={{ color: '#303653' }}>Reset Password</h3>
               </div>
 
               {forgotMsg && (
@@ -327,7 +362,7 @@ export const LoginPage: React.FC = () => {
 
               {forgotStep === 'EMAIL' ? (
                 <form onSubmit={handleSendResetCode} className="space-y-3">
-                  <p className="text-xs text-slate-500">
+                  <p className="text-xs" style={{ color: '#85899B' }}>
                     Enter your institutional email. We will dispatch a 6-digit verification code.
                   </p>
                   <div>
@@ -336,7 +371,16 @@ export const LoginPage: React.FC = () => {
                       value={forgotEmail}
                       onChange={(e) => setForgotEmail(e.target.value)}
                       placeholder="student.name@adityauniversity.in"
-                      className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-[#5B4DFF]/30"
+                      className="w-full px-3.5 py-2.5 rounded-xl text-xs focus:outline-none focus:ring-2 transition-all"
+                      style={{ border: '1px solid #EAE6E1', backgroundColor: '#FFF8ED', color: '#303653' }}
+                      onFocus={e => {
+                        e.currentTarget.style.borderColor = '#7563D9';
+                        e.currentTarget.style.boxShadow = '0 0 0 3px rgba(117,99,217,0.12)';
+                      }}
+                      onBlur={e => {
+                        e.currentTarget.style.borderColor = '#EAE6E1';
+                        e.currentTarget.style.boxShadow = 'none';
+                      }}
                       required
                     />
                   </div>
@@ -344,14 +388,20 @@ export const LoginPage: React.FC = () => {
                     <button
                       type="button"
                       onClick={() => setShowForgotModal(false)}
-                      className="flex-1 py-2 rounded-xl border border-slate-200 text-xs font-semibold text-slate-600 hover:bg-slate-50 cursor-pointer"
+                      className="flex-1 py-2 rounded-xl text-xs font-semibold cursor-pointer"
+                      style={{ border: '1px solid #EAE6E1', color: '#303653', backgroundColor: 'transparent' }}
+                      onMouseEnter={e => (e.currentTarget.style.backgroundColor = '#FFF8ED')}
+                      onMouseLeave={e => (e.currentTarget.style.backgroundColor = 'transparent')}
                     >
                       Cancel
                     </button>
                     <button
                       type="submit"
                       disabled={forgotLoading}
-                      className="flex-1 py-2 rounded-xl bg-[#5B4DFF] hover:bg-[#4F46E5] text-white text-xs font-bold cursor-pointer disabled:opacity-50"
+                      className="flex-1 py-2 rounded-xl text-white text-xs font-bold cursor-pointer disabled:opacity-50"
+                      style={{ backgroundColor: '#7563D9' }}
+                      onMouseEnter={e => !forgotLoading && (e.currentTarget.style.backgroundColor = '#6552C5')}
+                      onMouseLeave={e => (e.currentTarget.style.backgroundColor = '#7563D9')}
                     >
                       {forgotLoading ? 'Sending...' : 'Send OTP'}
                     </button>
@@ -359,29 +409,47 @@ export const LoginPage: React.FC = () => {
                 </form>
               ) : (
                 <form onSubmit={handleConfirmReset} className="space-y-3">
-                  <p className="text-xs text-slate-500">
-                    Enter the 6-digit code received at <span className="font-semibold text-slate-700">{forgotEmail}</span> and your new password.
+                  <p className="text-xs" style={{ color: '#85899B' }}>
+                    Enter the 6-digit code received at <span className="font-semibold" style={{ color: '#303653' }}>{forgotEmail}</span> and your new password.
                   </p>
                   <div>
-                    <label className="text-[11px] font-semibold text-slate-700">6-Digit Code</label>
+                    <label className="text-[11px] font-semibold" style={{ color: '#303653' }}>6-Digit Code</label>
                     <input
                       type="text"
                       maxLength={6}
                       value={forgotOtp}
                       onChange={(e) => setForgotOtp(e.target.value)}
                       placeholder="123456"
-                      className="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-sm font-mono tracking-widest text-center focus:outline-none focus:ring-2 focus:ring-[#5B4DFF]/30"
+                      className="w-full px-3.5 py-2 rounded-xl text-sm font-mono tracking-widest text-center focus:outline-none focus:ring-2 transition-all"
+                      style={{ border: '1px solid #EAE6E1', backgroundColor: '#FFF8ED', color: '#303653' }}
+                      onFocus={e => {
+                        e.currentTarget.style.borderColor = '#7563D9';
+                        e.currentTarget.style.boxShadow = '0 0 0 3px rgba(117,99,217,0.12)';
+                      }}
+                      onBlur={e => {
+                        e.currentTarget.style.borderColor = '#EAE6E1';
+                        e.currentTarget.style.boxShadow = 'none';
+                      }}
                       required
                     />
                   </div>
                   <div>
-                    <label className="text-[11px] font-semibold text-slate-700">New Password (min 8 chars)</label>
+                    <label className="text-[11px] font-semibold" style={{ color: '#303653' }}>New Password (min 8 chars)</label>
                     <input
                       type="password"
                       value={forgotNewPassword}
                       onChange={(e) => setForgotNewPassword(e.target.value)}
                       placeholder="••••••••••••"
-                      className="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-[#5B4DFF]/30"
+                      className="w-full px-3.5 py-2 rounded-xl text-xs focus:outline-none focus:ring-2 transition-all"
+                      style={{ border: '1px solid #EAE6E1', backgroundColor: '#FFF8ED', color: '#303653' }}
+                      onFocus={e => {
+                        e.currentTarget.style.borderColor = '#7563D9';
+                        e.currentTarget.style.boxShadow = '0 0 0 3px rgba(117,99,217,0.12)';
+                      }}
+                      onBlur={e => {
+                        e.currentTarget.style.borderColor = '#EAE6E1';
+                        e.currentTarget.style.boxShadow = 'none';
+                      }}
                       required
                       minLength={8}
                     />
@@ -390,14 +458,20 @@ export const LoginPage: React.FC = () => {
                     <button
                       type="button"
                       onClick={() => setForgotStep('EMAIL')}
-                      className="flex-1 py-2 rounded-xl border border-slate-200 text-xs font-semibold text-slate-600 hover:bg-slate-50 cursor-pointer"
+                      className="flex-1 py-2 rounded-xl text-xs font-semibold cursor-pointer"
+                      style={{ border: '1px solid #EAE6E1', color: '#303653', backgroundColor: 'transparent' }}
+                      onMouseEnter={e => (e.currentTarget.style.backgroundColor = '#FFF8ED')}
+                      onMouseLeave={e => (e.currentTarget.style.backgroundColor = 'transparent')}
                     >
                       Back
                     </button>
                     <button
                       type="submit"
                       disabled={forgotLoading}
-                      className="flex-1 py-2 rounded-xl bg-[#5B4DFF] hover:bg-[#4F46E5] text-white text-xs font-bold cursor-pointer disabled:opacity-50"
+                      className="flex-1 py-2 rounded-xl text-white text-xs font-bold cursor-pointer disabled:opacity-50"
+                      style={{ backgroundColor: '#7563D9' }}
+                      onMouseEnter={e => !forgotLoading && (e.currentTarget.style.backgroundColor = '#6552C5')}
+                      onMouseLeave={e => (e.currentTarget.style.backgroundColor = '#7563D9')}
                     >
                       {forgotLoading ? 'Resetting...' : 'Set Password'}
                     </button>

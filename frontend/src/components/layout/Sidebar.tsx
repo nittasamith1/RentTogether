@@ -36,18 +36,20 @@ export const Sidebar: React.FC = () => {
   const { user } = useAuth();
 
   return (
-    <aside className="w-64 bg-white border-r border-slate-100/90 text-slate-600 flex flex-col justify-between shrink-0 relative select-none py-6 z-20">
-      {/* Top Branding & Navigation */}
+    <aside
+      className="w-64 flex flex-col justify-between shrink-0 relative select-none py-5 z-20"
+      style={{ backgroundColor: '#E9E3FF', borderRight: '1px solid #D8D0F5' }}
+    >
+      {/* Logo */}
       <div>
-        {/* Authentic Brand Logo matching user reference image */}
-        <div className="px-6 pb-8 flex items-center">
+        <div className="px-5 pb-7 flex items-center">
           <NavLink to="/" className="inline-block">
             <Logo size="md" />
           </NavLink>
         </div>
 
-        {/* Navigation List */}
-        <nav className="px-4 space-y-1.5">
+        {/* Navigation */}
+        <nav className="px-3 space-y-1">
           {navItems.map((item) => {
             const Icon = item.icon;
             return (
@@ -56,10 +58,10 @@ export const Sidebar: React.FC = () => {
                 to={item.path}
                 end={item.path === '/'}
                 className={({ isActive }) =>
-                  `flex items-center gap-3.5 px-4 py-2.5 rounded-xl text-sm font-semibold transition-all duration-150 ${
+                  `flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200 ${
                     isActive
-                      ? 'bg-[#5B4DFF] text-white font-bold shadow-md shadow-indigo-500/25'
-                      : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
+                      ? 'bg-[#7563D9] text-white shadow-md'
+                      : 'text-[#303653] hover:bg-[#D8D0F5] hover:text-[#7563D9]'
                   }`
                 }
               >
@@ -67,7 +69,7 @@ export const Sidebar: React.FC = () => {
                   <>
                     <Icon
                       className={`w-4 h-4 shrink-0 stroke-[2] ${
-                        isActive ? 'text-white' : 'text-slate-400 group-hover:text-slate-600'
+                        isActive ? 'text-white' : 'text-[#7563D9]'
                       }`}
                     />
                     <span>{item.name}</span>
@@ -77,15 +79,14 @@ export const Sidebar: React.FC = () => {
             );
           })}
 
-          {/* Admin Link if staff */}
           {user?.is_staff && (
             <NavLink
               to="/admin/verifications"
               className={({ isActive }) =>
-                `flex items-center gap-3.5 px-4 py-2.5 rounded-xl text-sm font-semibold transition-all duration-150 ${
+                `flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200 ${
                   isActive
-                    ? 'bg-[#5B4DFF] text-white font-bold shadow-md shadow-indigo-500/25'
-                    : 'text-indigo-600 hover:text-indigo-900 hover:bg-indigo-50/60'
+                    ? 'bg-[#7563D9] text-white shadow-md'
+                    : 'text-[#7563D9] hover:bg-[#D8D0F5]'
                 }`
               }
             >
@@ -93,7 +94,7 @@ export const Sidebar: React.FC = () => {
                 <>
                   <ShieldCheck
                     className={`w-4 h-4 shrink-0 stroke-[2] ${
-                      isActive ? 'text-white' : 'text-indigo-500'
+                      isActive ? 'text-white' : 'text-[#7563D9]'
                     }`}
                   />
                   <span>Verifications</span>
@@ -104,8 +105,8 @@ export const Sidebar: React.FC = () => {
         </nav>
       </div>
 
-      {/* Bottom Campus Network Widget with Image 1 styling */}
-      <div className="px-3 pt-4 border-t border-slate-100/80">
+      {/* Bottom Campus Network Card */}
+      <div className="px-3 pt-4" style={{ borderTop: '1px solid #D0C8F0' }}>
         <CampusNetworkCard
           collegeName={user?.college_name || 'Aditya University'}
           collegeCode={user?.college_code || 'ADITYA'}

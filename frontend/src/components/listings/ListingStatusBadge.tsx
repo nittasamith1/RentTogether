@@ -16,31 +16,34 @@ export const ListingStatusBadge: React.FC<ListingStatusBadgeProps> = ({
     case 'ACTIVE':
       return (
         <span
-          className={`inline-flex items-center gap-1.5 font-bold rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200/80 ${
+          className={`inline-flex items-center gap-1.5 font-bold rounded-full border ${
             isSm ? 'px-2 py-0.5 text-[10px]' : 'px-2.5 py-1 text-xs'
           }`}
+          style={{ backgroundColor: '#DDF3E7', color: '#42A879', borderColor: '#B8E5CC' }}
         >
-          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+          <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ backgroundColor: '#42A879' }} />
           <span>Active & Rentable</span>
         </span>
       );
     case 'PAUSED':
       return (
         <span
-          className={`inline-flex items-center gap-1.5 font-bold rounded-full bg-amber-50 text-amber-700 border border-amber-200/80 ${
+          className={`inline-flex items-center gap-1.5 font-bold rounded-full border ${
             isSm ? 'px-2 py-0.5 text-[10px]' : 'px-2.5 py-1 text-xs'
           }`}
+          style={{ backgroundColor: '#FFE5D6', color: '#E8A447', borderColor: '#F5CDB8' }}
         >
           <PauseCircle className={isSm ? 'w-3 h-3' : 'w-3.5 h-3.5'} />
-          <span>Paused by You</span>
+          <span>Paused</span>
         </span>
       );
     case 'REMOVED':
       return (
         <span
-          className={`inline-flex items-center gap-1.5 font-bold rounded-full bg-slate-100 text-slate-500 border border-slate-200 ${
+          className={`inline-flex items-center gap-1.5 font-bold rounded-full border ${
             isSm ? 'px-2 py-0.5 text-[10px]' : 'px-2.5 py-1 text-xs'
           }`}
+          style={{ backgroundColor: '#FFF0F0', color: '#E87575', borderColor: '#F28B82' }}
         >
           <Trash2 className={isSm ? 'w-3 h-3' : 'w-3.5 h-3.5'} />
           <span>Removed</span>
@@ -48,7 +51,10 @@ export const ListingStatusBadge: React.FC<ListingStatusBadgeProps> = ({
       );
     default:
       return (
-        <span className="inline-flex items-center font-bold px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 text-xs">
+        <span
+          className="inline-flex items-center font-bold px-2 py-0.5 rounded-full text-xs border"
+          style={{ backgroundColor: '#FFFCF7', borderColor: '#EAE6E1', color: '#303653' }}
+        >
           {status}
         </span>
       );

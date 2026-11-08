@@ -125,21 +125,27 @@ export const MarketplacePage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#FDFBF9] pb-16">
+    <div className="min-h-screen pb-16 pt-2" style={{ backgroundColor: '#FFF8ED' }}>
       {/* 1. Campus Hero Header */}
-      <section className="bg-white border-b border-neutral-200/80 px-4 sm:px-6 lg:px-8 py-8">
-        <div className="max-w-7xl mx-auto flex flex-col md:flex-row md:items-center justify-between gap-6">
+      <section
+        className="rounded-3xl border p-6 sm:p-8 mb-6 shadow-sm"
+        style={{ backgroundColor: '#FFFCF7', borderColor: '#EAE6E1' }}
+      >
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div className="max-w-2xl">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-300/60 text-amber-900 text-xs font-semibold mb-3">
-              <Building2 className="w-3.5 h-3.5 text-amber-600" />
+            <div
+              className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold mb-3 border"
+              style={{ backgroundColor: '#E9E3FF', borderColor: '#D8D0F5', color: '#7563D9' }}
+            >
+              <Building2 className="w-3.5 h-3.5" />
               <span>Aditya University Campus Catalog</span>
-              <span className="w-1.5 h-1.5 rounded-full bg-amber-500" />
+              <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: '#7563D9' }} />
               <span>Intra-Campus Trusted Network</span>
             </div>
-            <h1 className="text-2xl sm:text-3xl font-black text-neutral-900 tracking-tight">
+            <h1 className="text-2xl sm:text-3xl font-black tracking-tight" style={{ color: '#303653' }}>
               Intra-Campus Resource Marketplace
             </h1>
-            <p className="text-sm text-neutral-600 mt-2 leading-relaxed">
+            <p className="text-sm mt-2 leading-relaxed" style={{ color: '#85899B' }}>
               Borrow laboratory kits, scientific calculators, high-end cameras, project tools, and
               academic equipment directly from verified peer students. Zero courier delays, safe
               on-campus handovers.
@@ -147,23 +153,32 @@ export const MarketplacePage: React.FC = () => {
           </div>
 
           <div className="flex flex-wrap sm:flex-nowrap gap-3 shrink-0">
-            <div className="bg-neutral-50 border border-neutral-200 rounded-2xl p-4 flex flex-col items-center justify-center min-w-[120px]">
-              <span className="text-xl font-black text-neutral-900">{totalCount}</span>
-              <span className="text-[11px] font-semibold text-neutral-500">Active Listings</span>
+            <div
+              className="rounded-2xl p-4 flex flex-col items-center justify-center min-w-[120px] border shadow-xs"
+              style={{ backgroundColor: '#E9E3FF', borderColor: '#D8D0F5' }}
+            >
+              <span className="text-xl font-black" style={{ color: '#303653' }}>{totalCount}</span>
+              <span className="text-[11px] font-semibold" style={{ color: '#7563D9' }}>Active Listings</span>
             </div>
-            <div className="bg-neutral-50 border border-neutral-200 rounded-2xl p-4 flex flex-col items-center justify-center min-w-[120px]">
-              <span className="text-xl font-black text-amber-600">8</span>
-              <span className="text-[11px] font-semibold text-neutral-500">Categories</span>
+            <div
+              className="rounded-2xl p-4 flex flex-col items-center justify-center min-w-[120px] border shadow-xs"
+              style={{ backgroundColor: '#DFEDFF', borderColor: '#C5DCFA' }}
+            >
+              <span className="text-xl font-black" style={{ color: '#6398D6' }}>8</span>
+              <span className="text-[11px] font-semibold" style={{ color: '#3A6BB5' }}>Categories</span>
             </div>
-            <div className="bg-neutral-50 border border-neutral-200 rounded-2xl p-4 flex flex-col items-center justify-center min-w-[120px]">
-              <span className="text-xl font-black text-emerald-600">100%</span>
-              <span className="text-[11px] font-semibold text-neutral-500">Verified Peers</span>
+            <div
+              className="rounded-2xl p-4 flex flex-col items-center justify-center min-w-[120px] border shadow-xs"
+              style={{ backgroundColor: '#DDF3E7', borderColor: '#B8E5CC' }}
+            >
+              <span className="text-xl font-black" style={{ color: '#42A879' }}>100%</span>
+              <span className="text-[11px] font-semibold" style={{ color: '#2D7A5B' }}>Verified Peers</span>
             </div>
           </div>
         </div>
       </section>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8">
+      <div>
         {/* 2. Popular / Trending Resources Carousel */}
         {popularItems.length > 0 && (
           <PopularResources
@@ -177,11 +192,14 @@ export const MarketplacePage: React.FC = () => {
           <div className="flex items-center gap-2 min-w-max">
             <button
               onClick={() => updateFilters({ category: '', page: 1 })}
-              className={`px-4 py-2.5 rounded-2xl text-xs font-bold transition flex items-center gap-2 border ${
-                !filters.category
-                  ? 'bg-neutral-900 text-white border-neutral-900 shadow-sm'
-                  : 'bg-white text-neutral-700 border-neutral-200 hover:bg-neutral-50'
+              className={`px-4 py-2.5 rounded-2xl text-xs font-bold transition flex items-center gap-2 border cursor-pointer ${
+                !filters.category ? 'shadow-sm' : ''
               }`}
+              style={{
+                backgroundColor: !filters.category ? '#7563D9' : '#FFFCF7',
+                color: !filters.category ? '#ffffff' : '#303653',
+                borderColor: !filters.category ? '#7563D9' : '#EAE6E1',
+              }}
             >
               <Grid2X2 className="w-4 h-4" />
               <span>All Categories</span>
@@ -193,19 +211,30 @@ export const MarketplacePage: React.FC = () => {
                 <button
                   key={cat.id}
                   onClick={() => updateFilters({ category: isSelected ? '' : cat.slug, page: 1 })}
-                  className={`px-4 py-2.5 rounded-2xl text-xs font-bold transition flex items-center gap-2 border ${
-                    isSelected
-                      ? 'bg-amber-500 text-white border-amber-500 shadow-sm'
-                      : 'bg-white text-neutral-700 border-neutral-200 hover:bg-neutral-50'
+                  className={`px-4 py-2.5 rounded-2xl text-xs font-bold transition flex items-center gap-2 border cursor-pointer ${
+                    isSelected ? 'shadow-sm' : ''
                   }`}
+                  style={{
+                    backgroundColor: isSelected ? '#7563D9' : '#FFFCF7',
+                    color: isSelected ? '#ffffff' : '#303653',
+                    borderColor: isSelected ? '#7563D9' : '#EAE6E1',
+                  }}
+                  onMouseEnter={(e) => {
+                    if (!isSelected) e.currentTarget.style.backgroundColor = '#E9E3FF';
+                  }}
+                  onMouseLeave={(e) => {
+                    if (!isSelected) e.currentTarget.style.backgroundColor = '#FFFCF7';
+                  }}
                 >
                   {getCategoryIcon(cat.icon_name)}
                   <span>{cat.name}</span>
                   {cat.eligible_item_count > 0 && (
                     <span
-                      className={`text-[10px] px-2 py-0.2 rounded-full font-semibold ${
-                        isSelected ? 'bg-amber-600 text-white' : 'bg-neutral-100 text-neutral-600'
-                      }`}
+                      className="text-[10px] px-2 py-0.5 rounded-full font-semibold"
+                      style={{
+                        backgroundColor: isSelected ? 'rgba(255,255,255,0.25)' : '#E9E3FF',
+                        color: isSelected ? '#ffffff' : '#7563D9',
+                      }}
                     >
                       {cat.eligible_item_count}
                     </span>
@@ -217,32 +246,37 @@ export const MarketplacePage: React.FC = () => {
         </div>
 
         {/* 4. Controls Bar (Active Filters, Sort dropdown, Mobile filter button) */}
-        <div className="bg-white border border-neutral-200/80 rounded-2xl p-4 mb-6 shadow-2xs flex flex-wrap items-center justify-between gap-4">
+        <div
+          className="rounded-2xl p-4 mb-6 shadow-xs flex flex-wrap items-center justify-between gap-4 border"
+          style={{ backgroundColor: '#FFFCF7', borderColor: '#EAE6E1' }}
+        >
           <div className="flex items-center gap-3">
             <button
               onClick={() => setIsMobileFilterOpen(!isMobileFilterOpen)}
-              className="lg:hidden flex items-center gap-1.5 px-3 py-2 rounded-xl border border-neutral-200 bg-neutral-50 text-xs font-bold text-neutral-800"
+              className="lg:hidden flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold border"
+              style={{ backgroundColor: '#E9E3FF', borderColor: '#D8D0F5', color: '#7563D9' }}
             >
-              <SlidersHorizontal className="w-4 h-4 text-amber-600" />
+              <SlidersHorizontal className="w-4 h-4" />
               <span>Filters</span>
             </button>
 
-            <span className="text-xs font-semibold text-neutral-600">
-              Showing <strong className="text-neutral-900">{items.length}</strong> of{' '}
-              <strong className="text-neutral-900">{totalCount}</strong> resources
+            <span className="text-xs font-semibold" style={{ color: '#85899B' }}>
+              Showing <strong style={{ color: '#303653' }}>{items.length}</strong> of{' '}
+              <strong style={{ color: '#303653' }}>{totalCount}</strong> resources
             </span>
           </div>
 
           {/* Sort Selector */}
           <div className="flex items-center gap-2">
-            <span className="text-xs text-neutral-500 font-medium flex items-center gap-1">
-              <ArrowUpDown className="w-3.5 h-3.5 text-neutral-400" />
+            <span className="text-xs font-medium flex items-center gap-1" style={{ color: '#85899B' }}>
+              <ArrowUpDown className="w-3.5 h-3.5" style={{ color: '#85899B' }} />
               Sort By:
             </span>
             <select
               value={filters.sort || 'newest'}
               onChange={(e) => updateFilters({ sort: e.target.value, page: 1 })}
-              className="px-3 py-1.5 rounded-xl border border-neutral-200 text-xs font-bold text-neutral-800 bg-neutral-50 focus:outline-none focus:ring-1 focus:ring-amber-500"
+              className="px-3 py-1.5 rounded-xl text-xs font-bold focus:outline-none focus:ring-1 focus:ring-[#7563D9] border"
+              style={{ backgroundColor: '#FFF8ED', borderColor: '#EAE6E1', color: '#303653' }}
             >
               <option value="newest">Newest First</option>
               <option value="price_low">Price: Low to High</option>
@@ -270,14 +304,17 @@ export const MarketplacePage: React.FC = () => {
           {isMobileFilterOpen && (
             <div className="fixed inset-0 z-50 lg:hidden flex">
               <div
-                className="fixed inset-0 bg-black/50 backdrop-blur-xs"
+                className="fixed inset-0 bg-black/40 backdrop-blur-xs"
                 onClick={() => setIsMobileFilterOpen(false)}
               />
-              <div className="relative ml-auto w-full max-w-xs bg-white h-full p-5 overflow-y-auto shadow-2xl z-10 flex flex-col gap-4">
-                <div className="flex items-center justify-between pb-3 border-b">
-                  <h3 className="font-bold text-sm text-neutral-900">Filters</h3>
+              <div
+                className="relative ml-auto w-full max-w-xs h-full p-5 overflow-y-auto shadow-2xl z-10 flex flex-col gap-4 border-l"
+                style={{ backgroundColor: '#FFFCF7', borderColor: '#EAE6E1' }}
+              >
+                <div className="flex items-center justify-between pb-3" style={{ borderBottom: '1px solid #EAE6E1' }}>
+                  <h3 className="font-bold text-sm" style={{ color: '#303653' }}>Filters</h3>
                   <button onClick={() => setIsMobileFilterOpen(false)}>
-                    <X className="w-5 h-5 text-neutral-500" />
+                    <X className="w-5 h-5" style={{ color: '#85899B' }} />
                   </button>
                 </div>
                 <MarketplaceFilterSidebar
@@ -300,28 +337,38 @@ export const MarketplacePage: React.FC = () => {
                 {Array.from({ length: 6 }).map((_, i) => (
                   <div
                     key={i}
-                    className="bg-white rounded-2xl border border-neutral-200 p-4 flex flex-col gap-3 animate-pulse"
+                    className="rounded-2xl border p-4 flex flex-col gap-3 animate-pulse"
+                    style={{ backgroundColor: '#FFFCF7', borderColor: '#EAE6E1' }}
                   >
-                    <div className="aspect-4/3 rounded-xl bg-neutral-200" />
-                    <div className="h-4 bg-neutral-200 rounded w-3/4" />
-                    <div className="h-3 bg-neutral-200 rounded w-1/2" />
-                    <div className="h-8 bg-neutral-100 rounded mt-4" />
+                    <div className="aspect-4/3 rounded-xl" style={{ backgroundColor: '#E9E3FF' }} />
+                    <div className="h-4 rounded w-3/4" style={{ backgroundColor: '#EAE6E1' }} />
+                    <div className="h-3 rounded w-1/2" style={{ backgroundColor: '#EAE6E1' }} />
+                    <div className="h-8 rounded mt-4" style={{ backgroundColor: '#E9E3FF' }} />
                   </div>
                 ))}
               </div>
             ) : items.length === 0 ? (
-              <div className="bg-white rounded-3xl border border-neutral-200/80 p-12 text-center flex flex-col items-center justify-center gap-4">
-                <div className="w-16 h-16 rounded-3xl bg-amber-500/10 flex items-center justify-center text-amber-600">
+              <div
+                className="rounded-3xl border p-12 text-center flex flex-col items-center justify-center gap-4"
+                style={{ backgroundColor: '#FFFCF7', borderColor: '#EAE6E1' }}
+              >
+                <div
+                  className="w-16 h-16 rounded-3xl flex items-center justify-center"
+                  style={{ backgroundColor: '#E9E3FF', color: '#7563D9' }}
+                >
                   <Search className="w-8 h-8" />
                 </div>
-                <h3 className="text-base font-bold text-neutral-900">No matching campus resources found</h3>
-                <p className="text-xs text-neutral-500 max-w-sm">
+                <h3 className="text-base font-bold" style={{ color: '#303653' }}>No matching campus resources found</h3>
+                <p className="text-xs max-w-sm" style={{ color: '#85899B' }}>
                   We couldn't find any resources matching your search and filter criteria. Try adjusting
                   the price range or clearing some filters.
                 </p>
                 <button
                   onClick={handleResetFilters}
-                  className="px-5 py-2.5 rounded-xl bg-amber-500 text-white text-xs font-bold hover:bg-amber-600 transition shadow-xs"
+                  className="px-5 py-2.5 rounded-xl text-white text-xs font-bold transition shadow-xs cursor-pointer"
+                  style={{ backgroundColor: '#7563D9' }}
+                  onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#6552C5')}
+                  onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#7563D9')}
                 >
                   Clear All Filters
                 </button>
@@ -340,24 +387,29 @@ export const MarketplacePage: React.FC = () => {
 
             {/* Pagination Controls */}
             {totalPages > 1 && (
-              <div className="bg-white rounded-2xl border border-neutral-200/80 p-4 flex items-center justify-between">
+              <div
+                className="rounded-2xl border p-4 flex items-center justify-between"
+                style={{ backgroundColor: '#FFFCF7', borderColor: '#EAE6E1' }}
+              >
                 <button
                   disabled={currentPage <= 1}
                   onClick={() => updateFilters({ page: currentPage - 1 })}
-                  className="px-4 py-2 rounded-xl border border-neutral-200 text-xs font-semibold text-neutral-700 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-neutral-50 transition"
+                  className="px-4 py-2 rounded-xl border text-xs font-semibold disabled:opacity-40 disabled:cursor-not-allowed transition"
+                  style={{ backgroundColor: '#FFFCF7', borderColor: '#EAE6E1', color: '#303653' }}
                 >
                   &larr; Previous
                 </button>
 
-                <span className="text-xs font-medium text-neutral-600">
-                  Page <strong className="text-neutral-900">{currentPage}</strong> of{' '}
-                  <strong className="text-neutral-900">{totalPages}</strong>
+                <span className="text-xs font-medium" style={{ color: '#85899B' }}>
+                  Page <strong style={{ color: '#303653' }}>{currentPage}</strong> of{' '}
+                  <strong style={{ color: '#303653' }}>{totalPages}</strong>
                 </span>
 
                 <button
                   disabled={currentPage >= totalPages}
                   onClick={() => updateFilters({ page: currentPage + 1 })}
-                  className="px-4 py-2 rounded-xl border border-neutral-200 text-xs font-semibold text-neutral-700 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-neutral-50 transition"
+                  className="px-4 py-2 rounded-xl border text-xs font-semibold disabled:opacity-40 disabled:cursor-not-allowed transition"
+                  style={{ backgroundColor: '#FFFCF7', borderColor: '#EAE6E1', color: '#303653' }}
                 >
                   Next &rarr;
                 </button>

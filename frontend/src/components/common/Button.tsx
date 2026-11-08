@@ -13,13 +13,13 @@ export const Button: React.FC<ButtonProps> = ({
   children,
   ...props
 }) => {
-  const baseStyles = 'inline-flex items-center justify-center font-medium rounded-full transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed';
+  const baseStyles = 'inline-flex items-center justify-center font-bold rounded-xl transition-all duration-200 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer';
 
   const variants = {
-    primary: 'bg-brand-yellow hover:bg-brand-yellow-600 text-brand-navy-950 shadow-sm focus:ring-brand-yellow-500 font-semibold',
-    secondary: 'bg-brand-navy-900 hover:bg-brand-navy-950 text-white focus:ring-brand-navy-800',
-    outline: 'border border-slate-300 hover:border-slate-400 bg-white hover:bg-slate-50 text-slate-700 shadow-sm focus:ring-slate-400',
-    ghost: 'hover:bg-slate-100 text-slate-700 focus:ring-slate-300',
+    primary: 'bg-[#7563D9] hover:bg-[#6552C5] text-white shadow-md',
+    secondary: 'bg-[#E9E3FF] hover:bg-[#D8D0F5] text-[#7563D9]',
+    outline: 'border border-[#EAE6E1] bg-[#FFFCF7] hover:bg-[#FFF8ED] text-[#303653] shadow-xs',
+    ghost: 'hover:bg-[#E9E3FF] text-[#303653]',
   };
 
   const sizes = {
@@ -37,4 +37,3 @@ export const Button: React.FC<ButtonProps> = ({
     </button>
   );
 };
-

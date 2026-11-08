@@ -136,10 +136,10 @@ export const VerifyOtpPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#F7F8FA] flex flex-col justify-center items-center py-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden font-sans text-slate-800">
+    <div className="min-h-screen flex flex-col justify-center items-center py-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden font-sans" style={{ backgroundColor: '#FFF8ED', color: '#303653' }}>
       {/* Soft Ambient Background Blooms */}
-      <div className="absolute top-0 right-1/4 w-96 h-96 bg-[#5B4DFF]/5 rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute bottom-0 left-1/4 w-96 h-96 bg-[#10B981]/5 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute top-0 right-1/4 w-96 h-96 rounded-full blur-3xl pointer-events-none" style={{ backgroundColor: 'rgba(117,99,217,0.06)' }} />
+      <div className="absolute bottom-0 left-1/4 w-96 h-96 rounded-full blur-3xl pointer-events-none" style={{ backgroundColor: 'rgba(66,168,121,0.06)' }} />
 
       <motion.div
         initial={{ opacity: 0, y: 14 }}
@@ -152,19 +152,19 @@ export const VerifyOtpPage: React.FC = () => {
           <Link to="/" className="inline-block mb-3 hover:opacity-95 transition-opacity">
             <Logo size="lg" />
           </Link>
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-indigo-50 border border-indigo-100/80 text-[#5B4DFF] text-xs font-semibold mb-2">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold mb-2" style={{ backgroundColor: '#E9E3FF', border: '1px solid #D8D0F5', color: '#7563D9' }}>
             <ShieldCheck className="w-3.5 h-3.5" />
             <span>Step 2 of 3: Email Verification</span>
           </div>
-          <h2 className="text-xl font-extrabold text-[#1E1B4B]">Verify Institutional Email</h2>
-          <p className="text-xs text-slate-500 mt-1 max-w-xs mx-auto">
+          <h2 className="text-xl font-extrabold" style={{ color: '#303653' }}>Verify Institutional Email</h2>
+          <p className="text-xs mt-1 max-w-xs mx-auto" style={{ color: '#85899B' }}>
             We sent a secure 6-digit verification code to:
           </p>
-          <p className="text-xs font-bold text-[#5B4DFF] mt-0.5">{email || 'your institutional email'}</p>
+          <p className="text-xs font-bold mt-0.5" style={{ color: '#7563D9' }}>{email || 'your institutional email'}</p>
         </div>
 
         {/* Card */}
-        <div className="bg-white rounded-3xl shadow-sm border border-slate-100 p-8">
+        <div className="rounded-3xl shadow-sm p-8" style={{ backgroundColor: '#FFFCF7', border: '1px solid #EAE6E1' }}>
           {errorMessage && (
             <motion.div
               initial={{ opacity: 0, y: -6 }}
@@ -197,7 +197,7 @@ export const VerifyOtpPage: React.FC = () => {
                 <div className="font-bold text-[11px] text-amber-800 uppercase tracking-wider">
                   Verification Code:
                 </div>
-                <div className="font-mono text-base font-black text-[#5B4DFF] tracking-wider">
+                <div className="font-mono text-base font-black tracking-wider" style={{ color: '#7563D9' }}>
                   {devOtp}
                 </div>
               </div>
@@ -207,7 +207,10 @@ export const VerifyOtpPage: React.FC = () => {
                   const digits = devOtp.split('').slice(0, 6);
                   setOtp(digits);
                 }}
-                className="px-3 py-1.5 rounded-xl bg-[#5B4DFF] text-white font-bold text-xs shadow-xs hover:bg-[#4F46E5] transition-all cursor-pointer"
+                className="px-3 py-1.5 rounded-xl text-white font-bold text-xs transition-all cursor-pointer"
+                style={{ backgroundColor: '#7563D9' }}
+                onMouseEnter={e => (e.currentTarget.style.backgroundColor = '#6552C5')}
+                onMouseLeave={e => (e.currentTarget.style.backgroundColor = '#7563D9')}
               >
                 Auto-Fill Code
               </button>
@@ -217,7 +220,7 @@ export const VerifyOtpPage: React.FC = () => {
           <form onSubmit={handleVerify} className="space-y-6">
             {/* 6 Digit Inputs */}
             <div>
-              <label className="block text-xs font-bold text-slate-700 text-center mb-3">
+              <label className="block text-xs font-bold text-center mb-3" style={{ color: '#303653' }}>
                 Enter 6-Digit Code
               </label>
               <div className="flex justify-between gap-2 max-w-xs mx-auto">
@@ -231,18 +234,31 @@ export const VerifyOtpPage: React.FC = () => {
                     value={digit}
                     onChange={(e) => handleChange(idx, e.target.value)}
                     onKeyDown={(e) => handleKeyDown(idx, e)}
-                    className="w-11 h-13 text-center text-xl font-bold font-mono rounded-xl border border-slate-200 bg-white focus:outline-none focus:ring-2 focus:ring-[#5B4DFF]/40 focus:border-[#5B4DFF] transition-all"
+                    className="w-11 h-13 text-center text-xl font-bold font-mono rounded-xl focus:outline-none focus:ring-2 transition-all"
+                    style={{
+                      border: '1px solid #EAE6E1',
+                      backgroundColor: '#FFFCF7',
+                      color: '#303653',
+                    }}
+                    onFocus={e => {
+                      e.currentTarget.style.borderColor = '#7563D9';
+                      e.currentTarget.style.boxShadow = '0 0 0 3px rgba(117,99,217,0.15)';
+                    }}
+                    onBlur={e => {
+                      e.currentTarget.style.borderColor = '#EAE6E1';
+                      e.currentTarget.style.boxShadow = 'none';
+                    }}
                   />
                 ))}
               </div>
             </div>
 
             {/* Timer and Cooldown */}
-            <div className="flex items-center justify-between text-xs text-slate-500 pt-1 px-1">
-              <div className="flex items-center gap-1.5 text-slate-500">
-                <Clock className="w-3.5 h-3.5 text-slate-400" />
+            <div className="flex items-center justify-between text-xs pt-1 px-1" style={{ color: '#85899B' }}>
+              <div className="flex items-center gap-1.5">
+                <Clock className="w-3.5 h-3.5" style={{ color: '#85899B' }} />
                 <span>Expires in:</span>
-                <span className={`font-mono font-bold ${timeLeft < 60 ? 'text-red-500' : 'text-slate-700'}`}>
+                <span className={`font-mono font-bold ${timeLeft < 60 ? 'text-red-500' : ''}`} style={timeLeft >= 60 ? { color: '#303653' } : {}}>
                   {formatTime(timeLeft)}
                 </span>
               </div>
@@ -251,7 +267,8 @@ export const VerifyOtpPage: React.FC = () => {
                 type="button"
                 onClick={handleResend}
                 disabled={cooldown > 0 || resending}
-                className="inline-flex items-center gap-1 text-[#5B4DFF] hover:underline font-bold disabled:text-slate-400 disabled:no-underline cursor-pointer"
+                className="inline-flex items-center gap-1 font-bold hover:underline disabled:no-underline cursor-pointer"
+                style={{ color: cooldown > 0 || resending ? '#85899B' : '#7563D9' }}
               >
                 <RotateCcw className={`w-3 h-3 ${resending ? 'animate-spin' : ''}`} />
                 <span>{cooldown > 0 ? `Resend (${cooldown}s)` : 'Resend Code'}</span>
@@ -261,22 +278,25 @@ export const VerifyOtpPage: React.FC = () => {
             <button
               type="submit"
               disabled={verifying || otp.join('').length !== 6}
-              className="w-full py-3.5 px-4 rounded-xl bg-[#5B4DFF] hover:bg-[#4F46E5] text-white font-bold text-xs shadow-md shadow-indigo-500/20 active:scale-[0.98] transition-all duration-150 flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+              className="w-full py-3.5 px-4 rounded-xl text-white font-bold text-xs active:scale-[0.98] transition-all duration-150 flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+              style={{ backgroundColor: '#7563D9', boxShadow: '0 4px 16px rgba(117,99,217,0.30)' }}
+              onMouseEnter={e => !(verifying || otp.join('').length !== 6) && (e.currentTarget.style.backgroundColor = '#6552C5')}
+              onMouseLeave={e => (e.currentTarget.style.backgroundColor = '#7563D9')}
             >
               {verifying ? (
                 <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
               ) : (
                 <>
-                  <span>Verify Email & Proceed</span>
+                  <span>Verify Email &amp; Proceed</span>
                   <ArrowRight className="w-4 h-4" />
                 </>
               )}
             </button>
           </form>
 
-          <div className="mt-6 text-center text-xs text-slate-500">
+          <div className="mt-6 text-center text-xs" style={{ color: '#85899B' }}>
             Wrong institutional email?{' '}
-            <Link to="/register" className="font-bold text-[#5B4DFF] hover:underline">
+            <Link to="/register" className="font-bold hover:underline" style={{ color: '#7563D9' }}>
               Re-enter registration details
             </Link>
           </div>

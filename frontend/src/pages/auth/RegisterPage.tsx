@@ -163,11 +163,27 @@ export const RegisterPage: React.FC = () => {
     }
   };
 
+  const inputStyle = {
+    backgroundColor: '#FFFCF7',
+    border: '1px solid #EAE6E1',
+    color: '#303653',
+  };
+
+  const handleInputFocus = (e: React.FocusEvent<HTMLInputElement | HTMLSelectElement>) => {
+    e.currentTarget.style.borderColor = '#7563D9';
+    e.currentTarget.style.boxShadow = '0 0 0 3px rgba(117,99,217,0.12)';
+  };
+
+  const handleInputBlur = (e: React.FocusEvent<HTMLInputElement | HTMLSelectElement>) => {
+    e.currentTarget.style.borderColor = '#EAE6E1';
+    e.currentTarget.style.boxShadow = 'none';
+  };
+
   return (
-    <div className="min-h-screen bg-[#F7F8FA] flex flex-col justify-center items-center py-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden font-sans text-slate-800">
+    <div className="min-h-screen flex flex-col justify-center items-center py-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden font-sans" style={{ backgroundColor: '#FFF8ED', color: '#303653' }}>
       {/* Soft Ambient Background Blooms */}
-      <div className="absolute top-0 right-1/4 w-[500px] h-[500px] bg-[#5B4DFF]/5 rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute bottom-0 left-1/4 w-[500px] h-[500px] bg-[#10B981]/5 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute top-0 right-1/4 w-[500px] h-[500px] rounded-full blur-3xl pointer-events-none" style={{ backgroundColor: 'rgba(117,99,217,0.06)' }} />
+      <div className="absolute bottom-0 left-1/4 w-[500px] h-[500px] rounded-full blur-3xl pointer-events-none" style={{ backgroundColor: 'rgba(66,168,121,0.06)' }} />
 
       <motion.div
         initial={{ opacity: 0, y: 14 }}
@@ -180,12 +196,12 @@ export const RegisterPage: React.FC = () => {
           <Link to="/" className="inline-block mb-3 hover:opacity-95 transition-opacity">
             <Logo size="lg" />
           </Link>
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-indigo-50 border border-indigo-100/80 text-[#5B4DFF] text-xs font-semibold mb-2">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold mb-2" style={{ backgroundColor: '#E9E3FF', border: '1px solid #D8D0F5', color: '#7563D9' }}>
             <ShieldCheck className="w-3.5 h-3.5" />
             <span>Institutional Identity Registration</span>
           </div>
-          <h2 className="text-2xl font-extrabold text-[#1E1B4B]">Join Campus Network</h2>
-          <p className="text-xs text-slate-500 mt-1 max-w-md mx-auto">
+          <h2 className="text-2xl font-extrabold" style={{ color: '#303653' }}>Join Campus Network</h2>
+          <p className="text-xs mt-1 max-w-md mx-auto" style={{ color: '#85899B' }}>
             {collegeLoading
               ? 'Loading active campus configuration...'
               : `One account for renting & lending exclusively for ${college?.name || 'Aditya University'} students.`}
@@ -193,7 +209,7 @@ export const RegisterPage: React.FC = () => {
         </div>
 
         {/* Card */}
-        <div className="bg-white rounded-3xl shadow-sm border border-slate-100 p-8 sm:p-9">
+        <div className="rounded-3xl shadow-sm p-8 sm:p-9" style={{ backgroundColor: '#FFFCF7', border: '1px solid #EAE6E1' }}>
           {formError && (
             <motion.div
               initial={{ opacity: 0, y: -6 }}
@@ -208,40 +224,46 @@ export const RegisterPage: React.FC = () => {
           <form onSubmit={handleSubmit} className="space-y-5">
             {/* 1. Academic Credentials */}
             <div className="space-y-4">
-              <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider">
+              <h3 className="text-xs font-bold uppercase tracking-wider" style={{ color: '#85899B' }}>
                 1. Institutional Identity
               </h3>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                  <label className="block text-xs font-bold mb-1.5" style={{ color: '#303653' }}>
                     Full Student Name
                   </label>
                   <div className="relative">
-                    <UserIcon className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                    <UserIcon className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4" style={{ color: '#85899B' }} />
                     <input
                       type="text"
                       value={fullName}
                       onChange={(e) => setFullName(e.target.value)}
                       placeholder="e.g. Sai Reddy"
-                      className="w-full pl-10 pr-3.5 py-2.5 rounded-xl border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-[#5B4DFF]/30 focus:border-[#5B4DFF] bg-white"
+                      className="w-full pl-10 pr-3.5 py-2.5 rounded-xl text-xs focus:outline-none focus:ring-2 transition-all"
+                      style={inputStyle}
+                      onFocus={handleInputFocus}
+                      onBlur={handleInputBlur}
                       required
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                  <label className="block text-xs font-bold mb-1.5" style={{ color: '#303653' }}>
                     Roll Number
                   </label>
                   <div className="relative">
-                    <IdCard className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                    <IdCard className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4" style={{ color: '#85899B' }} />
                     <input
                       type="text"
                       value={rollNumber}
                       onChange={(e) => setRollNumber(e.target.value)}
                       placeholder="e.g. 21A91A05B8"
-                      className="w-full pl-10 pr-3.5 py-2.5 rounded-xl border border-slate-200 text-xs uppercase focus:outline-none focus:ring-2 focus:ring-[#5B4DFF]/30 focus:border-[#5B4DFF] bg-white font-mono"
+                      className="w-full pl-10 pr-3.5 py-2.5 rounded-xl text-xs uppercase focus:outline-none focus:ring-2 transition-all font-mono"
+                      style={inputStyle}
+                      onFocus={handleInputFocus}
+                      onBlur={handleInputBlur}
                       required
                     />
                   </div>
@@ -249,17 +271,20 @@ export const RegisterPage: React.FC = () => {
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                <label className="block text-xs font-bold mb-1.5" style={{ color: '#303653' }}>
                   Institutional Email Address
                 </label>
                 <div className="relative">
-                  <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                  <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4" style={{ color: '#85899B' }} />
                   <input
                     type="email"
                     value={email}
                     onChange={(e) => handleEmailChange(e.target.value)}
                     placeholder="student.name@adityauniversity.in"
-                    className="w-full pl-10 pr-10 py-2.5 rounded-xl border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-[#5B4DFF]/30 focus:border-[#5B4DFF] bg-white"
+                    className="w-full pl-10 pr-10 py-2.5 rounded-xl text-xs focus:outline-none focus:ring-2 transition-all"
+                    style={inputStyle}
+                    onFocus={handleInputFocus}
+                    onBlur={handleInputBlur}
                     required
                   />
                   {emailDomainValid === true && (
@@ -269,9 +294,9 @@ export const RegisterPage: React.FC = () => {
                     <AlertCircle className="absolute right-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-red-500" />
                   )}
                 </div>
-                <p className="text-[11px] text-slate-400 mt-1">
+                <p className="text-[11px] mt-1" style={{ color: '#85899B' }}>
                   Must be an institutional address ending in{' '}
-                  <span className="font-semibold text-slate-600">
+                  <span className="font-semibold" style={{ color: '#303653' }}>
                     {college?.domain_whitelist?.join(' or ')}
                   </span>
                 </p>
@@ -279,15 +304,18 @@ export const RegisterPage: React.FC = () => {
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                  <label className="block text-xs font-bold mb-1.5" style={{ color: '#303653' }}>
                     Department
                   </label>
                   <div className="relative">
-                    <Building className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
+                    <Building className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 pointer-events-none" style={{ color: '#85899B' }} />
                     <select
                       value={department}
                       onChange={(e) => setDepartment(e.target.value)}
-                      className="w-full pl-10 pr-3.5 py-2.5 rounded-xl border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-[#5B4DFF]/30 bg-white"
+                      className="w-full pl-10 pr-3.5 py-2.5 rounded-xl text-xs focus:outline-none focus:ring-2 transition-all"
+                      style={inputStyle}
+                      onFocus={handleInputFocus}
+                      onBlur={handleInputBlur}
                     >
                       {DEPARTMENTS.map((dept) => (
                         <option key={dept} value={dept}>
@@ -299,7 +327,7 @@ export const RegisterPage: React.FC = () => {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                  <label className="block text-xs font-bold mb-1.5" style={{ color: '#303653' }}>
                     Year of Study
                   </label>
                   <div className="grid grid-cols-4 gap-1.5">
@@ -308,11 +336,14 @@ export const RegisterPage: React.FC = () => {
                         key={yr}
                         type="button"
                         onClick={() => setYearOfStudy(yr)}
-                        className={`py-2 rounded-xl text-xs font-bold border transition-all cursor-pointer ${
+                        className="py-2 rounded-xl text-xs font-bold border transition-all cursor-pointer"
+                        style={
                           yearOfStudy === yr
-                            ? 'bg-[#5B4DFF] text-white border-[#5B4DFF] shadow-xs'
-                            : 'bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100'
-                        }`}
+                            ? { backgroundColor: '#7563D9', color: '#fff', borderColor: '#7563D9' }
+                            : { backgroundColor: '#FFF8ED', color: '#303653', borderColor: '#EAE6E1' }
+                        }
+                        onMouseEnter={e => yearOfStudy !== yr && (e.currentTarget.style.backgroundColor = '#E9E3FF')}
+                        onMouseLeave={e => yearOfStudy !== yr && (e.currentTarget.style.backgroundColor = '#FFF8ED')}
                       >
                         {yr}
                         <span className="text-[10px] ml-0.5">
@@ -326,15 +357,20 @@ export const RegisterPage: React.FC = () => {
             </div>
 
             {/* 2. College ID Card Upload */}
-            <div className="space-y-2 pt-2 border-t border-slate-100">
+            <div className="space-y-2 pt-2" style={{ borderTop: '1px solid #EAE6E1' }}>
               <div className="flex items-center justify-between">
-                <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider">
+                <h3 className="text-xs font-bold uppercase tracking-wider" style={{ color: '#85899B' }}>
                   2. Student ID Card Photo
                 </h3>
-                <span className="text-[11px] text-slate-400">Required for campus verification</span>
+                <span className="text-[11px]" style={{ color: '#85899B' }}>Required for campus verification</span>
               </div>
 
-              <div className="relative border-2 border-dashed border-slate-200 hover:border-[#5B4DFF] rounded-2xl p-5 text-center transition-all bg-slate-50/50">
+              <div
+                className="relative rounded-2xl p-5 text-center transition-all"
+                style={{ border: '2px dashed #EAE6E1', backgroundColor: 'rgba(255,248,237,0.5)' }}
+                onMouseEnter={e => (e.currentTarget.style.borderColor = '#7563D9')}
+                onMouseLeave={e => (e.currentTarget.style.borderColor = '#EAE6E1')}
+              >
                 <input
                   type="file"
                   id="id-card-upload"
@@ -347,24 +383,26 @@ export const RegisterPage: React.FC = () => {
                     <img
                       src={idCardPreview}
                       alt="ID Preview"
-                      className="w-48 h-28 object-cover rounded-xl border border-slate-200 shadow-sm mb-3"
+                      className="w-48 h-28 object-cover rounded-xl shadow-sm mb-3"
+                      style={{ border: '1px solid #EAE6E1' }}
                     />
                     <label
                       htmlFor="id-card-upload"
-                      className="cursor-pointer text-xs font-bold text-[#5B4DFF] hover:underline"
+                      className="cursor-pointer text-xs font-bold hover:underline"
+                      style={{ color: '#7563D9' }}
                     >
                       Change photo
                     </label>
                   </div>
                 ) : (
                   <label htmlFor="id-card-upload" className="cursor-pointer flex flex-col items-center">
-                    <div className="w-10 h-10 rounded-xl bg-indigo-50 flex items-center justify-center text-[#5B4DFF] mb-2">
+                    <div className="w-10 h-10 rounded-xl flex items-center justify-center mb-2" style={{ backgroundColor: '#E9E3FF', color: '#7563D9' }}>
                       <UploadCloud className="w-5 h-5" />
                     </div>
-                    <span className="text-xs font-bold text-slate-700">
+                    <span className="text-xs font-bold" style={{ color: '#303653' }}>
                       Upload College ID Card
                     </span>
-                    <span className="text-[11px] text-slate-400 mt-0.5">
+                    <span className="text-[11px] mt-0.5" style={{ color: '#85899B' }}>
                       Clear photo showing name, photo, and roll number (PNG/JPG, max 5MB)
                     </span>
                   </label>
@@ -373,31 +411,35 @@ export const RegisterPage: React.FC = () => {
             </div>
 
             {/* 3. Account Security */}
-            <div className="space-y-4 pt-2 border-t border-slate-100">
-              <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider">
+            <div className="space-y-4 pt-2" style={{ borderTop: '1px solid #EAE6E1' }}>
+              <h3 className="text-xs font-bold uppercase tracking-wider" style={{ color: '#85899B' }}>
                 3. Password
               </h3>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                  <label className="block text-xs font-bold mb-1.5" style={{ color: '#303653' }}>
                     Password (min 8 chars)
                   </label>
                   <div className="relative">
-                    <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                    <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4" style={{ color: '#85899B' }} />
                     <input
                       type={showPassword ? 'text' : 'password'}
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       placeholder="••••••••••••"
-                      className="w-full pl-10 pr-10 py-2.5 rounded-xl border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-[#5B4DFF]/30 bg-white"
+                      className="w-full pl-10 pr-10 py-2.5 rounded-xl text-xs focus:outline-none focus:ring-2 transition-all"
+                      style={inputStyle}
+                      onFocus={handleInputFocus}
+                      onBlur={handleInputBlur}
                       required
                       minLength={8}
                     />
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 cursor-pointer"
+                      className="absolute right-3.5 top-1/2 -translate-y-1/2 cursor-pointer"
+                      style={{ color: '#85899B' }}
                     >
                       {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                     </button>
@@ -405,17 +447,20 @@ export const RegisterPage: React.FC = () => {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                  <label className="block text-xs font-bold mb-1.5" style={{ color: '#303653' }}>
                     Confirm Password
                   </label>
                   <div className="relative">
-                    <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                    <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4" style={{ color: '#85899B' }} />
                     <input
                       type={showPassword ? 'text' : 'password'}
                       value={confirmPassword}
                       onChange={(e) => setConfirmPassword(e.target.value)}
                       placeholder="••••••••••••"
-                      className="w-full pl-10 pr-3.5 py-2.5 rounded-xl border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-[#5B4DFF]/30 bg-white"
+                      className="w-full pl-10 pr-3.5 py-2.5 rounded-xl text-xs focus:outline-none focus:ring-2 transition-all"
+                      style={inputStyle}
+                      onFocus={handleInputFocus}
+                      onBlur={handleInputBlur}
                       required
                       minLength={8}
                     />
@@ -427,22 +472,25 @@ export const RegisterPage: React.FC = () => {
             <button
               type="submit"
               disabled={submitting || emailDomainValid === false}
-              className="w-full mt-4 py-3.5 px-4 rounded-xl bg-[#5B4DFF] hover:bg-[#4F46E5] text-white font-bold text-xs shadow-md shadow-indigo-500/20 active:scale-[0.98] transition-all duration-150 flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+              className="w-full mt-4 py-3.5 px-4 rounded-xl text-white font-bold text-xs active:scale-[0.98] transition-all duration-150 flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+              style={{ backgroundColor: '#7563D9', boxShadow: '0 4px 16px rgba(117,99,217,0.30)' }}
+              onMouseEnter={e => !(submitting || emailDomainValid === false) && (e.currentTarget.style.backgroundColor = '#6552C5')}
+              onMouseLeave={e => (e.currentTarget.style.backgroundColor = '#7563D9')}
             >
               {submitting ? (
                 <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
               ) : (
                 <>
-                  <span>Create Account & Verify Email</span>
+                  <span>Create Account &amp; Verify Email</span>
                   <ArrowRight className="w-4 h-4" />
                 </>
               )}
             </button>
           </form>
 
-          <div className="mt-6 text-center text-xs text-slate-500">
+          <div className="mt-6 text-center text-xs" style={{ color: '#85899B' }}>
             Already registered?{' '}
-            <Link to="/login" className="font-bold text-[#5B4DFF] hover:underline">
+            <Link to="/login" className="font-bold hover:underline" style={{ color: '#7563D9' }}>
               Sign In
             </Link>
           </div>

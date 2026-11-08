@@ -20,20 +20,21 @@ export const ItemCard: React.FC<ItemCardProps> = ({ item, onSelect }) => {
     try {
       await toggleWishlist(item.id, isWishlisted);
     } catch {
-      setIsWishlisted(!nextState); // rollback on error
+      setIsWishlisted(!nextState);
     }
   };
 
-  const conditionColors: Record<string, { bg: string; text: string; label: string }> = {
-    BRAND_NEW: { bg: 'bg-emerald-50 border-emerald-200', text: 'text-emerald-700', label: 'Brand New' },
-    LIKE_NEW: { bg: 'bg-blue-50 border-blue-200', text: 'text-blue-700', label: 'Like New' },
-    GOOD: { bg: 'bg-indigo-50 border-indigo-200', text: 'text-indigo-700', label: 'Good' },
-    FAIR: { bg: 'bg-amber-50 border-amber-200', text: 'text-amber-700', label: 'Fair' },
+  const conditionColors: Record<string, { bg: string; text: string; label: string; border: string }> = {
+    BRAND_NEW: { bg: '#DDF3E7', text: '#42A879', border: '#B8E5CC', label: 'Brand New' },
+    LIKE_NEW: { bg: '#DFEDFF', text: '#3A6BB5', border: '#C5DCFA', label: 'Like New' },
+    GOOD: { bg: '#E9E3FF', text: '#7563D9', border: '#D8D0F5', label: 'Good' },
+    FAIR: { bg: '#FFE5D6', text: '#C45C20', border: '#F5CDB8', label: 'Fair' },
   };
 
   const cond = conditionColors[item.condition] || {
-    bg: 'bg-neutral-100 border-neutral-200',
-    text: 'text-neutral-700',
+    bg: '#FFF8ED',
+    text: '#85899B',
+    border: '#EAE6E1',
     label: item.condition,
   };
 
@@ -42,10 +43,13 @@ export const ItemCard: React.FC<ItemCardProps> = ({ item, onSelect }) => {
   return (
     <div
       onClick={() => onSelect(item)}
-      className="group relative bg-white rounded-2xl border border-neutral-200/80 shadow-xs hover:shadow-md hover:border-neutral-300 transition-all duration-200 overflow-hidden flex flex-col cursor-pointer"
+      className="group relative rounded-2xl border shadow-xs hover:shadow-card-hover transition-all duration-200 overflow-hidden flex flex-col cursor-pointer"
+      style={{ backgroundColor: '#FFFCF7', borderColor: '#EAE6E1' }}
+      onMouseEnter={(e) => (e.currentTarget.style.borderColor = '#D8D0F5')}
+      onMouseLeave={(e) => (e.currentTarget.style.borderColor = '#EAE6E1')}
     >
       {/* Top Image & Overlays */}
-      <div className="relative aspect-4/3 w-full bg-neutral-100 overflow-hidden">
+      <div className="relative aspect-4/3 w-full overflow-hidden" style={{ backgroundColor: '#E9E3FF' }}>
         {item.primary_image_url ? (
           <img
             src={item.primary_image_url}
@@ -58,25 +62,32 @@ export const ItemCard: React.FC<ItemCardProps> = ({ item, onSelect }) => {
             }}
           />
         ) : (
-          <div className="w-full h-full flex items-center justify-center text-neutral-400 bg-neutral-100">
-            <span className="text-sm font-medium">No photo available</span>
+          <div className="w-full h-full flex items-center justify-center text-xs font-semibold" style={{ color: '#85899B', backgroundColor: '#E9E3FF' }}>
+            <span>No photo available</span>
           </div>
         )}
 
         {/* Condition Badge */}
         <div className="absolute top-3 left-3 flex flex-wrap gap-1.5 items-center">
           <span
-            className={`px-2.5 py-0.5 rounded-full text-xs font-semibold border backdrop-blur-md shadow-xs ${cond.bg} ${cond.text}`}
+            className="px-2.5 py-0.5 rounded-full text-xs font-semibold border backdrop-blur-md shadow-xs"
+            style={{ backgroundColor: cond.bg, color: cond.text, borderColor: cond.border }}
           >
             {cond.label}
           </span>
           {isAvailable ? (
-            <span className="px-2 py-0.5 rounded-full text-[11px] font-medium bg-emerald-500/90 text-white backdrop-blur-md shadow-xs flex items-center gap-1">
+            <span
+              className="px-2 py-0.5 rounded-full text-[11px] font-semibold text-white backdrop-blur-md shadow-xs flex items-center gap-1"
+              style={{ backgroundColor: '#42A879' }}
+            >
               <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
               Available
             </span>
           ) : (
-            <span className="px-2 py-0.5 rounded-full text-[11px] font-medium bg-neutral-700/80 text-white backdrop-blur-md shadow-xs flex items-center gap-1">
+            <span
+              className="px-2 py-0.5 rounded-full text-[11px] font-semibold text-white backdrop-blur-md shadow-xs flex items-center gap-1"
+              style={{ backgroundColor: 'rgba(48, 54, 83, 0.8)' }}
+            >
               <Clock className="w-3 h-3" />
               Rented
             </span>
@@ -88,18 +99,21 @@ export const ItemCard: React.FC<ItemCardProps> = ({ item, onSelect }) => {
           type="button"
           onClick={handleWishlistClick}
           aria-label={isWishlisted ? 'Remove from wishlist' : 'Save to wishlist'}
-          className={`absolute top-3 right-3 p-2 rounded-full backdrop-blur-md transition-all duration-200 shadow-xs ${
-            isWishlisted
-              ? 'bg-rose-500 text-white hover:bg-rose-600'
-              : 'bg-white/80 text-neutral-600 hover:bg-white hover:text-rose-500'
-          }`}
+          className="absolute top-3 right-3 p-2 rounded-full backdrop-blur-md transition-all duration-200 shadow-xs cursor-pointer"
+          style={{
+            backgroundColor: isWishlisted ? '#F28B82' : 'rgba(255, 255, 255, 0.85)',
+            color: isWishlisted ? '#fff' : '#85899B',
+          }}
         >
           <Heart className={`w-4 h-4 ${isWishlisted ? 'fill-current' : ''}`} />
         </button>
 
         {/* Category Pill */}
         <div className="absolute bottom-2.5 left-3">
-          <span className="px-2.5 py-1 rounded-md text-xs font-medium bg-neutral-900/75 text-white backdrop-blur-md flex items-center gap-1 shadow-xs">
+          <span
+            className="px-2.5 py-1 rounded-md text-xs font-semibold text-white backdrop-blur-md flex items-center gap-1 shadow-xs"
+            style={{ backgroundColor: 'rgba(48, 54, 83, 0.85)' }}
+          >
             {item.category_name}
           </span>
         </div>
@@ -110,59 +124,70 @@ export const ItemCard: React.FC<ItemCardProps> = ({ item, onSelect }) => {
         <div>
           {/* Title & Brand */}
           <div className="flex items-start justify-between gap-2">
-            <h3 className="font-semibold text-neutral-900 line-clamp-1 group-hover:text-amber-600 transition-colors">
+            <h3
+              className="font-bold line-clamp-1 transition-colors group-hover:text-[#7563D9]"
+              style={{ color: '#303653' }}
+            >
               {item.title}
             </h3>
           </div>
           {item.brand && (
-            <p className="text-xs text-neutral-500 font-medium mt-0.5">
+            <p className="text-xs font-medium mt-0.5" style={{ color: '#85899B' }}>
               {item.brand} {item.model_name ? `• ${item.model_name}` : ''}
             </p>
           )}
 
           {/* Short Description */}
-          <p className="text-xs text-neutral-600 mt-2 line-clamp-2 leading-relaxed">
+          <p className="text-xs mt-2 line-clamp-2 leading-relaxed" style={{ color: '#85899B' }}>
             {item.short_description}
           </p>
         </div>
 
-        <div className="mt-4 pt-3 border-t border-neutral-100 flex flex-col gap-2.5">
+        <div className="mt-4 pt-3 flex flex-col gap-2.5" style={{ borderTop: '1px solid #EAE6E1' }}>
           {/* Pricing & Deposit */}
           <div className="flex items-baseline justify-between">
             <div>
-              <span className="text-lg font-bold text-neutral-900">₹{parseFloat(String(item.daily_rental_price))}</span>
-              <span className="text-xs text-neutral-500 font-normal"> / day</span>
+              <span className="text-lg font-black" style={{ color: '#303653' }}>
+                ₹{parseFloat(String(item.daily_rental_price))}
+              </span>
+              <span className="text-xs font-normal" style={{ color: '#85899B' }}> / day</span>
             </div>
             {parseFloat(String(item.security_deposit)) > 0 && (
-              <span className="text-[11px] text-neutral-500 bg-neutral-100 px-2 py-0.5 rounded-md font-medium">
+              <span
+                className="text-[11px] px-2 py-0.5 rounded-md font-medium border"
+                style={{ backgroundColor: '#FFF8ED', color: '#85899B', borderColor: '#EAE6E1' }}
+              >
                 ₹{parseFloat(String(item.security_deposit))} deposit
               </span>
             )}
           </div>
 
           {/* Owner info & Pickup */}
-          <div className="flex items-center justify-between text-xs text-neutral-600 pt-1">
+          <div className="flex items-center justify-between text-xs pt-1" style={{ color: '#85899B' }}>
             <div className="flex items-center gap-1.5 truncate max-w-[65%]">
-              <div className="w-5 h-5 rounded-full bg-amber-100 text-amber-800 flex items-center justify-center text-[10px] font-bold shrink-0">
+              <div
+                className="w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold shrink-0"
+                style={{ backgroundColor: '#E9E3FF', color: '#7563D9' }}
+              >
                 {item.owner.display_name ? item.owner.display_name.charAt(0).toUpperCase() : 'S'}
               </div>
-              <span className="truncate font-medium text-neutral-800">{item.owner.display_name}</span>
+              <span className="truncate font-medium" style={{ color: '#303653' }}>{item.owner.display_name}</span>
             </div>
 
             {/* Rating */}
-            <div className="flex items-center gap-1 font-semibold text-neutral-800 shrink-0">
-              <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
+            <div className="flex items-center gap-1 font-semibold shrink-0" style={{ color: '#303653' }}>
+              <Star className="w-3.5 h-3.5 fill-[#E8A447]" style={{ color: '#E8A447' }} />
               <span>{item.owner.reputation.toFixed(1)}</span>
             </div>
           </div>
 
           {/* Pickup spot indicator */}
           {item.pickup_locations && item.pickup_locations.length > 0 && (
-            <div className="flex items-center gap-1 text-[11px] text-neutral-500 truncate">
-              <MapPin className="w-3 h-3 text-neutral-400 shrink-0" />
+            <div className="flex items-center gap-1 text-[11px] truncate" style={{ color: '#85899B' }}>
+              <MapPin className="w-3 h-3 shrink-0" style={{ color: '#7563D9' }} />
               <span className="truncate">{item.pickup_locations[0]}</span>
               {item.pickup_locations.length > 1 && (
-                <span className="text-neutral-400 shrink-0">+{item.pickup_locations.length - 1}</span>
+                <span className="shrink-0" style={{ color: '#85899B' }}>+{item.pickup_locations.length - 1}</span>
               )}
             </div>
           )}

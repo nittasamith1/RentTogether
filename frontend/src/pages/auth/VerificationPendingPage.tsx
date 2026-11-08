@@ -105,10 +105,10 @@ export const VerificationPendingPage: React.FC = () => {
   const status = verification?.verification_status || user?.verification_status || 'PENDING';
 
   return (
-    <div className="min-h-screen bg-[#F7F8FA] flex flex-col justify-center items-center py-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden font-sans text-slate-800">
+    <div className="min-h-screen flex flex-col justify-center items-center py-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden font-sans" style={{ backgroundColor: '#FFF8ED', color: '#303653' }}>
       {/* Soft Ambient Background Blooms */}
-      <div className="absolute top-0 right-1/4 w-96 h-96 bg-[#5B4DFF]/5 rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute bottom-0 left-1/4 w-96 h-96 bg-[#10B981]/5 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute top-0 right-1/4 w-96 h-96 rounded-full blur-3xl pointer-events-none" style={{ backgroundColor: 'rgba(117,99,217,0.06)' }} />
+      <div className="absolute bottom-0 left-1/4 w-96 h-96 rounded-full blur-3xl pointer-events-none" style={{ backgroundColor: 'rgba(66,168,121,0.06)' }} />
 
       <motion.div
         initial={{ opacity: 0, y: 14 }}
@@ -121,11 +121,11 @@ export const VerificationPendingPage: React.FC = () => {
           <Link to="/" className="inline-block mb-3 hover:opacity-95 transition-opacity">
             <Logo size="lg" />
           </Link>
-          <p className="text-xs text-slate-500 font-medium">Campus Identity & Verification Status</p>
+          <p className="text-xs font-medium" style={{ color: '#85899B' }}>Campus Identity &amp; Verification Status</p>
         </div>
 
         {/* Status Card */}
-        <div className="bg-white rounded-3xl shadow-sm border border-slate-100 p-8">
+        <div className="rounded-3xl shadow-sm p-8" style={{ backgroundColor: '#FFFCF7', border: '1px solid #EAE6E1' }}>
           {status === 'VERIFIED' ? (
             /* VERIFIED STATE */
             <div className="text-center space-y-4">
@@ -133,34 +133,37 @@ export const VerificationPendingPage: React.FC = () => {
                 <ShieldCheck className="w-8 h-8" />
               </div>
               <div>
-                <h2 className="text-xl font-extrabold text-[#1E1B4B]">Identity Verified!</h2>
-                <p className="text-xs text-slate-500 mt-1">
+                <h2 className="text-xl font-extrabold" style={{ color: '#303653' }}>Identity Verified!</h2>
+                <p className="text-xs mt-1" style={{ color: '#85899B' }}>
                   Your Aditya University campus membership has been approved by the campus administrator.
                 </p>
               </div>
 
-              <div className="p-4 rounded-2xl bg-slate-50/80 border border-slate-100 text-left text-xs space-y-2">
+              <div className="p-4 rounded-2xl text-left text-xs space-y-2" style={{ backgroundColor: '#FFF8ED', border: '1px solid #EAE6E1' }}>
                 <div className="flex justify-between">
-                  <span className="text-slate-400">Student Name:</span>
-                  <span className="font-bold text-slate-800">{verification?.student_name || user?.name}</span>
+                  <span style={{ color: '#85899B' }}>Student Name:</span>
+                  <span className="font-bold" style={{ color: '#303653' }}>{verification?.student_name || user?.name}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-slate-400">Roll Number:</span>
-                  <span className="font-mono font-bold text-slate-800">{verification?.roll_number}</span>
+                  <span style={{ color: '#85899B' }}>Roll Number:</span>
+                  <span className="font-mono font-bold" style={{ color: '#303653' }}>{verification?.roll_number}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-slate-400">Department:</span>
-                  <span className="font-semibold text-slate-800">{verification?.department}</span>
+                  <span style={{ color: '#85899B' }}>Department:</span>
+                  <span className="font-semibold" style={{ color: '#303653' }}>{verification?.department}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-slate-400">Institution:</span>
-                  <span className="font-semibold text-slate-800">{verification?.college_name || 'Aditya University'}</span>
+                  <span style={{ color: '#85899B' }}>Institution:</span>
+                  <span className="font-semibold" style={{ color: '#303653' }}>{verification?.college_name || 'Aditya University'}</span>
                 </div>
               </div>
 
               <button
                 onClick={() => navigate('/')}
-                className="w-full py-3.5 px-4 rounded-xl bg-[#5B4DFF] hover:bg-[#4F46E5] text-white font-bold text-xs shadow-md shadow-indigo-500/20 active:scale-[0.98] transition-all flex items-center justify-center gap-2 cursor-pointer"
+                className="w-full py-3.5 px-4 rounded-xl text-white font-bold text-xs active:scale-[0.98] transition-all flex items-center justify-center gap-2 cursor-pointer"
+                style={{ backgroundColor: '#7563D9', boxShadow: '0 4px 16px rgba(117,99,217,0.30)' }}
+                onMouseEnter={e => (e.currentTarget.style.backgroundColor = '#6552C5')}
+                onMouseLeave={e => (e.currentTarget.style.backgroundColor = '#7563D9')}
               >
                 <span>Enter Campus Dashboard</span>
                 <ArrowRight className="w-4 h-4" />
@@ -173,8 +176,8 @@ export const VerificationPendingPage: React.FC = () => {
                 <div className="w-14 h-14 rounded-2xl bg-rose-50 border border-rose-200/80 flex items-center justify-center text-rose-600 mx-auto mb-3">
                   <ShieldAlert className="w-7 h-7" />
                 </div>
-                <h2 className="text-lg font-extrabold text-[#1E1B4B]">Verification Needs Attention</h2>
-                <p className="text-xs text-slate-500 mt-1">
+                <h2 className="text-lg font-extrabold" style={{ color: '#303653' }}>Verification Needs Attention</h2>
+                <p className="text-xs mt-1" style={{ color: '#85899B' }}>
                   Your ID verification submission could not be approved by the administrator.
                 </p>
               </div>
@@ -199,14 +202,17 @@ export const VerificationPendingPage: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => setShowResubmitForm(true)}
-                  className="w-full py-3 px-4 rounded-xl bg-[#5B4DFF] hover:bg-[#4F46E5] text-white font-bold text-xs shadow-md shadow-indigo-500/20 transition-all flex items-center justify-center gap-2 cursor-pointer"
+                  className="w-full py-3 px-4 rounded-xl text-white font-bold text-xs transition-all flex items-center justify-center gap-2 cursor-pointer"
+                  style={{ backgroundColor: '#7563D9', boxShadow: '0 4px 16px rgba(117,99,217,0.30)' }}
+                  onMouseEnter={e => (e.currentTarget.style.backgroundColor = '#6552C5')}
+                  onMouseLeave={e => (e.currentTarget.style.backgroundColor = '#7563D9')}
                 >
                   <UploadCloud className="w-4 h-4" />
-                  <span>Upload Clearer ID Card & Resubmit</span>
+                  <span>Upload Clearer ID Card &amp; Resubmit</span>
                 </button>
               ) : (
-                <form onSubmit={handleResubmit} className="space-y-4 pt-2 border-t border-slate-100">
-                  <h4 className="text-xs font-bold text-slate-800">Resubmit College ID Photo</h4>
+                <form onSubmit={handleResubmit} className="space-y-4 pt-2" style={{ borderTop: '1px solid #EAE6E1' }}>
+                  <h4 className="text-xs font-bold" style={{ color: '#303653' }}>Resubmit College ID Photo</h4>
 
                   {resubmitError && (
                     <div className="p-2.5 rounded-lg bg-red-50 border border-red-200 text-xs text-red-600">
@@ -214,7 +220,12 @@ export const VerificationPendingPage: React.FC = () => {
                     </div>
                   )}
 
-                  <div className="border-2 border-dashed border-slate-200 hover:border-[#5B4DFF] rounded-2xl p-4 text-center bg-slate-50/50">
+                  <div
+                    className="rounded-2xl p-4 text-center transition-all"
+                    style={{ border: '2px dashed #EAE6E1', backgroundColor: 'rgba(255,248,237,0.5)' }}
+                    onMouseEnter={e => (e.currentTarget.style.borderColor = '#7563D9')}
+                    onMouseLeave={e => (e.currentTarget.style.borderColor = '#EAE6E1')}
+                  >
                     <input
                       type="file"
                       id="resubmit-id-upload"
@@ -227,20 +238,22 @@ export const VerificationPendingPage: React.FC = () => {
                         <img
                           src={newIdPreview}
                           alt="ID Preview"
-                          className="w-40 h-24 object-cover rounded-xl border border-slate-200 mb-2 shadow-sm"
+                          className="w-40 h-24 object-cover rounded-xl mb-2 shadow-sm"
+                          style={{ border: '1px solid #EAE6E1' }}
                         />
                         <label
                           htmlFor="resubmit-id-upload"
-                          className="text-xs font-bold text-[#5B4DFF] hover:underline cursor-pointer"
+                          className="text-xs font-bold hover:underline cursor-pointer"
+                          style={{ color: '#7563D9' }}
                         >
                           Change photo
                         </label>
                       </div>
                     ) : (
                       <label htmlFor="resubmit-id-upload" className="cursor-pointer flex flex-col items-center">
-                        <UploadCloud className="w-6 h-6 text-[#5B4DFF] mb-1.5" />
-                        <span className="text-xs font-bold text-slate-700">Choose clear ID card image</span>
-                        <span className="text-[10px] text-slate-400 mt-0.5">Ensure name and roll number are visible</span>
+                        <UploadCloud className="w-6 h-6 mb-1.5" style={{ color: '#7563D9' }} />
+                        <span className="text-xs font-bold" style={{ color: '#303653' }}>Choose clear ID card image</span>
+                        <span className="text-[10px] mt-0.5" style={{ color: '#85899B' }}>Ensure name and roll number are visible</span>
                       </label>
                     )}
                   </div>
@@ -249,14 +262,20 @@ export const VerificationPendingPage: React.FC = () => {
                     <button
                       type="button"
                       onClick={() => setShowResubmitForm(false)}
-                      className="flex-1 py-2.5 rounded-xl border border-slate-200 text-xs font-semibold text-slate-600 hover:bg-slate-50 cursor-pointer"
+                      className="flex-1 py-2.5 rounded-xl text-xs font-semibold cursor-pointer transition-all"
+                      style={{ border: '1px solid #EAE6E1', color: '#303653', backgroundColor: 'transparent' }}
+                      onMouseEnter={e => (e.currentTarget.style.backgroundColor = '#FFF8ED')}
+                      onMouseLeave={e => (e.currentTarget.style.backgroundColor = 'transparent')}
                     >
                       Cancel
                     </button>
                     <button
                       type="submit"
                       disabled={resubmitLoading || !newIdCard}
-                      className="flex-1 py-2.5 rounded-xl bg-[#5B4DFF] hover:bg-[#4F46E5] text-white text-xs font-bold cursor-pointer disabled:opacity-50"
+                      className="flex-1 py-2.5 rounded-xl text-white text-xs font-bold cursor-pointer disabled:opacity-50 transition-all"
+                      style={{ backgroundColor: '#7563D9' }}
+                      onMouseEnter={e => !(resubmitLoading || !newIdCard) && (e.currentTarget.style.backgroundColor = '#6552C5')}
+                      onMouseLeave={e => (e.currentTarget.style.backgroundColor = '#7563D9')}
                     >
                       {resubmitLoading ? 'Submitting...' : 'Submit for Re-Review'}
                     </button>
@@ -269,51 +288,51 @@ export const VerificationPendingPage: React.FC = () => {
             <div className="space-y-6">
               <div className="text-center">
                 <div className="relative w-16 h-16 mx-auto mb-3">
-                  <div className="absolute inset-0 rounded-2xl bg-indigo-100 animate-ping opacity-40" />
-                  <div className="relative w-16 h-16 rounded-2xl bg-indigo-50 border border-indigo-100 flex items-center justify-center text-[#5B4DFF]">
+                  <div className="absolute inset-0 rounded-2xl animate-ping opacity-40" style={{ backgroundColor: '#E9E3FF' }} />
+                  <div className="relative w-16 h-16 rounded-2xl flex items-center justify-center" style={{ backgroundColor: '#E9E3FF', border: '1px solid #D8D0F5', color: '#7563D9' }}>
                     <Clock className="w-8 h-8" />
                   </div>
                 </div>
-                <h2 className="text-xl font-extrabold text-[#1E1B4B]">Verification Under Review</h2>
-                <p className="text-xs text-slate-500 mt-1 max-w-sm mx-auto">
+                <h2 className="text-xl font-extrabold" style={{ color: '#303653' }}>Verification Under Review</h2>
+                <p className="text-xs mt-1 max-w-sm mx-auto" style={{ color: '#85899B' }}>
                   Your institutional registration has been submitted. Campus administrators verify student ID cards to ensure safe peer-to-peer sharing.
                 </p>
               </div>
 
               {/* Progress Milestones */}
-              <div className="space-y-3 p-4 rounded-2xl bg-slate-50/70 border border-slate-100 text-xs">
+              <div className="space-y-3 p-4 rounded-2xl text-xs" style={{ backgroundColor: '#FFF8ED', border: '1px solid #EAE6E1' }}>
                 <div className="flex items-center gap-3">
                   <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
-                  <span className="font-semibold text-slate-700">Student Registration Created</span>
+                  <span className="font-semibold" style={{ color: '#303653' }}>Student Registration Created</span>
                 </div>
                 <div className="flex items-center gap-3">
                   <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
-                  <span className="font-semibold text-slate-700">Institutional Email Verified</span>
+                  <span className="font-semibold" style={{ color: '#303653' }}>Institutional Email Verified</span>
                 </div>
                 <div className="flex items-center gap-3">
-                  <div className="w-4 h-4 rounded-full border-2 border-[#5B4DFF] border-t-transparent animate-spin shrink-0" />
-                  <span className="font-bold text-[#5B4DFF]">Administrator ID Card Verification (In Progress)</span>
+                  <div className="w-4 h-4 rounded-full border-2 border-t-transparent animate-spin shrink-0" style={{ borderColor: '#7563D9', borderTopColor: 'transparent' }} />
+                  <span className="font-bold" style={{ color: '#7563D9' }}>Administrator ID Card Verification (In Progress)</span>
                 </div>
-                <div className="flex items-center gap-3 text-slate-400">
-                  <div className="w-4 h-4 rounded-full border border-slate-300 shrink-0" />
-                  <span>Campus Marketplace & Rental Access</span>
+                <div className="flex items-center gap-3" style={{ color: '#85899B' }}>
+                  <div className="w-4 h-4 rounded-full border shrink-0" style={{ borderColor: '#EAE6E1' }} />
+                  <span>Campus Marketplace &amp; Rental Access</span>
                 </div>
               </div>
 
               {/* Summary details */}
               {verification && (
-                <div className="border-t border-slate-100 pt-4 text-xs space-y-1.5 text-slate-600">
+                <div className="pt-4 text-xs space-y-1.5" style={{ borderTop: '1px solid #EAE6E1', color: '#303653' }}>
                   <div className="flex justify-between">
-                    <span className="text-slate-400">Registered Email:</span>
-                    <span className="font-medium text-slate-800">{verification.user_email || emailParam}</span>
+                    <span style={{ color: '#85899B' }}>Registered Email:</span>
+                    <span className="font-medium">{verification.user_email || emailParam}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-slate-400">Roll Number:</span>
-                    <span className="font-mono font-bold text-slate-800">{verification.roll_number}</span>
+                    <span style={{ color: '#85899B' }}>Roll Number:</span>
+                    <span className="font-mono font-bold">{verification.roll_number}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-slate-400">Campus:</span>
-                    <span className="font-medium text-slate-800">{verification.college_name || 'Aditya University'}</span>
+                    <span style={{ color: '#85899B' }}>Campus:</span>
+                    <span className="font-medium">{verification.college_name || 'Aditya University'}</span>
                   </div>
                 </div>
               )}
@@ -324,7 +343,10 @@ export const VerificationPendingPage: React.FC = () => {
                   type="button"
                   onClick={handleManualRefresh}
                   disabled={refreshing}
-                  className="flex-1 py-3 px-4 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-xs flex items-center justify-center gap-1.5 transition-all cursor-pointer"
+                  className="flex-1 py-3 px-4 rounded-xl font-bold text-xs flex items-center justify-center gap-1.5 transition-all cursor-pointer"
+                  style={{ backgroundColor: '#E9E3FF', color: '#303653' }}
+                  onMouseEnter={e => !refreshing && (e.currentTarget.style.backgroundColor = '#D8D0F5')}
+                  onMouseLeave={e => (e.currentTarget.style.backgroundColor = '#E9E3FF')}
                 >
                   <RefreshCw className={`w-3.5 h-3.5 ${refreshing ? 'animate-spin' : ''}`} />
                   <span>Check Live Status</span>
@@ -335,7 +357,10 @@ export const VerificationPendingPage: React.FC = () => {
                     await logout();
                     navigate('/login');
                   }}
-                  className="py-3 px-3 rounded-xl border border-slate-200 text-slate-600 hover:bg-slate-50 text-xs font-semibold flex items-center gap-1 transition-all cursor-pointer"
+                  className="py-3 px-3 rounded-xl text-xs font-semibold flex items-center gap-1 transition-all cursor-pointer"
+                  style={{ border: '1px solid #EAE6E1', color: '#303653', backgroundColor: 'transparent' }}
+                  onMouseEnter={e => (e.currentTarget.style.backgroundColor = '#FFF8ED')}
+                  onMouseLeave={e => (e.currentTarget.style.backgroundColor = 'transparent')}
                 >
                   <LogOut className="w-3.5 h-3.5" />
                   <span>Sign Out</span>
