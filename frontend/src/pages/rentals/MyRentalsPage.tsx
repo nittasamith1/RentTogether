@@ -22,6 +22,7 @@ import {
   useDeleteBookingRecord,
   useClearCancelledBookings,
 } from '../../hooks/useBookings';
+import { useDialog } from '../../context/DialogContext';
 import { BookingSummary } from '../../services/bookingService';
 import { HandoverPassModal } from '../../components/bookings/HandoverPassModal';
 import { HandoverVerificationModal } from '../../components/bookings/HandoverVerificationModal';
@@ -29,6 +30,7 @@ import { LeaveReviewModal } from '../../components/common/LeaveReviewModal';
 
 export const MyRentalsPage: React.FC = () => {
   const navigate = useNavigate();
+  const dialog = useDialog();
 
   const [statusFilter, setStatusFilter] = useState<string>('ALL');
   const [selectedPassBooking, setSelectedPassBooking] = useState<BookingSummary | null>(null);
@@ -61,41 +63,62 @@ export const MyRentalsPage: React.FC = () => {
   const confirmedHandoverCount = bookings.filter((b) => b.status === 'PAID_CONFIRMED').length;
 
   const handlePay = async (booking: BookingSummary) => {
-    if (!confirm(`Confirm that you have handed over ₹${booking.total_amount} in offline cash to owner ${booking.owner_name}?`)) {
-      return;
-    }
+    const confirmed = await dialog.confirm({
+      title: 'Confirm Cash Handover',
+      message: `Confirm that you have handed over ₹${booking.total_amount} in offline cash to owner ${booking.owner_name} at the campus meetup location?`,
+      confirmText: 'Confirm Handover',
+      cancelText: 'Not Yet',
+      variant: 'success',
+    });
+    if (!confirmed) return;
+
     try {
       await confirmCashMutation.mutateAsync(booking.id);
-      showToast('Cash payment confirmed! Waiting for owner cash receipt.');
+      dialog.showToast('Cash payment confirmed! Waiting for owner cash receipt.', 'success');
       refetch();
     } catch (err: any) {
-      alert(err.response?.data?.detail || 'Failed to confirm cash payment.');
+      dialog.showToast(err.response?.data?.detail || 'Failed to confirm cash payment.', 'error');
     }
   };
 
   const handleCancel = async (booking: BookingSummary) => {
-    const reason = prompt('Please enter a cancellation reason:');
+    const reason = await dialog.prompt({
+      title: 'Cancel Rental Reservation',
+      message: 'Please provide a brief reason for cancelling your reservation:',
+      placeholder: 'e.g., Schedule change, no longer needed...',
+      confirmText: 'Confirm Cancellation',
+      cancelText: 'Keep Booking',
+      variant: 'danger',
+    });
     if (reason === null) return;
 
     try {
       await cancelMutation.mutateAsync({ bookingId: booking.id, reason });
-      showToast('Booking request cancelled.');
+      dialog.showToast('Booking request cancelled.', 'info');
       refetch();
     } catch (err: any) {
-      alert(err.response?.data?.detail || 'Failed to cancel booking.');
+      dialog.showToast(err.response?.data?.detail || 'Failed to cancel booking.', 'error');
     }
   };
 
   const handleReturn = async (booking: BookingSummary) => {
-    const notes = prompt('Any notes about return condition or pickup spot?');
+    const notes = await dialog.prompt({
+      title: 'Initiate Equipment Return',
+      message: 'Any notes regarding item condition or preferred campus meetup spot for return inspection?',
+      placeholder: 'e.g., Returning at Central Library counter, all components included.',
+      confirmText: 'Submit Return',
+      cancelText: 'Cancel',
+      variant: 'brand',
+      multiline: true,
+    });
     if (notes === null) return;
 
     try {
       await returnMutation.mutateAsync({ bookingId: booking.id, notes });
-      showToast('Return initiated! Owner notified for inspection.');
+      dialog.showToast('Return initiated! Owner notified for inspection.', 'success');
       refetch();
     } catch (err: any) {
-      alert(err.response?.data?.detail || 'Failed to initiate return.');
+      dialog.showToast(err.response?.data?.detail || 'Failed to initiate return.', 'error');
     }
   };
 
@@ -283,13 +306,20 @@ export const MyRentalsPage: React.FC = () => {
             <button
               type="button"
               onClick={async () => {
-                if (confirm('Permanently purge cancelled and declined rental records from the database to reclaim storage?')) {
+                const confirmed = await dialog.confirm({
+                  title: 'Purge Cancelled History',
+                  message: 'Permanently purge cancelled and declined rental records from the database to reclaim storage?',
+                  confirmText: 'Purge Records',
+                  cancelText: 'Cancel',
+                  variant: 'danger',
+                });
+                if (confirmed) {
                   try {
                     const res = await clearCancelledMutation.mutateAsync();
-                    showToast(res.detail || 'Cancelled history purged from database.');
+                    dialog.showToast(res.detail || 'Cancelled history purged from database.', 'success');
                     refetch();
                   } catch {
-                    alert('Failed to clear cancelled bookings.');
+                    dialog.showToast('Failed to clear cancelled bookings.', 'error');
                   }
                 }
               }}
@@ -560,13 +590,20 @@ export const MyRentalsPage: React.FC = () => {
                       <button
                         type="button"
                         onClick={async () => {
-                          if (confirm(`Permanently delete booking ${booking.booking_reference} from database history?`)) {
+                          const confirmed = await dialog.confirm({
+                            title: 'Delete Booking Record',
+                            message: `Permanently delete booking ${booking.booking_reference} from database history to reclaim storage?`,
+                            confirmText: 'Delete Record',
+                            cancelText: 'Cancel',
+                            variant: 'danger',
+                          });
+                          if (confirmed) {
                             try {
                               await deleteRecordMutation.mutateAsync(booking.id);
-                              showToast('Record cleared from database history.');
+                              dialog.showToast('Record cleared from database history.', 'success');
                               refetch();
                             } catch {
-                              alert('Failed to delete booking record.');
+                              dialog.showToast('Failed to delete booking record.', 'error');
                             }
                           }
                         }}

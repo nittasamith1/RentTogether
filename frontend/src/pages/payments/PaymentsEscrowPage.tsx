@@ -17,6 +17,7 @@ import {
 } from 'lucide-react';
 import { useMyRentals, useMyIncomingRequests, useConfirmCashPayment } from '../../hooks/useBookings';
 import { useAuth } from '../../context/AuthContext';
+import { useDialog } from '../../context/DialogContext';
 import { BookingSummary } from '../../services/bookingService';
 
 interface UnifiedTransaction extends BookingSummary {
@@ -26,6 +27,7 @@ interface UnifiedTransaction extends BookingSummary {
 
 export const PaymentsEscrowPage: React.FC = () => {
   const { user } = useAuth();
+  const dialog = useDialog();
 
   // Queries
   const { data: rentalsData, isLoading: loadingRentals, refetch: refetchRentals } = useMyRentals();
@@ -177,7 +179,7 @@ export const PaymentsEscrowPage: React.FC = () => {
         refetchIncoming();
       }, 1200);
     } catch (err: any) {
-      alert(err?.response?.data?.detail || 'Failed to record cash confirmation.');
+      dialog.showToast(err?.response?.data?.detail || 'Failed to record cash confirmation.', 'error');
     }
   };
 

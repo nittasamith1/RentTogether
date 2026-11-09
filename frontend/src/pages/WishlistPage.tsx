@@ -10,11 +10,13 @@ import {
   Trash2,
 } from 'lucide-react';
 import { useWishlist } from '../hooks/useWishlist';
+import { useDialog } from '../context/DialogContext';
 import { ItemDetailModal } from '../components/marketplace/ItemDetailModal';
 import { ItemCardSkeleton } from '../components/common/Skeleton';
 
 export const WishlistPage: React.FC = () => {
   const navigate = useNavigate();
+  const dialog = useDialog();
   const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
   const [page, setPage] = useState<number>(1);
 
@@ -70,9 +72,17 @@ export const WishlistPage: React.FC = () => {
 
           {totalCount > 0 && (
             <button
-              onClick={() => {
-                if (confirm('Are you sure you want to clear your entire wishlist history? This will permanently remove all saved items from the database to reclaim storage.')) {
+              onClick={async () => {
+                const confirmed = await dialog.confirm({
+                  title: 'Clear Wishlist History',
+                  message: 'Are you sure you want to clear your entire wishlist history? This will permanently remove all saved items from the database to reclaim storage.',
+                  confirmText: 'Clear Wishlist',
+                  cancelText: 'Keep Items',
+                  variant: 'danger',
+                });
+                if (confirmed) {
                   clearWishlist();
+                  dialog.showToast('Wishlist history cleared from database.', 'success');
                 }
               }}
               disabled={isClearing}

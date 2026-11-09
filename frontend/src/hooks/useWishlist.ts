@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useRef } from 'react';
 import { marketplaceService, ItemSummary, ItemDetail, PaginatedResponse } from '../services/marketplace';
 import { useAuth } from '../context/AuthContext';
+import { toast } from '../context/DialogContext';
 
 export function useWishlist() {
   const queryClient = useQueryClient();
@@ -113,14 +114,14 @@ export function useWishlist() {
     forcedStatus?: boolean
   ) => {
     if (!user) {
-      alert('Please log in to save items to your wishlist.');
+      toast.warning('Please log in to save items to your campus wishlist.');
       return;
     }
 
     // Prevent liking own items
     const ownerId = item.owner?.id || item.owner_id;
     if (ownerId && ownerId === user.id) {
-      alert('You cannot add your own listed resource to your wishlist.');
+      toast.info('You cannot add your own listed resource to your wishlist.');
       return;
     }
 

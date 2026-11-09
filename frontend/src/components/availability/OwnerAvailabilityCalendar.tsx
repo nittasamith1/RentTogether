@@ -14,6 +14,7 @@ import {
   Layers
 } from 'lucide-react';
 import { useOwnerCalendar, useCreateManualBlock, useDeleteManualBlock } from '../../hooks/useAvailability';
+import { useDialog } from '../../context/DialogContext';
 import { OwnerCalendarBlock } from '../../services/availabilityService';
 
 interface OwnerAvailabilityCalendarProps {
@@ -21,6 +22,7 @@ interface OwnerAvailabilityCalendarProps {
 }
 
 export const OwnerAvailabilityCalendar: React.FC<OwnerAvailabilityCalendarProps> = ({ items }) => {
+  const dialog = useDialog();
   const [selectedItemId, setSelectedItemId] = useState<string>('ALL');
   const [currentMonth, setCurrentMonth] = useState<Date>(() => {
     const d = new Date();
@@ -172,21 +174,29 @@ export const OwnerAvailabilityCalendar: React.FC<OwnerAvailabilityCalendarProps>
 
   const handleDeleteBlock = async (block: OwnerCalendarBlock) => {
     if (block.reason === 'BOOKED') {
-      alert('Active rental bookings cannot be deleted manually.');
+      await dialog.alert({
+        title: 'Active Rental Protected',
+        message: 'Active rental bookings cannot be removed manually. The calendar slot will automatically open when the rental is completed or returned.',
+        variant: 'warning',
+      });
       return;
     }
 
-    if (!confirm(`Are you sure you want to remove this ${block.reason} block for "${block.item_title}"?`)) {
-      return;
-    }
+    const confirmed = await dialog.confirm({
+      title: 'Remove Calendar Block',
+      message: `Are you sure you want to remove this ${block.reason.toLowerCase()} block for "${block.item_title}" and reopen these dates on the campus marketplace?`,
+      confirmText: 'Remove Block',
+      cancelText: 'Keep Block',
+      variant: 'danger',
+    });
+    if (!confirmed) return;
 
     try {
       await deleteBlockMutation.mutateAsync({ blockId: block.id, itemId: block.item_id });
-      setActionSuccess('Block removed successfully.');
-      setTimeout(() => setActionSuccess(null), 3500);
+      dialog.showToast('Block removed successfully.', 'success');
       refetch();
     } catch (err: any) {
-      alert(err.response?.data?.detail || 'Failed to delete block.');
+      dialog.showToast(err.response?.data?.detail || 'Failed to delete block.', 'error');
     }
   };
 

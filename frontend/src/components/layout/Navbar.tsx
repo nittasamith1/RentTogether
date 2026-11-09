@@ -16,6 +16,7 @@ import {
   Trash2,
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
+import { useDialog } from '../../context/DialogContext';
 import { useNotifications } from '../../hooks/useNotifications';
 import { useDebounce } from '../../hooks/useDebounce';
 import { marketplaceService } from '../../services/marketplace';
@@ -32,6 +33,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   onOpenMobileMenu,
 }) => {
   const navigate = useNavigate();
+  const dialog = useDialog();
   const { user, logout } = useAuth();
   const location = useLocation();
   const [searchParams] = useSearchParams();
@@ -340,9 +342,17 @@ export const Navbar: React.FC<NavbarProps> = ({
 
                     {notifications.length > 0 && (
                       <button
-                        onClick={() => {
-                          if (confirm('Clear all notification history from the database to reclaim storage?')) {
+                        onClick={async () => {
+                          const confirmed = await dialog.confirm({
+                            title: 'Clear Notification History',
+                            message: 'Permanently remove all notification history from the database to reclaim storage?',
+                            confirmText: 'Clear All Alerts',
+                            cancelText: 'Keep Alerts',
+                            variant: 'danger',
+                          });
+                          if (confirmed) {
                             clearNotifications('all');
+                            dialog.showToast('All notifications cleared from database.', 'success');
                           }
                         }}
                         disabled={isClearingNotifications}

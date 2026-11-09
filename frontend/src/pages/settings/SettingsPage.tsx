@@ -17,6 +17,7 @@ import {
   RotateCcw,
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
+import { useDialog } from '../../context/DialogContext';
 import { useProfile, useUpdateProfile } from '../../hooks/useProfile';
 import { useNotifications } from '../../hooks/useNotifications';
 import { useWishlist } from '../../hooks/useWishlist';
@@ -32,6 +33,7 @@ const CAMPUS_PICKUP_SPOTS = [
 
 export const SettingsPage: React.FC = () => {
   const { user, logout } = useAuth();
+  const dialog = useDialog();
   const { data: profile } = useProfile();
   const updateProfileMutation = useUpdateProfile();
 
@@ -44,6 +46,7 @@ export const SettingsPage: React.FC = () => {
 
   const showStorageToast = (msg: string) => {
     setStorageFeedback(msg);
+    dialog.showToast(msg, 'success');
     setTimeout(() => setStorageFeedback(null), 3500);
   };
 
@@ -85,7 +88,7 @@ export const SettingsPage: React.FC = () => {
       setSaveSuccess(true);
       setTimeout(() => setSaveSuccess(false), 3000);
     } catch {
-      alert('Failed to update settings. Please try again.');
+      dialog.showToast('Failed to update settings. Please try again.', 'error');
     }
   };
 
@@ -449,7 +452,7 @@ export const SettingsPage: React.FC = () => {
                   }}
                 />
                 <button
-                  onClick={() => alert('UPI payout ID saved for automatic escrow disbursements!')}
+                  onClick={() => dialog.showToast('UPI payout ID saved for offline cash receipts and records.', 'success')}
                   className="px-4 py-2 rounded-xl text-xs font-bold text-white shadow-xs transition-all cursor-pointer active:scale-95"
                   style={{ backgroundColor: '#7563D9' }}
                 >
@@ -525,7 +528,7 @@ export const SettingsPage: React.FC = () => {
                       const res: any = await clearNotificationsAsync('read');
                       showStorageToast(res?.detail || 'Read notifications cleared from database.');
                     } catch {
-                      alert('Failed to clear read alerts.');
+                      dialog.showToast('Failed to clear read alerts.', 'error');
                     }
                   }}
                   disabled={isClearingNotifications || !notifications.some((n: any) => n.is_read)}
@@ -539,12 +542,19 @@ export const SettingsPage: React.FC = () => {
                 <button
                   type="button"
                   onClick={async () => {
-                    if (confirm('Permanently delete all notifications history from the database?')) {
+                    const confirmed = await dialog.confirm({
+                      title: 'Clear All Notification History',
+                      message: 'Permanently delete all notification history from the database to reclaim storage?',
+                      confirmText: 'Clear All History',
+                      cancelText: 'Keep History',
+                      variant: 'danger',
+                    });
+                    if (confirmed) {
                       try {
                         const res: any = await clearNotificationsAsync('all');
                         showStorageToast(res?.detail || 'All notification history cleared from database.');
                       } catch {
-                        alert('Failed to clear all alerts.');
+                        dialog.showToast('Failed to clear all alerts.', 'error');
                       }
                     }
                   }}
@@ -583,12 +593,19 @@ export const SettingsPage: React.FC = () => {
                 <button
                   type="button"
                   onClick={async () => {
-                    if (confirm('Permanently clear all saved items from your wishlist in the database?')) {
+                    const confirmed = await dialog.confirm({
+                      title: 'Clear Wishlist History',
+                      message: 'Permanently remove all saved wishlist items from the database to reclaim storage?',
+                      confirmText: 'Clear Wishlist',
+                      cancelText: 'Keep Items',
+                      variant: 'danger',
+                    });
+                    if (confirmed) {
                       try {
                         const res: any = await clearWishlistAsync();
                         showStorageToast(res?.detail || 'Wishlist history cleared from database.');
                       } catch {
-                        alert('Failed to clear wishlist.');
+                        dialog.showToast('Failed to clear wishlist.', 'error');
                       }
                     }
                   }}
@@ -627,12 +644,19 @@ export const SettingsPage: React.FC = () => {
                 <button
                   type="button"
                   onClick={async () => {
-                    if (confirm('Permanently delete all cancelled and declined rental records from the database?')) {
+                    const confirmed = await dialog.confirm({
+                      title: 'Purge Cancelled Bookings',
+                      message: 'Permanently delete all cancelled and declined rental records from the database to reclaim storage?',
+                      confirmText: 'Purge Records',
+                      cancelText: 'Keep Records',
+                      variant: 'danger',
+                    });
+                    if (confirmed) {
                       try {
                         const res: any = await clearCancelledMutation.mutateAsync();
                         showStorageToast(res?.detail || 'Cancelled rental history cleared.');
                       } catch {
-                        alert('Failed to clear cancelled bookings.');
+                        dialog.showToast('Failed to clear cancelled bookings.', 'error');
                       }
                     }
                   }}

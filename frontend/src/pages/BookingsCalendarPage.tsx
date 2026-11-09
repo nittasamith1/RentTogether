@@ -25,12 +25,14 @@ import {
   useConfirmCashPayment
 } from '../hooks/useBookings';
 import { OwnerAvailabilityCalendar } from '../components/availability/OwnerAvailabilityCalendar';
+import { useDialog } from '../context/DialogContext';
 import { HandoverPassModal } from '../components/bookings/HandoverPassModal';
 import { HandoverVerificationModal } from '../components/bookings/HandoverVerificationModal';
 import { LeaveReviewModal } from '../components/common/LeaveReviewModal';
 import { BookingSummary } from '../services/bookingService';
 
 export const BookingsCalendarPage: React.FC = () => {
+  const dialog = useDialog();
   const [activeTab, setActiveTab] = useState<'CALENDAR' | 'REQUESTS' | 'ACTIVE_LENDINGS' | 'COMPLETED_LENDINGS'>('CALENDAR');
   const [selectedHandoverBooking, setSelectedHandoverBooking] = useState<BookingSummary | null>(null);
   const [selectedVerifyBooking, setSelectedVerifyBooking] = useState<BookingSummary | null>(null);
@@ -71,43 +73,69 @@ export const BookingsCalendarPage: React.FC = () => {
   const maintenanceCount = blocks.filter((b) => b.reason === 'MAINTENANCE').length;
 
   const handleAccept = async (booking: BookingSummary) => {
-    if (!confirm(`Accept rental request from ${booking.renter_name} for ${booking.item_title}?`)) {
-      return;
-    }
+    const confirmed = await dialog.confirm({
+      title: 'Accept Rental Reservation',
+      message: `Accept rental request from ${booking.renter_name} for "${booking.item_title}"? The dates will be locked on your calendar pending physical handover.`,
+      confirmText: 'Accept Request',
+      cancelText: 'Cancel',
+      variant: 'brand',
+      icon: 'calendar',
+    });
+    if (!confirmed) return;
+
     try {
       await acceptMutation.mutateAsync(booking.id);
-      showToast('Booking accepted! Reserved on calendar for 12 hours.');
+      dialog.showToast('Booking accepted! Reserved on calendar for 12 hours.', 'success');
       refetchIncoming();
     } catch (err: any) {
-      alert(err.response?.data?.detail || 'Failed to accept booking.');
+      dialog.showToast(err.response?.data?.detail || 'Failed to accept booking.', 'error');
     }
   };
 
   const handleReject = async (booking: BookingSummary) => {
-    const reason = prompt('Optional reason for declining:');
+    const reason = await dialog.prompt({
+      title: 'Decline Rental Request',
+      message: `Optional note to ${booking.renter_name} for declining this rental request:`,
+      placeholder: 'e.g., Equipment scheduled for personal class use...',
+      confirmText: 'Decline Request',
+      cancelText: 'Go Back',
+      variant: 'danger',
+    });
     if (reason === null) return;
 
     try {
       await rejectMutation.mutateAsync({ bookingId: booking.id, reason });
-      showToast('Booking request declined.');
+      dialog.showToast('Booking request declined.', 'info');
       refetchIncoming();
     } catch (err: any) {
-      alert(err.response?.data?.detail || 'Failed to decline booking.');
+      dialog.showToast(err.response?.data?.detail || 'Failed to decline booking.', 'error');
     }
   };
 
   const handleInspection = async (booking: BookingSummary, passed: boolean) => {
-    const promptMsg = passed
-      ? 'Confirm equipment is undamaged to complete the rental return?'
-      : 'Explain the damage or missing accessories to open a dispute:';
-
     let notes = '';
-    if (!passed) {
-      const input = prompt(promptMsg);
-      if (input === null) return;
-      notes = input;
+    if (passed) {
+      const confirmed = await dialog.confirm({
+        title: 'Approve Return Inspection',
+        message: `Confirm that "${booking.item_title}" has been returned undamaged with all accessories intact? This marks the rental officially completed.`,
+        confirmText: 'Approve Return',
+        cancelText: 'Cancel',
+        variant: 'success',
+      });
+      if (!confirmed) return;
     } else {
-      if (!confirm(promptMsg)) return;
+      const disputeNotes = await dialog.prompt({
+        title: 'Report Equipment Issue / Dispute',
+        message: 'Describe observed damage or missing components for campus dispute review:',
+        placeholder: 'e.g., Cable missing, scratched display...',
+        confirmText: 'Submit Dispute',
+        cancelText: 'Cancel',
+        variant: 'danger',
+        required: true,
+        multiline: true,
+      });
+      if (disputeNotes === null) return;
+      notes = disputeNotes;
     }
 
     try {
@@ -115,23 +143,29 @@ export const BookingsCalendarPage: React.FC = () => {
         bookingId: booking.id,
         payload: { passed, notes },
       });
-      showToast(passed ? 'Inspection approved! Rental completed.' : 'Dispute opened.');
+      dialog.showToast(passed ? 'Inspection approved! Rental completed.' : 'Dispute report submitted.', 'success');
       refetchIncoming();
     } catch (err: any) {
-      alert(err.response?.data?.detail || 'Failed to complete inspection.');
+      dialog.showToast(err.response?.data?.detail || 'Failed to complete inspection.', 'error');
     }
   };
 
   const handleConfirmCash = async (booking: BookingSummary) => {
-    if (!confirm(`Confirm that you have physically received ₹${booking.total_amount} in cash from renter ${booking.renter_name}?`)) {
-      return;
-    }
+    const confirmed = await dialog.confirm({
+      title: 'Confirm Cash Receipt',
+      message: `Confirm that you have physically received ₹${booking.total_amount} in offline cash from renter ${booking.renter_name}?`,
+      confirmText: 'Cash Received',
+      cancelText: 'Not Received',
+      variant: 'success',
+    });
+    if (!confirmed) return;
+
     try {
       await confirmCashMutation.mutateAsync(booking.id);
-      showToast('Cash receipt confirmed! Ready for handover exchange.');
+      dialog.showToast('Cash receipt confirmed! Ready for handover exchange.', 'success');
       refetchIncoming();
     } catch (err: any) {
-      alert(err.response?.data?.detail || 'Failed to confirm cash receipt.');
+      dialog.showToast(err.response?.data?.detail || 'Failed to confirm cash receipt.', 'error');
     }
   };
 

@@ -12,6 +12,7 @@ import {
   AlertCircle
 } from 'lucide-react';
 import { BookingSummary, BookingDetail } from '../../services/bookingService';
+import { useDialog } from '../../context/DialogContext';
 import { useHandoverPass, useRegenerateHandoverPass } from '../../hooks/useBookings';
 import { QRCodeView } from '../common/QRCodeView';
 
@@ -24,6 +25,7 @@ export const HandoverPassModal: React.FC<HandoverPassModalProps> = ({
   booking,
   onClose,
 }) => {
+  const dialog = useDialog();
   const [copied, setCopied] = useState<boolean>(false);
   const [timeLeft, setTimeLeft] = useState<number>(0);
 
@@ -76,7 +78,7 @@ export const HandoverPassModal: React.FC<HandoverPassModalProps> = ({
       await regenerateMutation.mutateAsync(booking.id);
       refetch();
     } catch (err: any) {
-      alert(err.response?.data?.detail || 'Failed to regenerate pass.');
+      dialog.showToast(err.response?.data?.detail || 'Failed to regenerate pass.', 'error');
     }
   };
 

@@ -13,6 +13,7 @@ import {
   CheckCircle,
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { useDialog } from '../context/DialogContext';
 import { profileService } from '../services/profile';
 import { DetailedStudentProfile, PublicStudentProfile, StudentReviewItem } from '../types';
 import { EditProfileModal } from '../components/common/EditProfileModal';
@@ -22,6 +23,7 @@ import { useMyRentals, useMyIncomingRequests } from '../hooks/useBookings';
 export const ProfilePage: React.FC = () => {
   const { id: peerId } = useParams<{ id?: string }>();
   const { user } = useAuth();
+  const dialog = useDialog();
 
   const isOwnProfile = !peerId || peerId === user?.id;
 
@@ -224,11 +226,14 @@ export const ProfilePage: React.FC = () => {
               </button>
             ) : (
               <button
-                onClick={() => {
+                onClick={async () => {
                   if (!completedWithPeer) {
-                    alert(
-                      "Student reviews require a completed rental exchange to maintain verified campus integrity.\n\nYou have not completed an equipment rental with this student yet. Once an exchange completes, you can rate and review them here or from your rentals dashboard."
-                    );
+                    await dialog.alert({
+                      title: 'Verified Rental Required',
+                      message: 'Student reviews require a completed rental exchange to maintain verified campus integrity.\n\nYou have not completed an equipment rental with this student yet. Once an exchange completes, you can rate and review them here or from your rentals dashboard.',
+                      variant: 'info',
+                      confirmText: 'Understood',
+                    });
                     return;
                   }
                   setIsReviewModalOpen(true);
