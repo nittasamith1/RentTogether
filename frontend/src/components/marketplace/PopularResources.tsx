@@ -10,7 +10,7 @@ interface PopularResourcesProps {
 
 export const PopularResources: React.FC<PopularResourcesProps> = ({ items, onSelect }) => {
   const scrollRef = useRef<HTMLDivElement>(null);
-  const { toggleWishlist, isLoading } = useWishlist();
+  const { toggleWishlist } = useWishlist();
 
   if (!items || items.length === 0) return null;
 
@@ -96,8 +96,8 @@ export const PopularResources: React.FC<PopularResourcesProps> = ({ items, onSel
                 }}
               />
               <span
-                className="absolute top-2 left-2 px-2 py-0.5 rounded-full text-[10px] font-bold text-white backdrop-blur-md"
-                style={{ backgroundColor: 'rgba(48, 54, 83, 0.85)' }}
+                className="absolute top-2 left-2 px-2 py-0.5 rounded-full text-[10px] font-bold text-white"
+                style={{ backgroundColor: 'rgba(48, 54, 83, 0.90)' }}
               >
                 {item.category_name}
               </span>
@@ -105,17 +105,18 @@ export const PopularResources: React.FC<PopularResourcesProps> = ({ items, onSel
                 type="button"
                 onClick={(e) => {
                   e.stopPropagation();
-                  if (!isLoading) {
-                    toggleWishlist(item.id, item.is_wishlisted);
-                  }
+                  toggleWishlist(item);
                 }}
-                className="absolute top-2 right-2 p-1.5 rounded-full backdrop-blur-md transition cursor-pointer"
+                aria-label={item.is_wishlisted ? 'Remove from wishlist' : 'Save to wishlist'}
+                title={item.is_wishlisted ? 'Saved in wishlist' : 'Save to wishlist'}
+                className="absolute top-2 right-2 p-1.5 rounded-full transition-transform active:scale-80 hover:scale-110 duration-150 shadow-md cursor-pointer z-10"
                 style={{
-                  backgroundColor: item.is_wishlisted ? '#F28B82' : 'rgba(255, 255, 255, 0.85)',
-                  color: item.is_wishlisted ? '#fff' : '#85899B',
+                  backgroundColor: item.is_wishlisted ? '#FFE5D6' : 'rgba(255, 255, 255, 0.95)',
+                  color: item.is_wishlisted ? '#F28B82' : '#85899B',
+                  border: item.is_wishlisted ? '1px solid #F5CDB8' : '1px solid rgba(234, 230, 225, 0.9)',
                 }}
               >
-                <Heart className={`w-3.5 h-3.5 ${item.is_wishlisted ? 'fill-current' : ''}`} />
+                <Heart className={`w-3.5 h-3.5 transition-colors ${item.is_wishlisted ? 'fill-[#F28B82] text-[#F28B82]' : ''}`} />
               </button>
             </div>
 

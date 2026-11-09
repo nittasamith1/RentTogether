@@ -3,28 +3,30 @@ import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Plus,
-  Search,
   Layers,
   CheckCircle2,
   PauseCircle,
   TrendingUp,
   AlertCircle,
   PackageOpen,
+  Calendar,
 } from 'lucide-react';
 import { useMyListings } from '../../hooks/useListings';
 import { ListingCard } from '../../components/listings/ListingCard';
 import { EditListingModal } from '../../components/listings/EditListingModal';
 import { RentalHistoryModal } from '../../components/listings/RentalHistoryModal';
+import { ItemDetailModal } from '../../components/marketplace/ItemDetailModal';
+import { ItemCardSkeleton } from '../../components/common/Skeleton';
 import { OwnerListingSummary } from '../../services/listingService';
 
 export const MyListingsPage: React.FC = () => {
   const navigate = useNavigate();
 
   // Filters & State
-  const [search, setSearch] = useState<string>('');
   const [statusFilter, setStatusFilter] = useState<'ALL' | 'ACTIVE' | 'PAUSED'>('ALL');
   const [editingItem, setEditingItem] = useState<OwnerListingSummary | null>(null);
   const [historyItem, setHistoryItem] = useState<OwnerListingSummary | null>(null);
+  const [detailItemId, setDetailItemId] = useState<string | null>(null);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
   const showToast = (msg: string) => {
@@ -33,7 +35,6 @@ export const MyListingsPage: React.FC = () => {
   };
 
   const queryFilters = {
-    search: search.trim() || undefined,
     status: statusFilter === 'ALL' ? undefined : statusFilter,
   };
 
@@ -84,17 +85,30 @@ export const MyListingsPage: React.FC = () => {
           </p>
         </div>
 
-        {/* Primary Action Button */}
-        <button
-          onClick={() => navigate('/listings/create')}
-          className="text-white px-5 py-2.5 rounded-2xl font-bold text-xs transition-all shadow-md flex items-center gap-2 cursor-pointer self-start sm:self-auto active:scale-95"
-          style={{ backgroundColor: '#7563D9', boxShadow: '0 4px 16px rgba(117, 99, 217, 0.25)' }}
-          onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#6552C5')}
-          onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#7563D9')}
-        >
-          <Plus className="w-4 h-4" />
-          <span>+ List an item</span>
-        </button>
+        <div className="flex flex-wrap items-center gap-2.5 self-start sm:self-auto">
+          {/* Quick link to Bookings & Calendar */}
+          <button
+            onClick={() => navigate('/bookings')}
+            className="px-4 py-2.5 rounded-2xl font-bold text-xs transition-all border flex items-center gap-2 cursor-pointer hover:bg-[#D8D0F5] active:scale-95 shadow-xs"
+            style={{ backgroundColor: '#E9E3FF', borderColor: '#D8D0F5', color: '#7563D9' }}
+            title="Open Bookings & Smart Calendar"
+          >
+            <Calendar className="w-4 h-4" />
+            <span>Bookings & Calendar →</span>
+          </button>
+
+          {/* Primary Action Button */}
+          <button
+            onClick={() => navigate('/listings/create')}
+            className="text-white px-5 py-2.5 rounded-2xl font-bold text-xs transition-all shadow-md flex items-center gap-2 cursor-pointer active:scale-95"
+            style={{ backgroundColor: '#7563D9', boxShadow: '0 4px 16px rgba(117, 99, 217, 0.25)' }}
+            onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#6552C5')}
+            onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#7563D9')}
+          >
+            <Plus className="w-4 h-4" />
+            <span>List an item</span>
+          </button>
+        </div>
       </div>
 
       {/* Top 4 KPI Summary Cards — Premium Pastel Themed */}
@@ -124,7 +138,7 @@ export const MyListingsPage: React.FC = () => {
           </div>
         </div>
 
-        {/* Card 2: Active & Rentable — Fresh Mint */}
+        {/* Card 2: Active Listings — Fresh Mint */}
         <div
           className="rounded-2xl p-5 border shadow-sm flex flex-col justify-between hover:shadow-card-hover transition-all"
           style={{ backgroundColor: '#DDF3E7', borderColor: '#B8E5CC' }}
@@ -174,7 +188,7 @@ export const MyListingsPage: React.FC = () => {
           </div>
         </div>
 
-        {/* Card 4: Total Completed Rentals — Sky Blue */}
+        {/* Card 4: Completed Rentals — Sky Blue */}
         <div
           className="rounded-2xl p-5 border shadow-sm flex flex-col justify-between hover:shadow-card-hover transition-all"
           style={{ backgroundColor: '#DFEDFF', borderColor: '#C5DCFA' }}
@@ -200,34 +214,18 @@ export const MyListingsPage: React.FC = () => {
         </div>
       </div>
 
-      {/* Search & Filter Bar */}
+      {/* Filter Bar */}
       <div
         className="rounded-2xl p-4 border shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-3"
         style={{ backgroundColor: '#FFFCF7', borderColor: '#EAE6E1' }}
       >
-        {/* Search Input */}
-        <div className="relative flex-1 max-w-md">
-          <Search className="w-4 h-4 absolute left-3.5 top-3" style={{ color: '#85899B' }} />
-          <input
-            type="text"
-            placeholder="Search your listings by title or keywords..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="w-full pl-9 pr-4 py-2 rounded-xl text-xs focus:outline-hidden transition-all"
-            style={{
-              backgroundColor: '#FFF8ED',
-              border: '1px solid #EAE6E1',
-              color: '#303653',
-            }}
-            onFocus={(e) => {
-              e.currentTarget.style.borderColor = '#7563D9';
-              e.currentTarget.style.boxShadow = '0 0 0 3px rgba(117,99,217,0.12)';
-            }}
-            onBlur={(e) => {
-              e.currentTarget.style.borderColor = '#EAE6E1';
-              e.currentTarget.style.boxShadow = 'none';
-            }}
-          />
+        <div className="flex items-center gap-2">
+          <span className="text-xs font-bold uppercase tracking-wider" style={{ color: '#303653' }}>
+            Filter Listings
+          </span>
+          <span className="text-[11px] font-medium" style={{ color: '#85899B' }}>
+            ({items.length} {items.length === 1 ? 'item' : 'items'})
+          </span>
         </div>
 
         {/* Status Filter Tabs */}
@@ -239,11 +237,10 @@ export const MyListingsPage: React.FC = () => {
             <button
               key={tab}
               onClick={() => setStatusFilter(tab)}
-              className={`px-3 py-1.5 rounded-lg transition-all cursor-pointer ${
-                statusFilter === tab
-                  ? 'bg-white shadow-xs font-bold'
-                  : 'hover:text-[#7563D9]'
-              }`}
+              className={`px-3 py-1.5 rounded-lg transition-all cursor-pointer ${statusFilter === tab
+                ? 'bg-white shadow-xs font-bold'
+                : 'hover:text-[#7563D9]'
+                }`}
               style={{
                 color: statusFilter === tab ? '#7563D9' : '#303653',
               }}
@@ -258,16 +255,7 @@ export const MyListingsPage: React.FC = () => {
       {isLoading ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
           {[1, 2, 3, 4].map((n) => (
-            <div
-              key={n}
-              className="rounded-2xl p-4 border animate-pulse space-y-3"
-              style={{ backgroundColor: '#FFFCF7', borderColor: '#EAE6E1' }}
-            >
-              <div className="aspect-4/3 rounded-xl" style={{ backgroundColor: '#E9E3FF' }} />
-              <div className="h-4 rounded-md w-3/4" style={{ backgroundColor: '#EAE6E1' }} />
-              <div className="h-3 rounded-md w-1/2" style={{ backgroundColor: '#EAE6E1' }} />
-              <div className="h-8 rounded-xl" style={{ backgroundColor: '#E9E3FF' }} />
-            </div>
+            <ItemCardSkeleton key={n} />
           ))}
         </div>
       ) : isError ? (
@@ -277,13 +265,15 @@ export const MyListingsPage: React.FC = () => {
         >
           <AlertCircle className="w-8 h-8 mx-auto" style={{ color: '#E87575' }} />
           <h3 className="text-sm font-bold" style={{ color: '#303653' }}>Failed to load listings</h3>
-          <p className="text-xs" style={{ color: '#85899B' }}>Please check your connection and try again.</p>
+          <p className="text-xs" style={{ color: '#85899B' }}>
+            Please ensure the backend API server is running on <code className="px-1.5 py-0.5 rounded bg-white font-mono text-[11px] text-[#303653]">http://localhost:8000</code> and your database connection is active.
+          </p>
           <button
             onClick={() => refetch()}
-            className="px-4 py-1.5 text-white rounded-xl text-xs font-bold cursor-pointer"
+            className="px-5 py-2 text-white rounded-xl text-xs font-bold cursor-pointer hover:opacity-90 active:scale-95 transition-all shadow-xs"
             style={{ backgroundColor: '#E87575' }}
           >
-            Retry
+            Retry Connection
           </button>
         </div>
       ) : items.length === 0 ? (
@@ -300,10 +290,11 @@ export const MyListingsPage: React.FC = () => {
           </div>
 
           <div>
-            <h3 className="text-lg font-bold" style={{ color: '#303653' }}>No items listed yet</h3>
+            <h3 className="text-lg font-bold" style={{ color: '#303653' }}>
+              No items listed yet
+            </h3>
             <p className="text-xs mt-1 max-w-md mx-auto leading-relaxed" style={{ color: '#85899B' }}>
-              Have a scientific calculator, drafter, textbook, or camera lying unused? List it
-              now to help fellow campus students and start earning passive income.
+              Have a scientific calculator, drafter, textbook, or camera lying unused? List it now to help fellow campus students and start earning passive income.
             </p>
           </div>
 
@@ -327,7 +318,7 @@ export const MyListingsPage: React.FC = () => {
               item={item}
               onEdit={(it) => setEditingItem(it)}
               onViewHistory={(it) => setHistoryItem(it)}
-              onViewDetails={() => navigate(`/marketplace/${item.id}`)}
+              onViewDetails={(itemId) => setDetailItemId(itemId)}
             />
           ))}
         </div>
@@ -348,6 +339,19 @@ export const MyListingsPage: React.FC = () => {
         item={historyItem}
         onClose={() => setHistoryItem(null)}
       />
+
+      {/* Item Detail Modal in Owner Mode */}
+      {detailItemId && (
+        <ItemDetailModal
+          itemId={detailItemId}
+          onClose={() => setDetailItemId(null)}
+          onEditListing={(id) => {
+            setDetailItemId(null);
+            const it = items.find((i) => i.id === id);
+            if (it) setEditingItem(it);
+          }}
+        />
+      )}
     </div>
   );
 };

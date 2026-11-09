@@ -111,12 +111,19 @@ def get_owner_listings(owner, filters: Optional[Dict[str, Any]] = None):
     search_val = filters.get('search') or ''
     search_query = search_val.strip()
     if search_query:
-        qs = qs.filter(
-            Q(title__icontains=search_query) |
-            Q(description__icontains=search_query) |
-            Q(brand__icontains=search_query) |
-            Q(model_name__icontains=search_query)
-        )
+        terms = search_query.split()
+        search_q = Q()
+        for term in terms:
+            term_q = (
+                Q(title__icontains=term) |
+                Q(description__icontains=term) |
+                Q(brand__icontains=term) |
+                Q(model_name__icontains=term) |
+                Q(category__name__icontains=term) |
+                Q(pickup_locations__icontains=term)
+            )
+            search_q &= term_q
+        qs = qs.filter(search_q)
 
     # Annotate active bookings count
     qs = qs.annotate(
@@ -211,6 +218,9 @@ def set_listing_status(owner, item_id: str, target_status: str) -> Item:
         raise ValidationError({"status": "Removed listings cannot be paused or resumed."})
 
     item.status = norm_status
+    item.is_published = (norm_status == Item.STATUS_ACTIVE)
+    if item.is_published and not item.published_at:
+        item.published_at = timezone.now()
     item.save(update_fields=['status', 'is_published', 'updated_at'])
     return item
 

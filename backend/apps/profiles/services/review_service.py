@@ -21,7 +21,7 @@ def submit_student_review(
     """
     with transaction.atomic():
         try:
-            booking = Booking.objects.select_for_update().get(id=booking_id)
+            booking = Booking.objects.select_for_update(of=('self',)).get(id=booking_id)
         except Booking.DoesNotExist:
             raise ValidationError({"booking": "Specified booking was not found."})
 

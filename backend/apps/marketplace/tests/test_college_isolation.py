@@ -34,11 +34,31 @@ class CollegeIsolationSecurityTests(APITestCase):
             is_college_verified=True,
         )
 
+        self.student_a2 = User.objects.create_user(
+            email="peer2@adityauniversity.in",
+            password="StrongPassword123!",
+            first_name="PeerTwo",
+            last_name="Aditya",
+            college=self.college_a,
+            email_verified=True,
+            is_college_verified=True,
+        )
+
         self.student_b = User.objects.create_user(
             email="peer@vnrvjiet.in",
             password="StrongPassword123!",
             first_name="Peer",
             last_name="Hyd",
+            college=self.college_b,
+            email_verified=True,
+            is_college_verified=True,
+        )
+
+        self.student_b2 = User.objects.create_user(
+            email="peer_b2@vnrvjiet.in",
+            password="StrongPassword123!",
+            first_name="PeerB2",
+            last_name="VNR",
             college=self.college_b,
             email_verified=True,
             is_college_verified=True,
@@ -70,8 +90,8 @@ class CollegeIsolationSecurityTests(APITestCase):
         )
 
     def test_marketplace_listing_isolates_by_college(self):
-        # Student A should only see Aditya Drafter
-        self.client.force_authenticate(user=self.student_a)
+        # Peer student A2 in College A should see Aditya Drafter, not VNR VJIET Lab Kit
+        self.client.force_authenticate(user=self.student_a2)
         response = self.client.get(reverse('marketplace-items'))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         results = response.data.get('results', [])
@@ -79,10 +99,14 @@ class CollegeIsolationSecurityTests(APITestCase):
         self.assertIn("Aditya Drafter", titles)
         self.assertNotIn("VNR VJIET Lab Kit", titles)
 
-        # Student B should only see VNR VJIET Lab Kit
-        self.client.force_authenticate(user=self.student_b)
+        # Peer student B2 in College B should see VNR VJIET Lab Kit, not Aditya Drafter
+        self.client.force_authenticate(user=self.student_b2)
         response_b = self.client.get(reverse('marketplace-items'))
         self.assertEqual(response_b.status_code, status.HTTP_200_OK)
+        results_b = response_b.data.get('results', [])
+        titles_b = [r['title'] for r in results_b]
+        self.assertIn("VNR VJIET Lab Kit", titles_b)
+        self.assertNotIn("Aditya Drafter", titles_b)
         results_b = response_b.data.get('results', [])
         titles_b = [r['title'] for r in results_b]
         self.assertIn("VNR VJIET Lab Kit", titles_b)
@@ -104,15 +128,15 @@ class CollegeIsolationSecurityTests(APITestCase):
         self.assertFalse(Wishlist.objects.filter(user=self.student_a, item=self.item_b).exists())
 
     def test_category_item_counts_are_college_isolated(self):
-        # Student A should see count = 1
-        self.client.force_authenticate(user=self.student_a)
+        # Peer student A2 in College A should see count = 1 for item listed by student A
+        self.client.force_authenticate(user=self.student_a2)
         res = self.client.get(reverse('marketplace-categories'))
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         cat_data = next(c for c in res.data if c['slug'] == 'academic-gear')
         self.assertEqual(cat_data['eligible_item_count'], 1)
 
     def test_popular_items_enforces_college_isolation(self):
-        self.client.force_authenticate(user=self.student_a)
+        self.client.force_authenticate(user=self.student_a2)
         res = self.client.get(reverse('marketplace-popular'))
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         item_ids = [i['id'] for i in res.data]

@@ -129,10 +129,19 @@ export const marketplaceService = {
     return response.data;
   },
 
-  // 6. Fetch saved wishlist items
-  async getWishlist(page: number = 1): Promise<PaginatedResponse<ItemSummary>> {
+  // 6. Clear entire personal wishlist history to free storage
+  async clearWishlist(): Promise<{ detail: string; deleted_count: number }> {
+    const response = await apiClient.delete<{ detail: string; deleted_count: number }>('/api/v1/marketplace/wishlist/clear/');
+    return response.data;
+  },
+
+  // 6. Fetch saved wishlist items with optional search
+  async getWishlist(page: number = 1, search?: string): Promise<PaginatedResponse<ItemSummary>> {
     const response = await apiClient.get<PaginatedResponse<ItemSummary>>('/api/v1/marketplace/wishlist/', {
-      params: { page },
+      params: {
+        page,
+        search: search?.trim() || undefined,
+      },
     });
     return response.data;
   },

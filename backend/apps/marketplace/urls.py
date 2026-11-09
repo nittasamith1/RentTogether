@@ -5,6 +5,7 @@ from apps.marketplace.views import (
     MarketplaceItemDetailView,
     WishlistActionView,
     WishlistListView,
+    ClearWishlistView,
     PopularItemsView,
 )
 
@@ -20,6 +21,7 @@ urlpatterns = [
 
     # Wishlist operations
     path('items/<uuid:item_id>/wishlist/', WishlistActionView.as_view(), name='marketplace-item-wishlist'),
+    path('wishlist/clear/', ClearWishlistView.as_view(), name='marketplace-wishlist-clear'),
     path('wishlist/', WishlistListView.as_view(), name='marketplace-wishlist'),
 
     # Popular / Trending intra-campus resources

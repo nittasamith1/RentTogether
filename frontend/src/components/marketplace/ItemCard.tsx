@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Heart, Star, MapPin, Clock } from 'lucide-react';
 import { ItemSummary } from '../../services/marketplace';
 import { useWishlist } from '../../hooks/useWishlist';
@@ -8,20 +8,12 @@ interface ItemCardProps {
   onSelect: (item: ItemSummary) => void;
 }
 
-export const ItemCard: React.FC<ItemCardProps> = ({ item, onSelect }) => {
-  const { toggleWishlist, isLoading } = useWishlist();
-  const [isWishlisted, setIsWishlisted] = useState(item.is_wishlisted);
+export const ItemCard = React.memo<ItemCardProps>(({ item, onSelect }) => {
+  const { toggleWishlist } = useWishlist();
 
-  const handleWishlistClick = async (e: React.MouseEvent) => {
+  const handleWishlistClick = (e: React.MouseEvent) => {
     e.stopPropagation();
-    if (isLoading) return;
-    const nextState = !isWishlisted;
-    setIsWishlisted(nextState);
-    try {
-      await toggleWishlist(item.id, isWishlisted);
-    } catch {
-      setIsWishlisted(!nextState);
-    }
+    toggleWishlist(item);
   };
 
   const conditionColors: Record<string, { bg: string; text: string; label: string; border: string }> = {
@@ -39,6 +31,8 @@ export const ItemCard: React.FC<ItemCardProps> = ({ item, onSelect }) => {
   };
 
   const isAvailable = item.availability_status === 'AVAILABLE';
+  const dailyPrice = parseFloat(String(item.daily_rental_price)) || 0;
+  const hourlyPrice = Math.round((dailyPrice / 24) * 100) / 100;
 
   return (
     <div
@@ -56,6 +50,7 @@ export const ItemCard: React.FC<ItemCardProps> = ({ item, onSelect }) => {
             alt={item.title}
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
             loading="lazy"
+            decoding="async"
             onError={(e) => {
               (e.currentTarget as HTMLImageElement).src =
                 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=600&q=80';
@@ -68,16 +63,16 @@ export const ItemCard: React.FC<ItemCardProps> = ({ item, onSelect }) => {
         )}
 
         {/* Condition Badge */}
-        <div className="absolute top-3 left-3 flex flex-wrap gap-1.5 items-center">
+        <div className="absolute top-3 left-3 flex flex-wrap gap-1.5 items-center pointer-events-none">
           <span
-            className="px-2.5 py-0.5 rounded-full text-xs font-semibold border backdrop-blur-md shadow-xs"
+            className="px-2.5 py-0.5 rounded-full text-xs font-semibold border shadow-xs"
             style={{ backgroundColor: cond.bg, color: cond.text, borderColor: cond.border }}
           >
             {cond.label}
           </span>
           {isAvailable ? (
             <span
-              className="px-2 py-0.5 rounded-full text-[11px] font-semibold text-white backdrop-blur-md shadow-xs flex items-center gap-1"
+              className="px-2 py-0.5 rounded-full text-[11px] font-semibold text-white shadow-xs flex items-center gap-1"
               style={{ backgroundColor: '#42A879' }}
             >
               <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
@@ -85,8 +80,8 @@ export const ItemCard: React.FC<ItemCardProps> = ({ item, onSelect }) => {
             </span>
           ) : (
             <span
-              className="px-2 py-0.5 rounded-full text-[11px] font-semibold text-white backdrop-blur-md shadow-xs flex items-center gap-1"
-              style={{ backgroundColor: 'rgba(48, 54, 83, 0.8)' }}
+              className="px-2 py-0.5 rounded-full text-[11px] font-semibold text-white shadow-xs flex items-center gap-1"
+              style={{ backgroundColor: '#303653' }}
             >
               <Clock className="w-3 h-3" />
               Rented
@@ -94,25 +89,27 @@ export const ItemCard: React.FC<ItemCardProps> = ({ item, onSelect }) => {
           )}
         </div>
 
-        {/* Wishlist Heart Button */}
+        {/* Wishlist Heart Button with instant optimistic toggle & micro-animation */}
         <button
           type="button"
           onClick={handleWishlistClick}
-          aria-label={isWishlisted ? 'Remove from wishlist' : 'Save to wishlist'}
-          className="absolute top-3 right-3 p-2 rounded-full backdrop-blur-md transition-all duration-200 shadow-xs cursor-pointer"
+          aria-label={item.is_wishlisted ? 'Remove from wishlist' : 'Save to wishlist'}
+          title={item.is_wishlisted ? 'Saved in wishlist' : 'Save to wishlist'}
+          className="absolute top-3 right-3 p-2 rounded-full transition-transform active:scale-80 hover:scale-110 duration-150 shadow-md cursor-pointer z-10"
           style={{
-            backgroundColor: isWishlisted ? '#F28B82' : 'rgba(255, 255, 255, 0.85)',
-            color: isWishlisted ? '#fff' : '#85899B',
+            backgroundColor: item.is_wishlisted ? '#FFE5D6' : 'rgba(255, 255, 255, 0.95)',
+            color: item.is_wishlisted ? '#F28B82' : '#85899B',
+            border: item.is_wishlisted ? '1px solid #F5CDB8' : '1px solid rgba(234, 230, 225, 0.9)',
           }}
         >
-          <Heart className={`w-4 h-4 ${isWishlisted ? 'fill-current' : ''}`} />
+          <Heart className={`w-4 h-4 transition-colors ${item.is_wishlisted ? 'fill-[#F28B82] text-[#F28B82]' : ''}`} />
         </button>
 
         {/* Category Pill */}
-        <div className="absolute bottom-2.5 left-3">
+        <div className="absolute bottom-2.5 left-3 pointer-events-none">
           <span
-            className="px-2.5 py-1 rounded-md text-xs font-semibold text-white backdrop-blur-md flex items-center gap-1 shadow-xs"
-            style={{ backgroundColor: 'rgba(48, 54, 83, 0.85)' }}
+            className="px-2.5 py-1 rounded-md text-xs font-semibold text-white flex items-center gap-1 shadow-xs"
+            style={{ backgroundColor: 'rgba(48, 54, 83, 0.90)' }}
           >
             {item.category_name}
           </span>
@@ -146,11 +143,15 @@ export const ItemCard: React.FC<ItemCardProps> = ({ item, onSelect }) => {
         <div className="mt-4 pt-3 flex flex-col gap-2.5" style={{ borderTop: '1px solid #EAE6E1' }}>
           {/* Pricing & Deposit */}
           <div className="flex items-baseline justify-between">
-            <div>
+            <div className="flex items-baseline gap-1.5 flex-wrap">
               <span className="text-lg font-black" style={{ color: '#303653' }}>
-                ₹{parseFloat(String(item.daily_rental_price))}
+                ₹{dailyPrice}
               </span>
-              <span className="text-xs font-normal" style={{ color: '#85899B' }}> / day</span>
+              <span className="text-xs font-normal" style={{ color: '#85899B' }}>/day</span>
+              <span className="text-xs font-semibold" style={{ color: '#85899B' }}>•</span>
+              <span className="text-xs font-bold" style={{ color: '#7563D9' }}>
+                ₹{hourlyPrice.toFixed(0)}/hr
+              </span>
             </div>
             {parseFloat(String(item.security_deposit)) > 0 && (
               <span
@@ -195,4 +196,4 @@ export const ItemCard: React.FC<ItemCardProps> = ({ item, onSelect }) => {
       </div>
     </div>
   );
-};
+});

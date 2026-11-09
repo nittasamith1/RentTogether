@@ -17,6 +17,7 @@ import { profileService } from '../services/profile';
 import { DetailedStudentProfile, PublicStudentProfile, StudentReviewItem } from '../types';
 import { EditProfileModal } from '../components/common/EditProfileModal';
 import { LeaveReviewModal } from '../components/common/LeaveReviewModal';
+import { useMyRentals, useMyIncomingRequests } from '../hooks/useBookings';
 
 export const ProfilePage: React.FC = () => {
   const { id: peerId } = useParams<{ id?: string }>();
@@ -29,6 +30,15 @@ export const ProfilePage: React.FC = () => {
   const [reviews, setReviews] = useState<StudentReviewItem[]>([]);
   const [activeTab, setActiveTab] = useState<'ALL' | 'OWNER' | 'RENTER'>('ALL');
   const [isLoading, setIsLoading] = useState<boolean>(true);
+
+  // Queries to detect completed rental transactions with this student for authentic review authorization
+  const { data: userRentals } = useMyRentals({ status: 'COMPLETED' });
+  const { data: userIncoming } = useMyIncomingRequests();
+
+  const completedWithPeer = peerId
+    ? (userRentals?.results || []).find((b) => b.owner_id === peerId && b.status === 'COMPLETED') ||
+      (userIncoming?.results || []).find((b) => b.renter_id === peerId && b.status === 'COMPLETED')
+    : null;
 
   // Modals state
   const [isEditModalOpen, setIsEditModalOpen] = useState<boolean>(false);
@@ -51,104 +61,12 @@ export const ProfilePage: React.FC = () => {
         const revs = await profileService.getStudentReviews(peerId);
         setReviews(revs.results || []);
       }
-    } catch {
-      // Graceful fallback for preview / demo mode
+    } catch (err) {
+      console.error('Failed to load profile from database:', err);
+      // Clean error/empty state - never invent fake fallback data
       if (isOwnProfile) {
-        setDetailedProfile({
-          id: 'demo-profile-id',
-          user: {
-            id: user?.id || 'demo-sai-id',
-            email: user?.email || 'sai.reddy@adityauniversity.in',
-            first_name: user?.first_name || 'Sai',
-            last_name: user?.last_name || 'Reddy',
-            full_name: user?.name || 'Sai Reddy',
-            college_code: 'ADITYA',
-            college_name: 'Aditya University',
-            date_joined: new Date().toISOString(),
-          },
-          college_name: 'Aditya University',
-          college_code: 'ADITYA',
-          roll_number: '21A91A0501',
-          department: 'Computer Science & Engineering',
-          year_of_study: 3,
-          avatar_url: '',
-          bio: 'CS Undergrad specializing in IoT & Embedded Systems. Always happy to share lab gear, calculators, and robotics kits!',
-          phone_number: '9876543210',
-          reputation_as_owner: '4.92',
-          reputation_as_renter: '4.85',
-          owner_badge: 'Excellent',
-          renter_badge: 'Trusted',
-          total_items_lent: 6,
-          total_items_borrowed: 8,
-          total_savings_inr: '4250.00',
-          total_earnings_inr: '1850.00',
-          preferred_pickup_spots: [
-            'Central Library',
-            'Main Canteen & Food Court',
-            'Ratan Tata Engineering Block',
-          ],
-          owner_stats: {
-            total_items_lent: 6,
-            completed_lending_transactions: 6,
-            active_listings: 3,
-            total_rental_earnings: '1850.00',
-            owner_reputation: '4.92',
-            owner_review_count: 5,
-            owner_badge: 'Excellent',
-            has_owner_reviews: true,
-          },
-          renter_stats: {
-            total_items_borrowed: 8,
-            completed_rentals: 8,
-            active_rentals: 1,
-            total_rental_spending: '1200.00',
-            total_savings_inr: '4250.00',
-            renter_reputation: '4.85',
-            renter_review_count: 7,
-            renter_badge: 'Trusted',
-            has_renter_reviews: true,
-          },
-          is_verified: true,
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString(),
-        });
-        setReviews([
-          {
-            id: 'demo-rev-1',
-            booking_id: 'b-01',
-            booking_reference: 'RT-202611-09',
-            item_title: 'Casio fx-991EX Scientific Calculator',
-            reviewer_id: 'u-02',
-            reviewer_name: 'Ananya Sharma',
-            reviewer_avatar: '',
-            reviewee_id: 'u-01',
-            reviewee_name: 'Sai Reddy',
-            review_type: 'OWNER',
-            condition_accuracy_score: 5,
-            communication_score: 5,
-            punctuality_score: 5,
-            calculated_score: '5.00',
-            overall_comment: 'Brand new calculator condition, met right at the library gate without delay!',
-            created_at: '2026-11-02T10:15:00Z',
-          },
-          {
-            id: 'demo-rev-2',
-            booking_id: 'b-02',
-            booking_reference: 'RT-202610-84',
-            item_title: 'Arduino Sensor Kit & Breadboards',
-            reviewer_id: 'u-03',
-            reviewer_name: 'Karthik Varma',
-            reviewer_avatar: '',
-            reviewee_id: 'u-01',
-            reviewee_name: 'Sai Reddy',
-            review_type: 'RENTER',
-            on_time_return_score: 5,
-            item_care_score: 5,
-            calculated_score: '5.00',
-            overall_comment: 'Returned all jumper wires and sensors packed neatly and on time.',
-            created_at: '2026-10-28T16:40:00Z',
-          },
-        ]);
+        setDetailedProfile(null);
+        setReviews([]);
       }
     } finally {
       setIsLoading(false);
@@ -160,8 +78,8 @@ export const ProfilePage: React.FC = () => {
   }, [peerId]);
 
   const displayName = isOwnProfile
-    ? detailedProfile?.user?.full_name || user?.name || 'Sai Reddy'
-    : publicProfile?.display_name || 'Aditya Student';
+    ? detailedProfile?.user?.full_name || (user ? (`${user.first_name || ''} ${user.last_name || ''}`.trim() || user.name || user.email) : 'Student')
+    : publicProfile?.display_name || 'Campus Student';
 
   const avatarUrl = isOwnProfile ? detailedProfile?.avatar_url : publicProfile?.avatar_url;
   const initial = displayName.charAt(0).toUpperCase();
@@ -175,12 +93,12 @@ export const ProfilePage: React.FC = () => {
     : publicProfile?.renter_reputation;
 
   const ownerBadge = isOwnProfile
-    ? detailedProfile?.owner_badge
-    : publicProfile?.owner_badge || 'Trusted';
+    ? detailedProfile?.owner_badge || 'New Member'
+    : publicProfile?.owner_badge || 'New Member';
 
   const renterBadge = isOwnProfile
-    ? detailedProfile?.renter_badge
-    : publicProfile?.renter_badge || 'Reliable';
+    ? detailedProfile?.renter_badge || 'New Member'
+    : publicProfile?.renter_badge || 'New Member';
 
   const ownerReviewCount = isOwnProfile
     ? detailedProfile?.owner_stats?.owner_review_count || 0
@@ -306,7 +224,15 @@ export const ProfilePage: React.FC = () => {
               </button>
             ) : (
               <button
-                onClick={() => setIsReviewModalOpen(true)}
+                onClick={() => {
+                  if (!completedWithPeer) {
+                    alert(
+                      "Student reviews require a completed rental exchange to maintain verified campus integrity.\n\nYou have not completed an equipment rental with this student yet. Once an exchange completes, you can rate and review them here or from your rentals dashboard."
+                    );
+                    return;
+                  }
+                  setIsReviewModalOpen(true);
+                }}
                 className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-white text-xs font-bold shadow-md transition-all cursor-pointer"
                 style={{ backgroundColor: '#7563D9' }}
                 onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#6552C5')}
@@ -373,49 +299,81 @@ export const ProfilePage: React.FC = () => {
           {/* Big Rating Display */}
           <div className="flex items-baseline gap-2.5 pb-2" style={{ borderBottom: '1px solid #EAE6E1' }}>
             <span className="text-3xl font-black" style={{ color: '#303653' }}>
-              {ownerReviewCount > 0 && ownerScore ? Number(ownerScore).toFixed(2) : '5.00'}
+              {ownerReviewCount > 0 && ownerScore ? Number(ownerScore).toFixed(2) : '—'}
             </span>
             <div className="flex items-center gap-1.5">
-              <Star className="w-5 h-5 fill-[#E8A447]" style={{ color: '#E8A447' }} />
-              <span className="text-xs" style={{ color: '#85899B' }}>
-                {ownerReviewCount > 0
-                  ? `(${ownerReviewCount} verified reviews)`
-                  : '· New Member (No reviews yet)'}
-              </span>
+              {ownerReviewCount > 0 ? (
+                <>
+                  <Star className="w-5 h-5 fill-[#E8A447]" style={{ color: '#E8A447' }} />
+                  <span className="text-xs" style={{ color: '#85899B' }}>
+                    ({ownerReviewCount} verified {ownerReviewCount === 1 ? 'review' : 'reviews'})
+                  </span>
+                </>
+              ) : (
+                <span className="text-xs font-medium" style={{ color: '#85899B' }}>
+                  No verified reviews yet
+                </span>
+              )}
             </div>
           </div>
 
           {/* Simple Performance Factors */}
           <div className="space-y-3">
-            <div>
-              <div className="flex justify-between text-xs font-medium mb-1.5">
-                <span style={{ color: '#303653' }}>Item Condition Accuracy</span>
-                <span className="font-bold" style={{ color: '#42A879' }}>
-                  {ownerReviewCount > 0 ? '4.9 ★' : '100% Verified'}
-                </span>
-              </div>
-              <div
-                className="w-full h-1.5 rounded-full overflow-hidden"
-                style={{ backgroundColor: '#FFF8ED', border: '1px solid #EAE6E1' }}
-              >
-                <div className="h-full rounded-full" style={{ width: '100%', backgroundColor: '#42A879' }} />
-              </div>
-            </div>
+            {ownerReviewCount > 0 ? (
+              <>
+                <div>
+                  <div className="flex justify-between text-xs font-medium mb-1.5">
+                    <span style={{ color: '#303653' }}>Item Condition Accuracy</span>
+                    <span className="font-bold" style={{ color: '#42A879' }}>
+                      {Number(ownerScore || 5.0).toFixed(1)} ★
+                    </span>
+                  </div>
+                  <div
+                    className="w-full h-1.5 rounded-full overflow-hidden"
+                    style={{ backgroundColor: '#FFF8ED', border: '1px solid #EAE6E1' }}
+                  >
+                    <div
+                      className="h-full rounded-full"
+                      style={{
+                        width: `${Math.min(100, (Number(ownerScore || 5) / 5) * 100)}%`,
+                        backgroundColor: '#42A879',
+                      }}
+                    />
+                  </div>
+                </div>
 
-            <div>
-              <div className="flex justify-between text-xs font-medium mb-1.5">
-                <span style={{ color: '#303653' }}>Communication & Handover</span>
-                <span className="font-bold" style={{ color: '#7563D9' }}>
-                  {ownerReviewCount > 0 ? '4.8 ★' : '100% Responsive'}
-                </span>
-              </div>
+                <div>
+                  <div className="flex justify-between text-xs font-medium mb-1.5">
+                    <span style={{ color: '#303653' }}>Communication & Handover</span>
+                    <span className="font-bold" style={{ color: '#7563D9' }}>
+                      {Number(ownerScore || 5.0).toFixed(1)} ★
+                    </span>
+                  </div>
+                  <div
+                    className="w-full h-1.5 rounded-full overflow-hidden"
+                    style={{ backgroundColor: '#FFF8ED', border: '1px solid #EAE6E1' }}
+                  >
+                    <div
+                      className="h-full rounded-full"
+                      style={{
+                        width: `${Math.min(100, (Number(ownerScore || 5) / 5) * 100)}%`,
+                        backgroundColor: '#7563D9',
+                      }}
+                    />
+                  </div>
+                </div>
+              </>
+            ) : (
               <div
-                className="w-full h-1.5 rounded-full overflow-hidden"
-                style={{ backgroundColor: '#FFF8ED', border: '1px solid #EAE6E1' }}
+                className="py-3 px-3.5 rounded-2xl border text-xs"
+                style={{ backgroundColor: '#FFF8ED', borderColor: '#EAE6E1', color: '#85899B' }}
               >
-                <div className="h-full rounded-full" style={{ width: '100%', backgroundColor: '#7563D9' }} />
+                <div className="font-semibold text-xs mb-0.5" style={{ color: '#303653' }}>
+                  Peer Evaluation Pending
+                </div>
+                Detailed ratings for item condition and handover accuracy unlock when peers return your gear.
               </div>
-            </div>
+            )}
           </div>
 
           {/* Owner Quick Stats */}
@@ -479,49 +437,81 @@ export const ProfilePage: React.FC = () => {
           {/* Big Rating Display */}
           <div className="flex items-baseline gap-2.5 pb-2" style={{ borderBottom: '1px solid #EAE6E1' }}>
             <span className="text-3xl font-black" style={{ color: '#303653' }}>
-              {renterReviewCount > 0 && renterScore ? Number(renterScore).toFixed(2) : '5.00'}
+              {renterReviewCount > 0 && renterScore ? Number(renterScore).toFixed(2) : '—'}
             </span>
             <div className="flex items-center gap-1.5">
-              <Star className="w-5 h-5 fill-[#E8A447]" style={{ color: '#E8A447' }} />
-              <span className="text-xs" style={{ color: '#85899B' }}>
-                {renterReviewCount > 0
-                  ? `(${renterReviewCount} verified reviews)`
-                  : '· New Member (No reviews yet)'}
-              </span>
+              {renterReviewCount > 0 ? (
+                <>
+                  <Star className="w-5 h-5 fill-[#E8A447]" style={{ color: '#E8A447' }} />
+                  <span className="text-xs" style={{ color: '#85899B' }}>
+                    ({renterReviewCount} verified {renterReviewCount === 1 ? 'review' : 'reviews'})
+                  </span>
+                </>
+              ) : (
+                <span className="text-xs font-medium" style={{ color: '#85899B' }}>
+                  No verified reviews yet
+                </span>
+              )}
             </div>
           </div>
 
           {/* Simple Performance Factors */}
           <div className="space-y-3">
-            <div>
-              <div className="flex justify-between text-xs font-medium mb-1.5">
-                <span style={{ color: '#303653' }}>On-Time Return Rate</span>
-                <span className="font-bold" style={{ color: '#42A879' }}>
-                  {renterReviewCount > 0 ? '4.9 ★' : '100% On-Time'}
-                </span>
-              </div>
-              <div
-                className="w-full h-1.5 rounded-full overflow-hidden"
-                style={{ backgroundColor: '#FFF8ED', border: '1px solid #EAE6E1' }}
-              >
-                <div className="h-full rounded-full" style={{ width: '100%', backgroundColor: '#42A879' }} />
-              </div>
-            </div>
+            {renterReviewCount > 0 ? (
+              <>
+                <div>
+                  <div className="flex justify-between text-xs font-medium mb-1.5">
+                    <span style={{ color: '#303653' }}>On-Time Return Rate</span>
+                    <span className="font-bold" style={{ color: '#42A879' }}>
+                      {Number(renterScore || 5.0).toFixed(1)} ★
+                    </span>
+                  </div>
+                  <div
+                    className="w-full h-1.5 rounded-full overflow-hidden"
+                    style={{ backgroundColor: '#FFF8ED', border: '1px solid #EAE6E1' }}
+                  >
+                    <div
+                      className="h-full rounded-full"
+                      style={{
+                        width: `${Math.min(100, (Number(renterScore || 5) / 5) * 100)}%`,
+                        backgroundColor: '#42A879',
+                      }}
+                    />
+                  </div>
+                </div>
 
-            <div>
-              <div className="flex justify-between text-xs font-medium mb-1.5">
-                <span style={{ color: '#303653' }}>Item Care & Safety</span>
-                <span className="font-bold" style={{ color: '#E8A447' }}>
-                  {renterReviewCount > 0 ? '4.8 ★' : '100% Care'}
-                </span>
-              </div>
+                <div>
+                  <div className="flex justify-between text-xs font-medium mb-1.5">
+                    <span style={{ color: '#303653' }}>Item Care & Safety</span>
+                    <span className="font-bold" style={{ color: '#E8A447' }}>
+                      {Number(renterScore || 5.0).toFixed(1)} ★
+                    </span>
+                  </div>
+                  <div
+                    className="w-full h-1.5 rounded-full overflow-hidden"
+                    style={{ backgroundColor: '#FFF8ED', border: '1px solid #EAE6E1' }}
+                  >
+                    <div
+                      className="h-full rounded-full"
+                      style={{
+                        width: `${Math.min(100, (Number(renterScore || 5) / 5) * 100)}%`,
+                        backgroundColor: '#E8A447',
+                      }}
+                    />
+                  </div>
+                </div>
+              </>
+            ) : (
               <div
-                className="w-full h-1.5 rounded-full overflow-hidden"
-                style={{ backgroundColor: '#FFF8ED', border: '1px solid #EAE6E1' }}
+                className="py-3 px-3.5 rounded-2xl border text-xs"
+                style={{ backgroundColor: '#FFF8ED', borderColor: '#EAE6E1', color: '#85899B' }}
               >
-                <div className="h-full rounded-full" style={{ width: '100%', backgroundColor: '#E8A447' }} />
+                <div className="font-semibold text-xs mb-0.5" style={{ color: '#303653' }}>
+                  Borrower Evaluation Pending
+                </div>
+                Detailed ratings for punctuality and item care unlock when owners confirm your return inspections.
               </div>
-            </div>
+            )}
           </div>
 
           {/* Renter Quick Stats */}
@@ -729,16 +719,18 @@ export const ProfilePage: React.FC = () => {
         />
       )}
 
-      <LeaveReviewModal
-        isOpen={isReviewModalOpen}
-        onClose={() => setIsReviewModalOpen(false)}
-        bookingId="demo-booking-uuid"
-        bookingReference="RT-202611-12"
-        itemTitle="Academic Engineering Equipment"
-        partnerName={displayName}
-        defaultReviewType="OWNER"
-        onReviewSubmitted={() => loadProfile()}
-      />
+      {isReviewModalOpen && completedWithPeer && (
+        <LeaveReviewModal
+          isOpen={isReviewModalOpen}
+          onClose={() => setIsReviewModalOpen(false)}
+          bookingId={completedWithPeer.id}
+          bookingReference={completedWithPeer.booking_reference}
+          itemTitle={completedWithPeer.item_title}
+          partnerName={displayName}
+          defaultReviewType={completedWithPeer.owner_id === peerId ? 'OWNER' : 'RENTER'}
+          onReviewSubmitted={() => loadProfile()}
+        />
+      )}
     </div>
   );
 };

@@ -18,6 +18,7 @@ import {
 } from 'lucide-react';
 import { marketplaceService, MarketplaceFilterParams } from '../services/marketplace';
 import { ItemCard } from '../components/marketplace/ItemCard';
+import { ItemCardSkeleton } from '../components/common/Skeleton';
 import { PopularResources } from '../components/marketplace/PopularResources';
 import { MarketplaceFilterSidebar } from '../components/marketplace/MarketplaceFilterSidebar';
 import { ItemDetailModal } from '../components/marketplace/ItemDetailModal';
@@ -82,7 +83,7 @@ export const MarketplacePage: React.FC = () => {
   } = useQuery({
     queryKey: ['marketplace-items', filters],
     queryFn: () => marketplaceService.getItems(filters),
-    staleTime: 1000 * 60 * 1,
+    staleTime: 1000 * 60 * 2,
   });
 
   const items = itemsData?.results || [];
@@ -152,27 +153,27 @@ export const MarketplacePage: React.FC = () => {
             </p>
           </div>
 
-          <div className="flex flex-wrap sm:flex-nowrap gap-3 shrink-0">
+          <div className="grid grid-cols-3 sm:flex sm:flex-nowrap gap-2 sm:gap-3 shrink-0 w-full md:w-auto">
             <div
-              className="rounded-2xl p-4 flex flex-col items-center justify-center min-w-[120px] border shadow-xs"
+              className="rounded-2xl p-3 sm:p-4 flex flex-col items-center justify-center flex-1 sm:flex-initial sm:min-w-[110px] border shadow-xs text-center"
               style={{ backgroundColor: '#E9E3FF', borderColor: '#D8D0F5' }}
             >
-              <span className="text-xl font-black" style={{ color: '#303653' }}>{totalCount}</span>
-              <span className="text-[11px] font-semibold" style={{ color: '#7563D9' }}>Active Listings</span>
+              <span className="text-lg sm:text-xl font-black" style={{ color: '#303653' }}>{totalCount}</span>
+              <span className="text-[10px] sm:text-[11px] font-semibold" style={{ color: '#7563D9' }}>Active Listings</span>
             </div>
             <div
-              className="rounded-2xl p-4 flex flex-col items-center justify-center min-w-[120px] border shadow-xs"
+              className="rounded-2xl p-3 sm:p-4 flex flex-col items-center justify-center flex-1 sm:flex-initial sm:min-w-[110px] border shadow-xs text-center"
               style={{ backgroundColor: '#DFEDFF', borderColor: '#C5DCFA' }}
             >
-              <span className="text-xl font-black" style={{ color: '#6398D6' }}>8</span>
-              <span className="text-[11px] font-semibold" style={{ color: '#3A6BB5' }}>Categories</span>
+              <span className="text-lg sm:text-xl font-black" style={{ color: '#6398D6' }}>8</span>
+              <span className="text-[10px] sm:text-[11px] font-semibold" style={{ color: '#3A6BB5' }}>Categories</span>
             </div>
             <div
-              className="rounded-2xl p-4 flex flex-col items-center justify-center min-w-[120px] border shadow-xs"
+              className="rounded-2xl p-3 sm:p-4 flex flex-col items-center justify-center flex-1 sm:flex-initial sm:min-w-[110px] border shadow-xs text-center"
               style={{ backgroundColor: '#DDF3E7', borderColor: '#B8E5CC' }}
             >
-              <span className="text-xl font-black" style={{ color: '#42A879' }}>100%</span>
-              <span className="text-[11px] font-semibold" style={{ color: '#2D7A5B' }}>Verified Peers</span>
+              <span className="text-lg sm:text-xl font-black" style={{ color: '#42A879' }}>100%</span>
+              <span className="text-[10px] sm:text-[11px] font-semibold" style={{ color: '#2D7A5B' }}>Verified Peers</span>
             </div>
           </div>
         </div>
@@ -331,25 +332,16 @@ export const MarketplacePage: React.FC = () => {
           )}
 
           {/* Product Cards Grid (9 cols) */}
-          <div className="lg:col-span-9 flex flex-col gap-6">
+          <div className="lg:col-span-9 flex flex-col gap-6 min-w-0">
             {isItemsLoading ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
-                {Array.from({ length: 6 }).map((_, i) => (
-                  <div
-                    key={i}
-                    className="rounded-2xl border p-4 flex flex-col gap-3 animate-pulse"
-                    style={{ backgroundColor: '#FFFCF7', borderColor: '#EAE6E1' }}
-                  >
-                    <div className="aspect-4/3 rounded-xl" style={{ backgroundColor: '#E9E3FF' }} />
-                    <div className="h-4 rounded w-3/4" style={{ backgroundColor: '#EAE6E1' }} />
-                    <div className="h-3 rounded w-1/2" style={{ backgroundColor: '#EAE6E1' }} />
-                    <div className="h-8 rounded mt-4" style={{ backgroundColor: '#E9E3FF' }} />
-                  </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-4 sm:gap-6">
+                {Array.from({ length: 8 }).map((_, i) => (
+                  <ItemCardSkeleton key={i} />
                 ))}
               </div>
             ) : items.length === 0 ? (
               <div
-                className="rounded-3xl border p-12 text-center flex flex-col items-center justify-center gap-4"
+                className="rounded-3xl border p-8 sm:p-12 text-center flex flex-col items-center justify-center gap-4"
                 style={{ backgroundColor: '#FFFCF7', borderColor: '#EAE6E1' }}
               >
                 <div
@@ -374,7 +366,7 @@ export const MarketplacePage: React.FC = () => {
                 </button>
               </div>
             ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-4 sm:gap-6">
                 {items.map((item) => (
                   <ItemCard
                     key={item.id}

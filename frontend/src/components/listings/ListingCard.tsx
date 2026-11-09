@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { motion } from 'framer-motion';
 import {
   MapPin,
   Edit3,
@@ -51,10 +50,8 @@ export const ListingCard: React.FC<ListingCardProps> = ({
   };
 
   return (
-    <motion.div
-      whileHover={{ y: -3 }}
-      transition={{ duration: 0.2 }}
-      className="rounded-2xl border shadow-xs hover:shadow-card-hover transition-all overflow-hidden flex flex-col justify-between group"
+    <div
+      className="rounded-2xl border shadow-xs hover:shadow-card-hover hover:-translate-y-0.5 transition-all duration-200 overflow-hidden flex flex-col justify-between group"
       style={{ backgroundColor: '#FFFCF7', borderColor: '#EAE6E1' }}
     >
       <div>
@@ -266,6 +263,6 @@ export const ListingCard: React.FC<ListingCardProps> = ({
           </div>
         )}
       </div>
-    </motion.div>
+    </div>
   );
 };

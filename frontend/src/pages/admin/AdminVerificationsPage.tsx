@@ -8,6 +8,7 @@ import {
   AlertCircle,
   Search,
   RefreshCw,
+  X,
 } from 'lucide-react';
 import { authService } from '../../services/auth';
 import { StudentVerification } from '../../types';
@@ -173,9 +174,22 @@ export const AdminVerificationsPage: React.FC = () => {
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Escape') setSearchQuery('');
+            }}
             placeholder="Search by name, roll number, email..."
-            className="w-full pl-9 pr-3.5 py-2 rounded-xl border border-neutral-200 text-xs focus:outline-none focus:ring-2 focus:ring-[#F5A623]/40 bg-white"
+            className="w-full pl-9 pr-8 py-2 rounded-xl border border-neutral-200 text-xs focus:outline-none focus:ring-2 focus:ring-[#F5A623]/40 bg-white"
           />
+          {searchQuery && (
+            <button
+              type="button"
+              onClick={() => setSearchQuery('')}
+              className="absolute right-2.5 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-neutral-700 cursor-pointer"
+              aria-label="Clear search"
+            >
+              <X className="w-3.5 h-3.5" />
+            </button>
+          )}
         </div>
       </div>
 

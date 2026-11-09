@@ -183,7 +183,7 @@ export const LoginPage: React.FC = () => {
         </div>
 
         {/* Card */}
-        <div className="rounded-3xl shadow-sm p-8" style={{ backgroundColor: '#FFFCF7', border: '1px solid #EAE6E1' }}>
+        <div className="rounded-3xl shadow-sm p-5 sm:p-8" style={{ backgroundColor: '#FFFCF7', border: '1px solid #EAE6E1' }}>
           {errorMessage && (
             <motion.div
               initial={{ opacity: 0, y: -6 }}

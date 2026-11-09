@@ -1,20 +1,27 @@
-import React from 'react';
+import React, { Suspense, lazy } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { AppLayout } from './components/layout/AppLayout';
-import { DashboardPage } from './pages/DashboardPage';
-import { AnalyticsPage } from './pages/AnalyticsPage';
-import { ProfilePage } from './pages/ProfilePage';
-import { MarketplacePage } from './pages/MarketplacePage';
-import { MyListingsPage } from './pages/listings/MyListingsPage';
-import { CreateListingPage } from './pages/listings/CreateListingPage';
-import { PlaceholderPage } from './pages/PlaceholderPage';
-import { LoginPage } from './pages/auth/LoginPage';
-import { RegisterPage } from './pages/auth/RegisterPage';
-import { VerifyOtpPage } from './pages/auth/VerifyOtpPage';
-import { VerificationPendingPage } from './pages/auth/VerificationPendingPage';
-import { AdminVerificationsPage } from './pages/admin/AdminVerificationsPage';
+import { LoadingSpinner } from './components/common/LoadingSpinner';
+
+// Route-based code splitting: lazy load each page on demand
+const DashboardPage = lazy(() => import('./pages/DashboardPage').then(m => ({ default: m.DashboardPage })));
+const AnalyticsPage = lazy(() => import('./pages/AnalyticsPage').then(m => ({ default: m.AnalyticsPage })));
+const ProfilePage = lazy(() => import('./pages/ProfilePage').then(m => ({ default: m.ProfilePage })));
+const MarketplacePage = lazy(() => import('./pages/MarketplacePage').then(m => ({ default: m.MarketplacePage })));
+const WishlistPage = lazy(() => import('./pages/WishlistPage').then(m => ({ default: m.WishlistPage })));
+const MyListingsPage = lazy(() => import('./pages/listings/MyListingsPage').then(m => ({ default: m.MyListingsPage })));
+const CreateListingPage = lazy(() => import('./pages/listings/CreateListingPage').then(m => ({ default: m.CreateListingPage })));
+const BookingsCalendarPage = lazy(() => import('./pages/BookingsCalendarPage').then(m => ({ default: m.BookingsCalendarPage })));
+const MyRentalsPage = lazy(() => import('./pages/rentals/MyRentalsPage').then(m => ({ default: m.MyRentalsPage })));
+const PaymentsEscrowPage = lazy(() => import('./pages/payments/PaymentsEscrowPage').then(m => ({ default: m.PaymentsEscrowPage })));
+const SettingsPage = lazy(() => import('./pages/settings/SettingsPage').then(m => ({ default: m.SettingsPage })));
+const LoginPage = lazy(() => import('./pages/auth/LoginPage').then(m => ({ default: m.LoginPage })));
+const RegisterPage = lazy(() => import('./pages/auth/RegisterPage').then(m => ({ default: m.RegisterPage })));
+const VerifyOtpPage = lazy(() => import('./pages/auth/VerifyOtpPage').then(m => ({ default: m.VerifyOtpPage })));
+const VerificationPendingPage = lazy(() => import('./pages/auth/VerificationPendingPage').then(m => ({ default: m.VerificationPendingPage })));
+const AdminVerificationsPage = lazy(() => import('./pages/admin/AdminVerificationsPage').then(m => ({ default: m.AdminVerificationsPage })));
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -90,102 +97,71 @@ export const App: React.FC = () => {
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
         <BrowserRouter>
-          <Routes>
-            {/* Public Authentication Pages */}
-            <Route
-              path="/login"
-              element={
-                <PublicOnlyRoute>
-                  <LoginPage />
-                </PublicOnlyRoute>
-              }
-            />
-            <Route
-              path="/register"
-              element={
-                <PublicOnlyRoute>
-                  <RegisterPage />
-                </PublicOnlyRoute>
-              }
-            />
-            <Route path="/verify-email" element={<VerifyOtpPage />} />
-            <Route path="/verification-pending" element={<VerificationPendingPage />} />
+          <Suspense fallback={<LoadingSpinner fullPage size="lg" label="Loading RentTogether..." />}>
+            <Routes>
+              {/* Public Authentication Pages */}
+              <Route
+                path="/login"
+                element={
+                  <PublicOnlyRoute>
+                    <LoginPage />
+                  </PublicOnlyRoute>
+                }
+              />
+              <Route
+                path="/register"
+                element={
+                  <PublicOnlyRoute>
+                    <RegisterPage />
+                  </PublicOnlyRoute>
+                }
+              />
+              <Route path="/verify-email" element={<VerifyOtpPage />} />
+              <Route path="/verification-pending" element={<VerificationPendingPage />} />
 
-            {/* Main Application with AppLayout (Protected) */}
-            <Route
-              path="/"
-              element={
-                <ProtectedRoute>
-                  <AppLayout />
-                </ProtectedRoute>
-              }
-            >
-              <Route index element={<DashboardPage />} />
-              <Route path="marketplace" element={<MarketplacePage />} />
-              <Route path="explore" element={<MarketplacePage />} />
+              {/* Main Application with AppLayout (Protected) */}
               <Route
-                path="rentals"
+                path="/"
                 element={
-                  <PlaceholderPage
-                    title="My Rentals"
-                    description="Track items you are currently borrowing, return schedules, and savings."
-                    phase="Phase 07"
-                  />
+                  <ProtectedRoute>
+                    <AppLayout />
+                  </ProtectedRoute>
                 }
-              />
-              <Route path="listings" element={<MyListingsPage />} />
-              <Route path="listings/create" element={<CreateListingPage />} />
-              <Route path="listings/new" element={<CreateListingPage />} />
-              <Route
-                path="bookings"
-                element={
-                  <PlaceholderPage
-                    title="Rental Bookings & Calendar"
-                    description="Manage incoming and outgoing booking requests with conflict-free scheduling."
-                    phase="Phase 06 & 07"
-                  />
-                }
-              />
-              <Route
-                path="payments"
-                element={
-                  <PlaceholderPage
-                    title="Campus Payments & Escrow"
-                    description="Track secure rental deposits, UPI disbursements, and refund transactions."
-                    phase="Phase 08"
-                  />
-                }
-              />
-              <Route path="insights" element={<AnalyticsPage />} />
-              <Route path="analytics" element={<AnalyticsPage />} />
-              <Route path="ai-insights" element={<AnalyticsPage />} />
-              <Route path="sustainability" element={<AnalyticsPage />} />
-              <Route path="profile" element={<ProfilePage />} />
-              <Route path="profile/:id" element={<ProfilePage />} />
-              <Route
-                path="settings"
-                element={
-                  <PlaceholderPage
-                    title="Account & Campus Settings"
-                    description="Manage your institutional email, notifications, and profile details."
-                    phase="Phase 03"
-                  />
-                }
-              />
+              >
+                <Route index element={<DashboardPage />} />
+                <Route path="marketplace" element={<MarketplacePage />} />
+                <Route path="explore" element={<MarketplacePage />} />
+                <Route path="wishlist" element={<WishlistPage />} />
+                <Route path="rentals" element={<MyRentalsPage />} />
+                <Route path="listings" element={<MyListingsPage />} />
+                <Route path="listings/create" element={<CreateListingPage />} />
+                <Route path="listings/new" element={<CreateListingPage />} />
+                <Route path="bookings" element={<BookingsCalendarPage />} />
+                <Route path="calendar" element={<Navigate to="/bookings" replace />} />
+                <Route path="payments" element={<PaymentsEscrowPage />} />
+                <Route path="escrow" element={<Navigate to="/payments" replace />} />
+                <Route path="insights" element={<AnalyticsPage />} />
+                <Route path="analytics" element={<AnalyticsPage />} />
+                <Route path="ai-insights" element={<AnalyticsPage />} />
+                <Route path="sustainability" element={<AnalyticsPage />} />
+                <Route path="profile" element={<ProfilePage />} />
+                <Route path="profile/:id" element={<ProfilePage />} />
+                <Route path="settings" element={<SettingsPage />} />
 
-              {/* Admin Portal within AppLayout */}
-              <Route
-                path="admin/verifications"
-                element={
-                  <AdminRoute>
-                    <AdminVerificationsPage />
-                  </AdminRoute>
-                }
-              />
+                {/* Admin Portal within AppLayout */}
+                <Route
+                  path="admin/verifications"
+                  element={
+                    <AdminRoute>
+                      <AdminVerificationsPage />
+                    </AdminRoute>
+                  }
+                />
 
-              <Route path="*" element={<Navigate to="/" replace />} />
-            </Route>
-          </Routes>
+                <Route path="*" element={<Navigate to="/" replace />} />
+              </Route>
+            </Routes>
+          </Suspense>
         </BrowserRouter>
       </AuthProvider>
     </QueryClientProvider>

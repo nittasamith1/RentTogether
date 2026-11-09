@@ -1,8 +1,6 @@
 import React from 'react';
 import {
-  Search,
   Filter,
-  X,
   RotateCcw,
   Calendar,
   MapPin,
@@ -78,36 +76,7 @@ export const MarketplaceFilterSidebar: React.FC<MarketplaceFilterSidebarProps> =
         )}
       </div>
 
-      {/* 1. Search Box */}
-      <div>
-        <label className="block text-xs font-semibold mb-1.5" style={{ color: '#303653' }}>Search Resources</label>
-        <div className="relative">
-          <Search className="w-4 h-4 absolute left-3 top-2.5" style={{ color: '#85899B' }} />
-          <input
-            type="text"
-            value={filters.search || ''}
-            onChange={(e) => onFilterChange({ search: e.target.value, page: 1 })}
-            placeholder="Search title, brand, specs..."
-            className="w-full pl-9 pr-8 py-2 text-xs rounded-xl focus:outline-none"
-            style={{
-              backgroundColor: '#FFF8ED',
-              border: '1px solid #EAE6E1',
-              color: '#303653',
-            }}
-          />
-          {filters.search && (
-            <button
-              onClick={() => onFilterChange({ search: '', page: 1 })}
-              className="absolute right-2.5 top-2.5"
-              style={{ color: '#85899B' }}
-            >
-              <X className="w-4 h-4" />
-            </button>
-          )}
-        </div>
-      </div>
-
-      {/* 2. Categories */}
+      {/* 1. Categories */}
       <div>
         <label className="block text-xs font-semibold mb-2" style={{ color: '#303653' }}>Categories</label>
         <div className="flex flex-col gap-1 max-h-48 overflow-y-auto pr-1">

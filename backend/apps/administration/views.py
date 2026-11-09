@@ -1,6 +1,7 @@
 from rest_framework import status, views, generics
 from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
+from django.db.models import Q
 
 from apps.accounts.permissions import IsAdminUser
 from apps.profiles.models import StudentVerification
@@ -25,6 +26,23 @@ class AdminVerificationListView(generics.ListAPIView):
         queryset = StudentVerification.objects.select_related('user', 'college', 'verified_by').all()
         if status_param != 'ALL':
             queryset = queryset.filter(verification_status=status_param)
+
+        search_query = self.request.query_params.get('search', '').strip()
+        if search_query:
+            terms = search_query.split()
+            search_q = Q()
+            for term in terms:
+                term_q = (
+                    Q(user__first_name__icontains=term) |
+                    Q(user__last_name__icontains=term) |
+                    Q(user__email__icontains=term) |
+                    Q(college_roll_number__icontains=term) |
+                    Q(college_email__icontains=term) |
+                    Q(department__icontains=term)
+                )
+                search_q &= term_q
+            queryset = queryset.filter(search_q)
+
         return queryset.order_by('-submitted_at')
 
 
@@ -51,6 +69,15 @@ class AdminVerificationApproveView(views.APIView):
         verification = get_object_or_404(StudentVerification, id=id)
         verification.approve(admin_user=request.user)
 
+        from apps.notifications.services import send_notification
+        send_notification(
+            recipient=verification.user,
+            actor=request.user,
+            event_type="STUDENT_VERIFIED",
+            title="Student Verification Approved!",
+            message=f"Congratulations! Your student verification for {verification.college.name} has been approved. You now have full access to campus equipment rentals."
+        )
+
         return Response(
             {
                 "message": f"Student {verification.user.email} has been approved successfully.",
@@ -74,6 +101,16 @@ class AdminVerificationRejectView(views.APIView):
         reason = serializer.validated_data['reason']
 
         verification.reject(admin_user=request.user, reason=reason)
+
+        from apps.notifications.services import send_notification
+        send_notification(
+            recipient=verification.user,
+            actor=request.user,
+            event_type="STUDENT_VERIFICATION_REJECTED",
+            title="Verification Application Declined",
+            message=f"Your campus student verification could not be approved. Reason: {reason}",
+            metadata={"reason": reason}
+        )
 
         return Response(
             {

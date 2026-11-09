@@ -33,8 +33,9 @@ def apply_full_text_search(queryset, search_query: str):
                 SearchVector('category__name', weight='B') +
                 SearchVector('description', weight='C')
             )
-            # Combine words using & (AND) query for precision
-            search_expr = " & ".join(terms)
+            # Support prefix / partial-word matching with :* for each term
+            prefix_terms = [f"{t}:*" for t in terms]
+            search_expr = " & ".join(prefix_terms)
             query_obj = SearchQuery(search_expr, search_type='raw')
             ranked_qs = queryset.annotate(rank=SearchRank(vector, query_obj)).filter(rank__gt=0.01).order_by('-rank')
             if ranked_qs.exists():

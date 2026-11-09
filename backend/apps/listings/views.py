@@ -53,6 +53,14 @@ class CreateListingView(views.APIView):
 
         try:
             item = create_listing(request.user, serializer.validated_data, image_files)
+            from apps.notifications.services import send_notification
+            hourly = (item.rental_price_per_day / 24)
+            send_notification(
+                recipient=request.user,
+                event_type="LISTING_PUBLISHED",
+                title="Listing Published!",
+                message=f"Your resource '{item.title}' is now live and discoverable on campus at ₹{item.rental_price_per_day}/day (₹{hourly:.2f}/hr)."
+            )
             output = OwnerListingDetailSerializer(item).data
             return Response(output, status=status.HTTP_201_CREATED)
         except ValidationError as exc:
@@ -155,6 +163,13 @@ class ListingStatusUpdateView(views.APIView):
 
         try:
             item = set_listing_status(request.user, item_id, new_status)
+            from apps.notifications.services import send_notification
+            send_notification(
+                recipient=request.user,
+                event_type=f"LISTING_{item.status}",
+                title=f"Listing {item.status.capitalize()}",
+                message=f"Your resource '{item.title}' is now {item.status.lower()}."
+            )
             return Response(
                 {
                     "id": str(item.id),
@@ -242,6 +257,7 @@ class OwnerListingRentalHistoryView(views.APIView):
         bookings = item.bookings.select_related('renter').order_by('-created_at')
 
         history = []
+        from apps.profiles.models import StudentReview
         for b in bookings:
             renter_name = b.renter.get_full_name() or b.renter.username
             renter_avatar = ''
@@ -261,6 +277,7 @@ class OwnerListingRentalHistoryView(views.APIView):
                 'deposit_amount_inr': float(b.deposit_amount_inr),
                 'pickup_spot': b.pickup_spot,
                 'created_at': b.created_at.isoformat(),
+                'has_reviewed': StudentReview.objects.filter(booking=b, reviewer=request.user).exists(),
             })
 
         return Response({

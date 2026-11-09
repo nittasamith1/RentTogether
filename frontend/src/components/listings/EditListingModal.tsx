@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Save, AlertCircle, Loader2 } from 'lucide-react';
 import { OwnerListingSummary } from '../../services/listingService';
@@ -22,7 +23,6 @@ export const EditListingModal: React.FC<EditListingModalProps> = ({
     item?.condition || 'GOOD'
   );
   const [rentalPrice, setRentalPrice] = useState(item?.rental_price_per_day?.toString() || '30');
-  const [deposit, setDeposit] = useState(item?.security_deposit?.toString() || '100');
   const [pickupLocation, setPickupLocation] = useState(item?.pickup_location || 'Central Library Ground Floor');
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
@@ -33,15 +33,9 @@ export const EditListingModal: React.FC<EditListingModalProps> = ({
     setErrorMessage(null);
 
     const priceNum = parseFloat(rentalPrice);
-    const depositNum = parseFloat(deposit);
 
     if (isNaN(priceNum) || priceNum <= 0) {
       setErrorMessage('Daily rental price must be greater than zero.');
-      return;
-    }
-
-    if (isNaN(depositNum) || depositNum < 0) {
-      setErrorMessage('Security deposit cannot be negative.');
       return;
     }
 
@@ -52,7 +46,7 @@ export const EditListingModal: React.FC<EditListingModalProps> = ({
           title,
           condition: condition as any,
           rental_price_per_day: priceNum,
-          security_deposit: depositNum,
+          security_deposit: 0,
           pickup_location: pickupLocation,
         },
       },
@@ -70,22 +64,22 @@ export const EditListingModal: React.FC<EditListingModalProps> = ({
     );
   };
 
-  return (
+  return createPortal(
     <AnimatePresence>
-      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 overflow-y-auto">
+      <div className="fixed inset-0 z-50 overflow-y-auto bg-[#303653]/60 backdrop-blur-xs p-4 flex min-h-screen items-center justify-center">
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           onClick={onClose}
-          className="fixed inset-0 bg-[#303653]/60 backdrop-blur-xs"
+          className="fixed inset-0"
         />
 
         <motion.div
           initial={{ opacity: 0, scale: 0.95, y: 16 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.95, y: 16 }}
-          className="relative w-full max-w-lg rounded-3xl shadow-2xl border overflow-hidden z-10 p-6 sm:p-7 space-y-5"
+          className="relative w-full max-w-lg rounded-3xl shadow-2xl border overflow-hidden z-10 my-auto p-6 sm:p-7 space-y-5"
           style={{ backgroundColor: '#FFFCF7', borderColor: '#EAE6E1' }}
         >
           {/* Header */}
@@ -176,25 +170,25 @@ export const EditListingModal: React.FC<EditListingModalProps> = ({
                     color: '#303653',
                   }}
                 />
+                <p className="text-[10px] mt-1 font-semibold" style={{ color: '#7563D9' }}>
+                  Hourly: ₹{((parseFloat(rentalPrice) || 0) / 24).toFixed(2)}/hr (₹/24)
+                </p>
               </div>
               <div>
                 <label className="block text-xs font-bold mb-1" style={{ color: '#303653' }}>
-                  Security Deposit (₹)
+                  Security Deposit
                 </label>
-                <input
-                  type="number"
-                  min="0"
-                  step="10"
-                  required
-                  value={deposit}
-                  onChange={(e) => setDeposit(e.target.value)}
-                  className="w-full px-3.5 py-2.5 rounded-xl text-sm focus:outline-hidden"
+                <div
+                  className="w-full px-3.5 py-2.5 rounded-xl text-xs font-bold flex items-center justify-between"
                   style={{
-                    backgroundColor: '#FFF8ED',
-                    border: '1px solid #EAE6E1',
-                    color: '#303653',
+                    backgroundColor: '#DDF3E7',
+                    border: '1px solid #B8E5CC',
+                    color: '#2D7A5B',
                   }}
-                />
+                >
+                  <span>Zero Deposit</span>
+                  <span>₹0.00</span>
+                </div>
               </div>
             </div>
 
@@ -252,6 +246,7 @@ export const EditListingModal: React.FC<EditListingModalProps> = ({
           </form>
         </motion.div>
       </div>
-    </AnimatePresence>
+    </AnimatePresence>,
+    document.body
   );
 };

@@ -16,9 +16,9 @@
   }
 
   html {
-    scroll-behavior: smooth;
     -webkit-overflow-scrolling: touch;
     overscroll-behavior-y: none;
+    text-size-adjust: 100%;
   }
 
   body {

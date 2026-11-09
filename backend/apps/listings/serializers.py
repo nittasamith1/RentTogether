@@ -73,6 +73,7 @@ class OwnerListingSummarySerializer(serializers.ModelSerializer):
     category_slug = serializers.CharField(source='category.slug', read_only=True)
     active_bookings_count = serializers.IntegerField(default=0, read_only=True)
     completed_bookings_count = serializers.IntegerField(default=0, read_only=True)
+    hourly_rental_price = serializers.SerializerMethodField()
 
     class Meta:
         model = Item
@@ -84,6 +85,7 @@ class OwnerListingSummarySerializer(serializers.ModelSerializer):
             'category_slug',
             'condition',
             'rental_price_per_day',
+            'hourly_rental_price',
             'security_deposit',
             'status',
             'rental_count',
@@ -94,12 +96,18 @@ class OwnerListingSummarySerializer(serializers.ModelSerializer):
             'created_at',
         ]
 
+    def get_hourly_rental_price(self, obj) -> str:
+        if obj.rental_price_per_day:
+            return str((Decimal(str(obj.rental_price_per_day)) / Decimal('24')).quantize(Decimal('0.01')))
+        return "0.00"
+
 
 class OwnerListingDetailSerializer(serializers.ModelSerializer):
     category = CategorySerializer(read_only=True)
     images = ItemImageListingSerializer(many=True, read_only=True)
     active_bookings_count = serializers.SerializerMethodField()
     completed_bookings_count = serializers.SerializerMethodField()
+    hourly_rental_price = serializers.SerializerMethodField()
 
     class Meta:
         model = Item
@@ -115,6 +123,7 @@ class OwnerListingDetailSerializer(serializers.ModelSerializer):
             'item_age_months',
             'purchase_date',
             'rental_price_per_day',
+            'hourly_rental_price',
             'security_deposit',
             'min_rental_days',
             'max_rental_days',
@@ -132,6 +141,11 @@ class OwnerListingDetailSerializer(serializers.ModelSerializer):
             'updated_at',
             'images',
         ]
+
+    def get_hourly_rental_price(self, obj) -> str:
+        if obj.rental_price_per_day:
+            return str((Decimal(str(obj.rental_price_per_day)) / Decimal('24')).quantize(Decimal('0.01')))
+        return "0.00"
 
     def get_active_bookings_count(self, obj) -> int:
         if hasattr(obj, 'active_bookings_count'):

@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useMemo, useCallback } from 'react';
 import { AuthUser } from '../types';
 import { authService } from '../services/auth';
 
@@ -15,38 +15,18 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-// Initial fallback demo student (matching dashboard mockup) if user hasn't logged in yet
-const DEFAULT_DEMO_STUDENT: AuthUser = {
-  id: 'demo-sai-id',
-  email: 'sai.reddy@adityauniversity.in',
-  name: 'Sai Reddy',
-  first_name: 'Sai',
-  last_name: 'Reddy',
-  college_code: 'Aditya University',
-  college_name: 'Aditya University',
-  email_verified: true,
-  is_college_verified: true,
-  verification_status: 'VERIFIED',
-  is_staff: false,
-};
-
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<AuthUser | null>(() => {
     try {
       const stored = localStorage.getItem('auth_user');
-      if (stored) {
+      const hasToken = localStorage.getItem('access_token') || localStorage.getItem('refresh_token');
+      if (stored && hasToken) {
         return JSON.parse(stored);
       }
     } catch {
       // Ignore parsing errors
     }
-    // Check if token exists
-    const token = localStorage.getItem('access_token');
-    if (token) {
-      return null;
-    }
-    // Default to demo student for preview experience
-    return DEFAULT_DEMO_STUDENT;
+    return null;
   });
 
   const isLoading = false;
@@ -54,14 +34,24 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const isAuthenticated = Boolean(user && (user.email_verified || user.is_staff));
   const isVerified = Boolean(user && (user.is_college_verified || user.is_staff));
 
-  const login = (access: string, refresh: string, userData: AuthUser) => {
+  useEffect(() => {
+    const handleUnauthorized = () => {
+      setUser(null);
+    };
+    window.addEventListener('auth:unauthorized', handleUnauthorized);
+    return () => {
+      window.removeEventListener('auth:unauthorized', handleUnauthorized);
+    };
+  }, []);
+
+  const login = useCallback((access: string, refresh: string, userData: AuthUser) => {
     localStorage.setItem('access_token', access);
     localStorage.setItem('refresh_token', refresh);
     localStorage.setItem('auth_user', JSON.stringify(userData));
     setUser(userData);
-  };
+  }, []);
 
-  const logout = async () => {
+  const logout = useCallback(async () => {
     const refreshToken = localStorage.getItem('refresh_token');
     if (refreshToken) {
       try {
@@ -74,18 +64,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     localStorage.removeItem('refresh_token');
     localStorage.removeItem('auth_user');
     setUser(null);
-  };
+  }, []);
 
-  const updateUser = (patch: Partial<AuthUser>) => {
+  const updateUser = useCallback((patch: Partial<AuthUser>) => {
     setUser((prev) => {
       if (!prev) return null;
       const updated = { ...prev, ...patch };
       localStorage.setItem('auth_user', JSON.stringify(updated));
       return updated;
     });
-  };
+  }, []);
 
-  const checkVerificationStatus = async () => {
+  const checkVerificationStatus = useCallback(async () => {
     if (!user) return;
     try {
       const statusRes = await authService.getVerificationStatus(user.email);
@@ -99,7 +89,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     } catch {
       // Silently fail on polling error
     }
-  };
+  }, [user, updateUser]);
 
   // Sync state if user changes
   useEffect(() => {
@@ -108,19 +98,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   }, [user]);
 
+  const contextValue = useMemo<AuthContextType>(() => ({
+    user,
+    isAuthenticated,
+    isVerified,
+    isLoading,
+    login,
+    logout,
+    updateUser,
+    checkVerificationStatus,
+  }), [user, isAuthenticated, isVerified, isLoading, login, logout, updateUser, checkVerificationStatus]);
+
   return (
-    <AuthContext.Provider
-      value={{
-        user,
-        isAuthenticated,
-        isVerified,
-        isLoading,
-        login,
-        logout,
-        updateUser,
-        checkVerificationStatus,
-      }}
-    >
+    <AuthContext.Provider value={contextValue}>
       {children}
     </AuthContext.Provider>
   );

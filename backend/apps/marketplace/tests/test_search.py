@@ -24,6 +24,15 @@ class SearchServiceTests(APITestCase):
             email_verified=True,
             is_college_verified=True,
         )
+        self.renter = User.objects.create_user(
+            email="renter@adityauniversity.in",
+            password="StrongPassword123!",
+            first_name="Renter",
+            last_name="Student",
+            college=self.college,
+            email_verified=True,
+            is_college_verified=True,
+        )
 
         self.category, _ = Category.objects.get_or_create(
             slug="creative-media",
@@ -66,7 +75,7 @@ class SearchServiceTests(APITestCase):
             status=Item.STATUS_ACTIVE
         )
 
-        self.client.force_authenticate(user=self.student)
+        self.client.force_authenticate(user=self.renter)
         self.url = reverse('marketplace-items')
 
     def test_search_by_title_keyword(self):

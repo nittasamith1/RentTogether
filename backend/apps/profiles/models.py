@@ -229,10 +229,18 @@ class StudentProfile(models.Model):
         """Backward compatible property alias"""
         return self.total_savings_inr
 
+    @total_savings.setter
+    def total_savings(self, value):
+        self.total_savings_inr = Decimal(str(value))
+
     @property
     def total_earnings(self):
         """Backward compatible property alias"""
         return self.total_earnings_inr
+
+    @total_earnings.setter
+    def total_earnings(self, value):
+        self.total_earnings_inr = Decimal(str(value))
 
     def __str__(self):
         return f"Profile: {self.user.email} [{self.college.code if self.college else 'No College'}]"

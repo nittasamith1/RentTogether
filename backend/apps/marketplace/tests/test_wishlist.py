@@ -87,3 +87,24 @@ class WishlistEngineTests(APITestCase):
         results = response.data.get('results', [])
         self.assertEqual(len(results), 1)
         self.assertEqual(results[0]['id'], str(self.item.id))
+
+    def test_clear_wishlist_history(self):
+        item2 = Item.objects.create(
+            owner=self.owner,
+            category=self.category,
+            title="Scientific Calculator",
+            daily_rental_price=Decimal("20.00"),
+            is_published=True,
+            status=Item.STATUS_ACTIVE
+        )
+        Wishlist.objects.create(user=self.renter, item=self.item)
+        Wishlist.objects.create(user=self.renter, item=item2)
+        self.assertEqual(Wishlist.objects.filter(user=self.renter).count(), 2)
+
+        self.client.force_authenticate(user=self.renter)
+        clear_url = reverse('marketplace-wishlist-clear')
+        response = self.client.delete(clear_url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data.get('deleted_count'), 2)
+        self.assertEqual(Wishlist.objects.filter(user=self.renter).count(), 0)
+

@@ -50,9 +50,19 @@ class CategoryCatalogTests(APITestCase):
         self.cat_inactive.is_active = False
         self.cat_inactive.save()
 
-        # Create one item in Academic
+        self.other_student = User.objects.create_user(
+            email="other@adityauniversity.in",
+            password="StrongPassword123!",
+            first_name="Other",
+            last_name="Student",
+            college=self.college,
+            email_verified=True,
+            is_college_verified=True,
+        )
+
+        # Create one item in Academic owned by other_student so verified_student sees it in marketplace
         Item.objects.create(
-            owner=self.verified_student,
+            owner=self.other_student,
             category=self.cat_active2,
             title="Scientific Calculator",
             description="Casio calculator for exams",

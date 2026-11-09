@@ -4,10 +4,12 @@ from django.db.models.functions import Coalesce
 from django.core.exceptions import ValidationError
 from django.shortcuts import get_object_or_404
 from django.http import Http404
+from django.utils import timezone
 
 from apps.listings.models import Item
 from apps.marketplace.models import Wishlist, Category
 from apps.bookings.models import Booking
+from apps.availability.models import ItemAvailabilityBlock
 from .search_service import apply_full_text_search
 from .availability_service import filter_available_items, is_item_available
 
@@ -16,16 +18,32 @@ def get_marketplace_items_queryset(user, params: dict):
     """
     Constructs the base marketplace queryset enforcing strict intra-campus isolation:
     Only verified resources from the student's own college are returned.
+    Excludes the student's own listings and items manually blocked by their owner for booking.
     """
     if not user or not user.is_authenticated or not user.college_id:
         return Item.objects.none()
 
-    # Base College-isolated queryset
+    today = timezone.now().date()
+
+    # Identify items blocked by their owner for booking (OWNER_UNAVAILABLE or MAINTENANCE)
+    owner_blocked_item_ids = ItemAvailabilityBlock.objects.filter(
+        reason__in=[
+            ItemAvailabilityBlock.REASON_OWNER_UNAVAILABLE,
+            ItemAvailabilityBlock.REASON_MAINTENANCE
+        ],
+        end_date__gt=today
+    ).values_list('item_id', flat=True)
+
+    # Base College-isolated queryset (strictly excludes the student's own listings and owner-blocked items)
     qs = Item.objects.filter(
         owner__college_id=user.college_id,
         status=Item.STATUS_ACTIVE,
         is_published=True,
         category__is_active=True
+    ).exclude(
+        owner_id=user.id
+    ).exclude(
+        id__in=owner_blocked_item_ids
     ).select_related(
         'owner',
         'category',
@@ -152,11 +170,25 @@ def get_item_detail(user, item_id: str) -> dict:
     if user and user.college_id and item.owner.college_id != user.college_id:
         raise Http404("Resource item not found.")
 
+    today = timezone.now().date()
+
     # Status & publication check: Only the owner or staff can inspect drafts / unlisted items
     is_owner = bool(user and user.is_authenticated and user.id == item.owner_id)
     is_staff = bool(user and user.is_authenticated and user.is_staff)
     if (item.status != Item.STATUS_ACTIVE or not item.is_published) and not (is_owner or is_staff):
         raise Http404("Resource item not found.")
+
+    # Check if item is blocked by the owner for booking
+    is_blocked_by_owner = ItemAvailabilityBlock.objects.filter(
+        item=item,
+        reason__in=[
+            ItemAvailabilityBlock.REASON_OWNER_UNAVAILABLE,
+            ItemAvailabilityBlock.REASON_MAINTENANCE
+        ],
+        end_date__gt=today
+    ).exists()
+    if is_blocked_by_owner and not (is_owner or is_staff):
+        raise Http404("Resource item is currently blocked from booking by owner.")
 
     # Wishlist status for the requesting student
     is_wishlisted = False
@@ -169,13 +201,24 @@ def get_item_detail(user, item_id: str) -> dict:
     # Immediate availability flag
     currently_available = is_item_available(item)
 
-    # Related items in same category from this college (excluding this item)
-    related_items = Item.objects.filter(
+    # Related items in same category from this college (excluding this item, user's own items, and owner-blocked items)
+    owner_blocked_item_ids = ItemAvailabilityBlock.objects.filter(
+        reason__in=[
+            ItemAvailabilityBlock.REASON_OWNER_UNAVAILABLE,
+            ItemAvailabilityBlock.REASON_MAINTENANCE
+        ],
+        end_date__gt=today
+    ).values_list('item_id', flat=True)
+
+    related_qs = Item.objects.filter(
         category=item.category,
         owner__college_id=item.owner.college_id,
         status=Item.STATUS_ACTIVE,
         is_published=True
-    ).exclude(id=item.id).select_related('owner', 'category')[:4]
+    ).exclude(id=item.id).exclude(id__in=owner_blocked_item_ids)
+    if user and user.is_authenticated:
+        related_qs = related_qs.exclude(owner_id=user.id)
+    related_items = related_qs.select_related('owner', 'category')[:4]
 
     return {
         "item": item,

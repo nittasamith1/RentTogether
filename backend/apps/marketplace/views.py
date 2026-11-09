@@ -18,6 +18,7 @@ from apps.marketplace.services.marketplace_service import (
 from apps.marketplace.services.wishlist_service import (
     add_to_wishlist,
     remove_from_wishlist,
+    clear_user_wishlist,
     get_user_wishlist_items,
 )
 from apps.marketplace.services.popularity_service import get_popular_items
@@ -119,13 +120,35 @@ class WishlistListView(generics.ListAPIView):
     """
     GET /api/v1/marketplace/wishlist/
     Returns paginated items saved by the authenticated student.
+    Supports ?search= query parameter.
     """
     permission_classes = [IsVerifiedStudent]
     serializer_class = MarketplaceItemSummarySerializer
     pagination_class = MarketplacePagination
 
     def get_queryset(self):
-        return get_user_wishlist_items(self.request.user)
+        search = self.request.query_params.get('search')
+        return get_user_wishlist_items(self.request.user, search=search)
+
+
+class ClearWishlistView(views.APIView):
+    """
+    DELETE /api/v1/marketplace/wishlist/clear/
+    Permanently clears all saved wishlist entries for the authenticated student,
+    freeing database storage.
+    """
+    permission_classes = [IsVerifiedStudent]
+
+    def delete(self, request):
+        deleted_count = clear_user_wishlist(request.user)
+        return Response({
+            "detail": f"Successfully cleared {deleted_count} item(s) from wishlist history. Database storage reclaimed.",
+            "deleted_count": deleted_count
+        }, status=status.HTTP_200_OK)
+
+    def post(self, request):
+        return self.delete(request)
+
 
 
 class PopularItemsView(views.APIView):

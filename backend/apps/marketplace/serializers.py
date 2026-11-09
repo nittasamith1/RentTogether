@@ -28,10 +28,26 @@ class CategorySerializer(serializers.ModelSerializer):
     def get_eligible_item_count(self, obj) -> int:
         request = self.context.get('request')
         if request and request.user and request.user.is_authenticated and request.user.college_id:
+            from django.utils import timezone
+            from apps.availability.models import ItemAvailabilityBlock
+
+            today = timezone.now().date()
+            owner_blocked_item_ids = ItemAvailabilityBlock.objects.filter(
+                reason__in=[
+                    ItemAvailabilityBlock.REASON_OWNER_UNAVAILABLE,
+                    ItemAvailabilityBlock.REASON_MAINTENANCE
+                ],
+                end_date__gt=today
+            ).values_list('item_id', flat=True)
+
             return obj.items.filter(
                 owner__college_id=request.user.college_id,
                 status=Item.STATUS_ACTIVE,
                 is_published=True
+            ).exclude(
+                owner_id=request.user.id
+            ).exclude(
+                id__in=owner_blocked_item_ids
             ).count()
         return 0
 
@@ -87,6 +103,7 @@ class MarketplaceItemSummarySerializer(serializers.ModelSerializer):
     completed_rental_count = serializers.SerializerMethodField()
     is_wishlisted = serializers.SerializerMethodField()
     owner = serializers.SerializerMethodField()
+    hourly_rental_price = serializers.SerializerMethodField()
 
     class Meta:
         model = Item
@@ -102,6 +119,7 @@ class MarketplaceItemSummarySerializer(serializers.ModelSerializer):
             'brand',
             'model_name',
             'daily_rental_price',
+            'hourly_rental_price',
             'security_deposit',
             'availability_status',
             'completed_rental_count',
@@ -110,6 +128,13 @@ class MarketplaceItemSummarySerializer(serializers.ModelSerializer):
             'owner',
             'created_at',
         ]
+
+    def get_hourly_rental_price(self, obj) -> str:
+        from decimal import Decimal
+        daily = obj.rental_price_per_day
+        if daily:
+            return str((Decimal(str(daily)) / Decimal('24')).quantize(Decimal('0.01')))
+        return "0.00"
 
     def get_short_description(self, obj) -> str:
         desc = obj.description or ''

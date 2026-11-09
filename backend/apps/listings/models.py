@@ -202,15 +202,19 @@ class Item(models.Model):
 
     def save(self, *args, **kwargs):
         # Sync dual price fields
-        if self.rental_price_per_day:
+        if self.daily_rental_price and (not self.rental_price_per_day or self.rental_price_per_day == Decimal('10.00')) and self.daily_rental_price != Decimal('10.00'):
+            self.rental_price_per_day = self.daily_rental_price
+        elif self.rental_price_per_day and (not self.daily_rental_price or self.daily_rental_price == Decimal('10.00')) and self.rental_price_per_day != Decimal('10.00'):
+            self.daily_rental_price = self.rental_price_per_day
+        elif self.rental_price_per_day:
             self.daily_rental_price = self.rental_price_per_day
         elif self.daily_rental_price:
             self.rental_price_per_day = self.daily_rental_price
 
-        if self.original_price:
-            self.original_purchase_price = self.original_price
-        elif self.original_purchase_price:
+        if self.original_purchase_price and (not self.original_price or self.original_price == Decimal('0.00')):
             self.original_price = self.original_purchase_price
+        elif self.original_price:
+            self.original_purchase_price = self.original_price
 
         # Sync pickup locations list
         if self.pickup_location and (not self.pickup_locations or self.pickup_location not in self.pickup_locations):
@@ -220,10 +224,11 @@ class Item(models.Model):
 
         # Sync published status
         if self.status == self.STATUS_ACTIVE:
-            self.is_published = True
-            if not self.published_at:
+            if self.is_published is None:
+                self.is_published = True
+            if self.is_published and not self.published_at:
                 self.published_at = timezone.now()
-        else:
+        elif self.status in [self.STATUS_PAUSED, self.STATUS_REMOVED]:
             self.is_published = False
 
         if self.status == self.STATUS_REMOVED and not self.removed_at:

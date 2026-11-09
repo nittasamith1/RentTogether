@@ -1,3 +1,898 @@
+RentTogether — System Architecture
+Brand: RentTogether
+Tagline: Share Smart. Save More. Live Better.
+Product: AI-Powered Campus Resource Sharing Platform.
+
+Scope: Version 1 — Single-College Platform
+RentTogether will initially be developed as a single-college resource-sharing platform:
+- Registration restricted strictly to students belonging to the selected college.
+- Mandatory college identity verification (institutional email domain & student ID).
+- All resource listings, searches, bookings, and transactions remain strictly intra-campus.
+- AI engines (price prediction, fraud detection, demand forecasting) analyze campus-specific rental patterns, semester schedules, and academic events.
+- Platform administration and dispute resolution managed by college-specific administrators.
+
+I recommend a modular monolithic architecture with an independent ML layer.
+
+This gives you a clean, scalable architecture without introducing unnecessary microservices.
+1. High-Level System Architecture
+                 COLLEGE STUDENTS / CAMPUS ADMIN
+                        |
+                        v
+              REACT + TYPESCRIPT
+                  FRONTEND
+                        |
+                        v
+                 DJANGO REST API
+                        |
+          +-------------+-------------+
+          |             |             |
+          v             v             v
+      AUTH &         MARKETPLACE    RENTAL &
+     PROFILES        MANAGEMENT     BOOKINGS
+          |             |             |
+          +-------------+-------------+
+                        |
+          +-------------+-------------+
+          |             |             |
+          v             v             v
+       PAYMENTS      NOTIFICATIONS   REVIEWS
+          |             |             |
+          +-------------+-------------+
+                        |
+                        v
+                 DJANGO SERVICES
+                        |
+          +-------------+-------------+
+          |             |             |
+          v             v             v
+      PostgreSQL     Redis          Celery
+       (Neon)        Cache        Background Jobs
+          |
+          |
+          v
+                AI / ML ENGINE
+          +-------------+-------------+
+          |             |             |
+          v             v             v
+      FAIR PRICE      FRAUD         DEMAND
+     PREDICTION     DETECTION     FORECASTING
+          |             |             |
+          +-------------+-------------+
+                        |
+                        v
+                ML PREDICTION
+                   SERVICES
+                        |
+                        v
+                 DJANGO REST API
+                        |
+                        v
+                 REACT FRONTEND
+
+2. Frontend Architecture
+Technology: React.js + TypeScript + Tailwind CSS.
+
+Organize the frontend into these sections:
+frontend/
+│
+├── src/
+│   ├── assets/
+│   │
+│   ├── components/
+│   │   ├── common/
+│   │   ├── navbar/
+│   │   ├── sidebar/
+│   │   ├── cards/
+│   │   └── charts/
+│   │
+│   ├── pages/
+│   │   ├── auth/
+│   │   ├── dashboard/
+│   │   ├── marketplace/
+│   │   ├── listings/
+│   │   ├── bookings/
+│   │   ├── payments/
+│   │   ├── analytics/
+│   │   └── admin/
+│   │
+│   ├── services/
+│   │   ├── api.ts
+│   │   ├── auth.ts
+│   │   ├── marketplace.ts
+│   │   ├── bookings.ts
+│   │   └── payments.ts
+│   │
+│   ├── hooks/
+│   ├── context/
+│   ├── types/
+│   ├── utils/
+│   └── App.tsx
+│
+└── package.json
+
+Important frontend behaviour
+Every student gets one dashboard and one account.
+
+The dashboard contains:
+- My Rentals — resources borrowed.
+- My Listings — resources shared.
+- My Bookings — incoming and outgoing requests.
+- My Earnings — rental income.
+- My Spending — rental expenses.
+- AI Recommendations.
+- Sustainability Insights.
+No separate owner or renter login.
+3. Backend Architecture
+Technology: Python + Django + Django REST Framework.
+
+Use a modular Django application structure.
+backend/
+│
+├── config/
+│   ├── settings.py
+│   ├── urls.py
+│   ├── asgi.py
+│   └── wsgi.py
+│
+├── apps/
+│   │
+│   ├── accounts/
+│   │   ├── models.py
+│   │   ├── serializers.py
+│   │   ├── views.py
+│   │   └── urls.py
+│   │
+│   ├── profiles/
+│   ├── marketplace/
+│   ├── listings/
+│   ├── bookings/
+│   ├── availability/
+│   ├── payments/
+│   ├── reviews/
+│   ├── notifications/
+│   ├── recommendations/
+│   ├── sustainability/
+│   ├── fraud_management/
+│   └── administration/
+│
+├── ml_engine/
+│   ├── pricing/
+│   ├── fraud_detection/
+│   ├── demand_prediction/
+│   └── recommendations/
+│
+├── services/
+├── permissions/
+├── utils/
+├── tests/
+├── manage.py
+└── requirements.txt
+
+Backend responsibilities
+Module	Responsibility
+Accounts	Registration, login, JWT
+Profiles	Student information
+Marketplace	Search and discover resources
+Listings	Item creation and management
+Bookings	Rental lifecycle
+Availability	Calendar and conflict detection
+Payments	Transactions and refunds
+Reviews	Ratings and feedback
+Notifications	Email and in-app alerts
+Recommendations	Personalized suggestions
+Sustainability	Impact calculations
+Fraud Management	Risk analysis and alerts
+Administration	Platform management
+
+
+4. AI/ML Architecture
+This is one of the most important parts of RentTogether.
+
+Use Python, Pandas, NumPy, Scikit-learn and XGBoost.
+
+Build three independent ML engines.
+A. Fair Price Prediction
+Item Details
+     |
+     v
+Feature Engineering
+     |
+     v
+Trained ML Model
+     |
+     v
+Predicted Rental Price
+     |
+     v
+Django API
+     |
+     v
+Owner Dashboard
+
+Input:
+- Category
+- Original price
+- Item age
+- Condition
+- Demand
+- Historical rental prices
+Output:
+- Recommended rental price.
+- Suggested price range.
+B. Fraud Risk Detection
+User + Listing + Booking Activity
+                |
+                v
+         Feature Extraction
+                |
+                v
+         Fraud Detection Model
+                |
+                v
+           Risk Score
+                |
+                v
+          Django Backend
+                |
+                v
+          Admin Dashboard
+
+Use Isolation Forest initially. Introduce supervised classification when labelled fraud data becomes available.
+C. Demand Prediction
+Historical Booking Data
+          |
+          v
+    Data Processing
+          |
+          v
+    Feature Engineering
+          |
+          v
+      ML Model
+          |
+          v
+   Future Demand Forecast
+          |
+          v
+    Owner Dashboard
+
+Output:
+- Weekly demand.
+- Monthly demand.
+- High-demand categories.
+- Upcoming demand trends.
+Important: Train models separately from the live application. Save trained artifacts and load them through reusable prediction services.
+5. Database Architecture
+Database: Neon PostgreSQL
+ORM: Django ORM
+
+Recommended database tables:
+Table	Purpose
+College	Active college tenant entity (defines domain whitelist & campus rules)
+User	Student account (strictly linked to the college)
+StudentProfile	Student details, department, roll number, ID verification
+Category	Resource categories
+Item	Listed resources
+ItemImage	Item images
+Availability	Available rental periods
+Booking	Rental transactions
+Payment	Payment records
+Deposit	Security deposits
+Review	Ratings and reviews
+Wishlist	Saved items
+Notification	User notifications
+Report	Reported listings/users
+FraudAlert	AI-generated risk alerts
+Dispute	Rental disputes
+Transaction	Financial activity
+
+
+Most important database relationship
+One user can be an owner and renter.
+                  USER
+                   |
+          +--------+--------+
+          |                 |
+          v                 v
+       LISTINGS           BOOKINGS
+          |                 |
+          v                 v
+        ITEM          OWNER_ID
+                            |
+                         RENTER_ID
+                            |
+                            v
+                           USER
+
+In the Booking table:
+- owner_id references User.
+- renter_id references User.
+- item_id references Item.
+Both users are normal student accounts. The roles are determined by their activity in a particular transaction.
+6. Supporting Infrastructure
+Component	Technology	Purpose
+Database	Neon PostgreSQL	Persistent application data
+Cache	Redis	Frequently accessed data
+Background jobs	Celery	Reminders and scheduled tasks
+Image storage	Cloudinary	Item and profile images
+Authentication	SimpleJWT	Secure API authentication
+Payments	Razorpay	Rental payments
+ML	Scikit-learn/XGBoost	AI predictions
+Deployment	Docker	Application containerization
+Version control	GitHub	Source code management
+
+
+7. Complete Request Flow
+Example: A student wants to rent a scientific calculator within their campus.
+1. Student logs in (verified institutional credentials)
+2. Marketplace queries return items exclusively listed by students of the same college
+       |
+2. React sends request to Django API
+       |
+3. Django verifies JWT
+       |
+4. Marketplace returns calculator details
+       |
+5. Student selects rental dates
+       |
+6. Django checks availability
+       |
+7. Django calculates rental price
+       |
+8. Student sends booking request
+       |
+9. Owner receives notification
+       |
+10. Owner approves request
+       |
+11. Payment is processed
+       |
+12. Booking is confirmed
+       |
+13. Student collects calculator
+       |
+14. Rental is completed
+       |
+15. Return is verified
+       |
+16. Both students can submit reviews
+
+All operations happen through the same student account system.
+8. Deployment Architecture
+For your initial deployment, keep it simple.
+Component	Hosting
+React frontend	Vercel
+Django backend	Render or another suitable cloud host
+PostgreSQL	Neon
+Images	Cloudinary
+Redis	Managed Redis provider
+ML models	Packaged with Django initially
+Source code	GitHub
+
+
+You can later separate ML inference into its own service if workload justifies it.
+9. Final Architecture Decisions
+I recommend freezing these decisions:
+Layer	Final Choice
+Architecture	Modular Monolith (Single-College Scoped, Multi-Tenancy Ready)
+Frontend	React + TypeScript
+Backend	Django + DRF
+Database	Neon PostgreSQL
+ORM	Django ORM
+Authentication	JWT
+ML Framework	Scikit-learn + XGBoost
+AI Integration	Django ML Services
+Background Jobs	Celery + Redis
+Storage	Cloudinary
+Payment	Razorpay
+Deployment	Docker + Cloud
+
+
+Why Modular Monolith?
+Because RentTogether is initially a student marketplace, not a massive enterprise platform.
+
+A modular monolith gives you:
+- Easier development.
+- Simpler deployment.
+- Centralized authentication.
+- Consistent database transactions.
+- Easier testing.
+- Clear separation between modules.
+
+RentTogether — Complete Modules & Functionalities
+Brand: RentTogether
+Tagline: Share Smart. Save More. Live Better.
+Product Identity: AI-Powered Campus Resource Sharing Platform.
+
+Scope: Version 1 — Single-College Platform
+RentTogether will initially be developed as a single-college resource-sharing platform:
+- Only students belonging to the selected college can register and access the platform.
+- Students must verify their college identity (institutional college email verification and student ID validation).
+- Students can list unused resources for rent within their college.
+- Students can rent resources listed exclusively by other students from the same college.
+- All rental activities, bookings, physical handovers, and transactions remain strictly within the college community.
+- AI features (fair pricing, fraud risk detection, demand forecasting) will analyze rental activity and resource demand specific to that college.
+- College-specific administrators can monitor campus users, listings, disputes, and platform activities.
+
+Overview
+RentTogether is an AI-powered campus resource-sharing platform designed to help college students save money by renting and sharing educational resources, electronics, project equipment, and daily-use items within their college community.
+
+Students often purchase expensive resources such as calculators, books, laptops, cameras, and laboratory kits that they only need for a short period. Instead of purchasing these items individually, RentTogether provides a platform where students can rent available resources from other students at affordable prices.
+
+Each student has one account that supports both renting and lending. A student can list their own resources for rent while simultaneously renting items from others.
+
+The platform uses Artificial Intelligence and Machine Learning to recommend fair rental prices, identify suspicious activities, predict resource demand, and provide personalized recommendations.
+
+RentTogether aims to create a trusted, affordable, and sustainable campus ecosystem where students save money, earn from unused resources, and reduce unnecessary purchases through resource sharing.
+Core Vision
+To make campus resource sharing simple, affordable, intelligent, and accessible to students.
+Expected Impact
+- Reduce students' educational expenses.
+- Help students earn from unused resources.
+- Improve resource accessibility.
+- Encourage reuse instead of unnecessary purchases.
+- Build a trusted student-sharing community.
+- Use AI to make rental decisions smarter.
+In one line: RentTogether connects students who have resources with students who need them, making campus life more affordable through intelligent resource sharing.
+
+1. Core Platform Concept
+One student account can perform two activities simultaneously:
+- Owner: List personal resources and rent them to other students.
+- Renter: Discover and rent resources from other students.
+A student does not need separate accounts or separate registrations.
+                  STUDENT ACCOUNT
+                         |
+             +-----------+-----------+
+             |                       |
+             v                       v
+          OWNER                   RENTER
+             |                       |
+        List Items               Browse Items
+        Manage Listings          Request Rentals
+        Accept Bookings          Make Payments
+        Track Earnings           Track Rentals
+             |                       |
+             +-----------+-----------+
+                         |
+                  SAME ACCOUNT
+
+The platform also has a separate Admin role.
+2. Main Modules and Functionalities
+I recommend 13 main modules.
+Module 1: Authentication & Student Verification
+Purpose: Build a trusted single-college campus community.
+
+Functionalities:
+- Single-college restricted registration (validates institutional email domain, e.g., @college.edu).
+- Student registration & login/logout.
+- College identity verification (student roll number, institutional ID card upload & review).
+- Student login/logout.
+- College email verification.
+- OTP verification.
+- JWT authentication.
+- Forgot/reset password.
+- Student profile creation.
+- Profile picture upload.
+- College, department and year selection.
+- Password change.
+- Account management.
+- Role-based access control.
+- Admin authentication.
+Module 2: Student Profile Management
+Purpose: Manage student information and rental identity.
+
+Functionalities:
+- View/edit profile.
+- Add student information.
+- View rental history.
+- View lending history.
+- View ratings and reviews.
+- View owner reputation.
+- View renter reputation.
+- Manage contact information.
+- Manage notification preferences.
+- View account activity.
+Important: Each student has one profile but can have both owner and renter activities.
+Module 3: Resource Marketplace
+Purpose: Discover available resources across the designated college campus.
+
+Functionalities:
+- Browse all resources within the college (strictly intra-college catalog).
+- Filter by department, block, and campus pickup locations.
+- Search by item name.
+- Filter by category.
+- Filter by rental price.
+- Filter by condition.
+- Filter by availability.
+- Sort by price.
+- Sort by popularity.
+- Sort by newest listings.
+- View item details.
+- View item images.
+- View owner profile.
+- View ratings.
+- Add to wishlist.
+- Recently viewed items.
+- Report suspicious listings.
+Categories:
+Category	Examples
+Academic	Books, calculators, notes
+Electronics	Laptops, cameras, headphones
+Laboratory	Lab kits, instruments
+Project	Arduino, Raspberry Pi, sensors
+Daily Use	Cycles, bags, sports equipment
+Creative	Drawing tools, microphones
+
+
+Module 4: Item Listing & Inventory Management
+Purpose: Allow students to rent out their unused resources.
+
+Functionalities:
+- Create item listing.
+- Upload multiple images.
+- Add item name and description.
+- Select category.
+- Enter original purchase price.
+- Enter item age.
+- Select item condition.
+- Set rental price.
+- Set refundable deposit.
+- Set minimum/maximum rental duration.
+- Set availability.
+- Edit listings.
+- Delete listings.
+- Pause/resume listings.
+- View listing performance.
+- Track rental count.
+Module 5: Rental & Booking Management
+Purpose: Handle the complete rental process.
+
+Functionalities:
+- Request item rental.
+- Select start date.
+- Select end date.
+- Calculate rental charges.
+- Calculate security deposit.
+- Send booking request.
+- Accept/reject booking requests.
+- Confirm bookings.
+- Cancel bookings.
+- Request rental extensions.
+- Track active rentals.
+- Track upcoming returns.
+- Manage overdue rentals.
+- On-campus handover at designated safe campus spots (Library, Canteen, Hostels).
+- Confirm item pickup.
+- Confirm item return.
+- View booking history.
+Booking workflow:
+Student selects item
+        |
+        v
+Select rental dates
+        |
+        v
+Check availability
+        |
+        v
+Send rental request
+        |
+        v
+Owner approval
+        |
+        v
+Payment confirmation
+        |
+        v
+Booking confirmed
+        |
+        v
+Item pickup
+        |
+        v
+Rental active
+        |
+        v
+Return verification
+        |
+        v
+Booking completed
+
+Module 6: AI Fair Price Prediction
+Purpose: Recommend fair rental prices using ML.
+
+Input features:
+- Item category.
+- Original price.
+- Item age.
+- Item condition.
+- Historical rental prices.
+- Demand level.
+- Availability.
+- Rental duration.
+Functionalities:
+- Predict recommended rental price.
+- Generate suggested price range.
+- Compare owner price with predicted price.
+- Display pricing factors.
+- Detect unusual pricing.
+ML models:
+- Linear Regression.
+- Random Forest Regressor.
+- XGBoost Regressor.
+Example:
+AI PRICE RECOMMENDATION
+
+Item: Scientific Calculator
+
+Predicted Price: ₹25/day
+Suggested Range: ₹20–₹30/day
+
+Demand: High
+Price Status: Fair
+
+Module 7: AI Fraud Risk Detection
+Purpose: Identify suspicious users, listings and rental activities.
+
+Functionalities:
+- Duplicate listing detection.
+- Unusual price detection.
+- Suspicious booking pattern detection.
+- Repeated cancellation analysis.
+- User report analysis.
+- Anomaly detection.
+- Risk score generation.
+- Fraud alert generation.
+- Admin review queue.
+- Fraud investigation history.
+ML techniques:
+- Isolation Forest.
+- Random Forest.
+- XGBoost (when labelled data is available).
+Example:
+FRAUD RISK ANALYSIS
+
+Risk Score: 82/100
+Risk Level: High
+
+Signals:
+- Duplicate listing pattern
+- Unusual rental pricing
+- Multiple user reports
+
+Action: Admin review
+
+AI flags suspicious activity; admins make the final decision.
+Module 8: AI Demand Prediction
+Purpose: Predict future demand for campus resources.
+
+Functionalities:
+- Predict resource demand.
+- Identify high-demand categories.
+- Generate weekly forecasts.
+- Generate monthly forecasts.
+- Analyze historical rental patterns.
+- Identify seasonal demand.
+- College academic calendar integration (midterms, semester finals, lab evaluations).
+- Analyze examination-period demand.
+- Analyze project submission and campus tech fest demand.
+- Display demand trends.
+ML models:
+- Random Forest.
+- XGBoost.
+- Time-series forecasting models.
+Example:
+Resource	Predicted Demand
+Calculators	High
+Lab Equipment	Very High
+Project Kits	High
+Cameras	Medium
+
+
+Module 9: AI Recommendation Engine
+Purpose: Recommend useful and relevant resources to students.
+
+Functionalities:
+- Personalized recommendations.
+- Similar item recommendations.
+- Category-based recommendations.
+- Budget-based recommendations.
+- Recently popular items.
+- Frequently rented items.
+- Complementary item recommendations.
+- Search-history-based recommendations.
+- Rental-history-based recommendations.
+Example:
+
+A student rents an Arduino kit.
+
+Recommend:
+- Sensors.
+- Breadboards.
+- Jumper wires.
+- Electronic components.
+Start with content-based filtering and expand later.
+Module 10: Smart Calendar & Notifications
+Purpose: Manage rental schedules and avoid booking conflicts.
+
+Functionalities:
+- Interactive rental calendar.
+- Item availability calendar.
+- Automatic conflict detection.
+- Rental extension requests.
+- Due-date reminders.
+- Overdue notifications.
+- Booking approval notifications.
+- Payment notifications.
+- Return reminders.
+- Waiting list.
+- Email notifications.
+- In-app notifications.
+Module 11: Payment & Transaction Management
+Purpose: Manage rental payments and financial records.
+
+Functionalities:
+- Calculate rental charges.
+- Security deposit collection.
+- Payment gateway integration.
+- Payment confirmation.
+- Payment history.
+- Transaction tracking.
+- Refund management.
+- Owner earnings tracking.
+- Renter spending tracking.
+- Platform commission.
+- Payment receipts.
+- Failed payment handling.
+Use Razorpay test mode initially.
+Module 12: Sustainability & Analytics
+Purpose: Measure the economic and environmental impact of resource sharing.
+
+Student analytics:
+- Total money saved.
+- Total items rented.
+- Resources reused.
+- Active rentals.
+Owner analytics:
+- Total earnings.
+- Total bookings.
+- Most popular items.
+- Item utilization.
+- Rental performance.
+Platform analytics:
+- Total registered students.
+- Total listings.
+- Total successful rentals.
+- Total resources reused.
+- Estimated money saved.
+- Estimated waste avoided.
+Module 13: Admin & Platform Management
+Purpose: Manage the single-college RentTogether campus platform.
+
+Functionalities:
+- College-specific admin dashboard.
+- Verify student college identities and department credentials.
+- Manage student accounts.
+- Verify student accounts.
+- Manage item categories.
+- Monitor listings.
+- Review reported listings.
+- Monitor fraud alerts.
+- Review suspicious accounts.
+- Manage disputes.
+- Manage payment issues.
+- Manage refunds.
+- Suspend accounts when justified.
+- View platform analytics.
+- Monitor platform activity.
+3. Three Dashboard Interfaces
+Although students use one account, provide separate dashboard sections based on their activities.
+A. Student Dashboard
+The default landing dashboard.
+Section	Functionalities
+Overview	Personal activity summary
+Explore	Browse resources
+My Rentals	Items borrowed
+My Listings	Items being rented out
+My Bookings	Incoming and outgoing requests
+Wishlist	Saved items
+AI Recommendations	Suggested resources
+Transactions	Spending and earnings
+Notifications	Updates and reminders
+Profile	Account management
+
+
+B. Owner Dashboard
+Accessible through the same student account.
+Section	Functionalities
+Overview	Owner statistics
+My Listings	Manage resources
+Rental Requests	Accept/reject requests
+Active Rentals	Track rented items
+Availability	Manage calendar
+AI Pricing	Price recommendations
+Demand Insights	Demand forecasts
+Earnings	Rental income
+Reviews	Owner ratings
+
+
+C. Admin Dashboard
+Section	Functionalities
+Overview	Platform statistics
+Students	Account management
+Listings	Listing moderation
+Bookings	Booking monitoring
+Fraud Detection	AI risk alerts
+Disputes	Complaint management
+Payments	Transaction monitoring
+Analytics	Platform performance
+Settings	Platform configuration
+
+
+4. Additional Premium Features
+These can make RentTogether more distinctive.
+Feature	Functionality
+QR-Based Handover	Verify item pickup and return
+Digital Rental Agreement	Generate agreements for bookings
+Group Rentals	Allow students to share rental expenses
+Smart Price Comparison	Compare similar listings
+Owner Reputation	Build trust using rental history
+Dispute Management	Handle damaged/missing items
+Waiting List	Notify students when items become available
+Intra-Campus Search	Discover resources across college departments & blocks (Multi-college search reserved for V2)
+
+
+5. Final Technology Stack
+Layer	Technology
+Frontend	React.js + TypeScript
+UI	Tailwind CSS
+Backend	Django
+REST API	Django REST Framework
+Database	Neon PostgreSQL
+ORM	Django ORM
+Authentication	JWT + SimpleJWT
+ML	Scikit-learn + XGBoost
+Data Processing	Pandas + NumPy
+Explainability	SHAP
+Background Tasks	Celery
+Cache	Redis
+Image Storage	Cloudinary
+Payments	Razorpay
+Deployment	Docker + Cloud
+
+
+6. Recommended Development Priority
+Don't build all modules simultaneously.
+Phase	Modules
+1	Authentication + Student Profiles
+2	Marketplace + Item Listings
+3	Rental + Booking Management
+4	Calendar + Notifications
+5	Payment + Transactions
+6	AI Fair Price Prediction
+7	AI Fraud Detection
+8	AI Demand Prediction
+9	Recommendation Engine
+10	Sustainability + Analytics
+11	Admin Management
+12	QR Handover + Digital Agreements
+13	Testing + Security + Deployment
+
+
+7. Final Project Scope (Version 1: Single-College Focus)
+Your project should deliver for Version 1:
+1. A complete single-college campus rental marketplace (100% intra-college).
+2. Institutional email & ID verification ensuring only campus students participate.
+2. One student account supporting both owner and renter activities.
+3. Secure rental booking and payment management.
+4. AI-powered fair price prediction.
+5. AI-based fraud risk detection.
+6. AI-based demand forecasting.
+7. Personalized resource recommendations.
+8. Smart scheduling and notifications.
+9. Sustainability analytics.
+10. Admin and platform management.
+
 ================================================================================
                     RENTTOGETHER — MASTER DEVELOPMENT PHASES
            AI-Powered Campus Resource Sharing Platform (Version 1)

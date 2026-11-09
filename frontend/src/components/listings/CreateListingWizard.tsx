@@ -40,7 +40,7 @@ export const CreateListingWizard: React.FC<CreateListingWizardProps> = ({
   const [images, setImages] = useState<File[]>([]);
 
   const [rentalPrice, setRentalPrice] = useState<string>('35');
-  const [securityDeposit, setSecurityDeposit] = useState<string>('150');
+  const securityDeposit = '0';
   const [minRentalDays, setMinRentalDays] = useState<string>('1');
   const [maxRentalDays, setMaxRentalDays] = useState<string>('30');
 
@@ -259,12 +259,12 @@ export const CreateListingWizard: React.FC<CreateListingWizardProps> = ({
         </div>
 
         {/* Stepper Pills */}
-        <div className="grid grid-cols-5 gap-2 pt-6 text-center text-[11px] font-semibold">
+        <div className="grid grid-cols-5 gap-1.5 sm:gap-2 pt-6 text-center text-[10px] sm:text-[11px] font-semibold">
           {[
             { step: 1, label: 'Basics' },
             { step: 2, label: 'Condition' },
             { step: 3, label: 'Photos' },
-            { step: 4, label: 'AI Pricing' },
+            { step: 4, label: 'Pricing' },
             { step: 5, label: 'Handover' },
           ].map((s) => (
             <button
@@ -272,7 +272,7 @@ export const CreateListingWizard: React.FC<CreateListingWizardProps> = ({
               type="button"
               disabled={s.step > currentStep}
               onClick={() => setCurrentStep(s.step)}
-              className={`py-1.5 rounded-xl transition-all cursor-pointer ${
+              className={`py-1.5 px-1 rounded-xl transition-all cursor-pointer truncate ${
                 currentStep === s.step
                   ? 'bg-white font-bold shadow-xs'
                   : currentStep > s.step
@@ -662,29 +662,27 @@ export const CreateListingWizard: React.FC<CreateListingWizardProps> = ({
                     }}
                   />
                 </div>
+                <p className="text-[11px] mt-1.5 flex items-center gap-1 font-semibold" style={{ color: '#7563D9' }}>
+                  <span>Hourly Rate:</span>
+                  <span className="font-bold">
+                    ₹{((parseFloat(rentalPrice) || 0) / 24).toFixed(2)}/hr
+                  </span>
+                  <span className="text-[10px] font-normal" style={{ color: '#85899B' }}>
+                    (automatically ₹{rentalPrice || 0} ÷ 24)
+                  </span>
+                </p>
               </div>
 
               <div>
                 <label className="block text-xs font-bold uppercase tracking-wider mb-1" style={{ color: '#303653' }}>
-                  Refundable Security Deposit (₹) *
+                  Security Deposit Policy
                 </label>
-                <div className="relative">
-                  <span className="absolute left-3.5 top-2.5 font-bold text-sm" style={{ color: '#85899B' }}>
-                    ₹
-                  </span>
-                  <input
-                    type="number"
-                    min="0"
-                    required
-                    value={securityDeposit}
-                    onChange={(e) => setSecurityDeposit(e.target.value)}
-                    className="w-full pl-8 pr-4 py-2.5 rounded-xl text-sm focus:outline-hidden"
-                    style={{
-                      backgroundColor: '#FFF8ED',
-                      border: '1px solid #EAE6E1',
-                      color: '#303653',
-                    }}
-                  />
+                <div
+                  className="p-2.5 rounded-xl text-xs font-semibold border flex items-center justify-between"
+                  style={{ backgroundColor: '#DDF3E7', borderColor: '#B8E5CC', color: '#2D7A5B' }}
+                >
+                  <span>Zero Deposit Campus Sharing</span>
+                  <span className="font-bold">₹0.00</span>
                 </div>
               </div>
             </div>
@@ -805,7 +803,7 @@ export const CreateListingWizard: React.FC<CreateListingWizardProps> = ({
                   <h5 className="text-sm font-bold truncate" style={{ color: '#303653' }}>{title}</h5>
                   <div className="flex items-center gap-2 mt-1">
                     <span className="text-xs font-extrabold" style={{ color: '#7563D9' }}>
-                      ₹{rentalPrice} / day
+                      ₹{rentalPrice} / day (₹{((parseFloat(rentalPrice) || 0) / 24).toFixed(2)}/hr)
                     </span>
                     <span className="text-xs" style={{ color: '#85899B' }}>·</span>
                     <span className="text-xs" style={{ color: '#85899B' }}>Deposit: ₹{securityDeposit}</span>

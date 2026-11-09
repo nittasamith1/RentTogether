@@ -1,5 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useQueryClient } from '@tanstack/react-query';
 import {
   X,
   Calendar,
@@ -7,9 +9,11 @@ import {
   MapPin,
   AlertCircle,
   Loader2,
+  Star,
 } from 'lucide-react';
 import { useListingRentalHistory } from '../../hooks/useListings';
 import { OwnerListingSummary } from '../../services/listingService';
+import { LeaveReviewModal } from '../common/LeaveReviewModal';
 
 interface RentalHistoryModalProps {
   item: OwnerListingSummary | null;
@@ -17,6 +21,8 @@ interface RentalHistoryModalProps {
 }
 
 export const RentalHistoryModal: React.FC<RentalHistoryModalProps> = ({ item, onClose }) => {
+  const queryClient = useQueryClient();
+  const [reviewingRecord, setReviewingRecord] = useState<any | null>(null);
   const { data, isLoading, isError } = useListingRentalHistory(item ? item.id : null);
 
   if (!item) return null;
@@ -73,16 +79,16 @@ export const RentalHistoryModal: React.FC<RentalHistoryModalProps> = ({ item, on
     }
   };
 
-  return (
+  return createPortal(
     <AnimatePresence>
-      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 overflow-y-auto">
+      <div className="fixed inset-0 z-50 overflow-y-auto bg-[#303653]/60 backdrop-blur-xs p-4 flex min-h-screen items-center justify-center">
         {/* Backdrop */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           onClick={onClose}
-          className="fixed inset-0 bg-[#303653]/60 backdrop-blur-xs"
+          className="fixed inset-0"
         />
 
         {/* Modal Window */}
@@ -90,7 +96,7 @@ export const RentalHistoryModal: React.FC<RentalHistoryModalProps> = ({ item, on
           initial={{ opacity: 0, scale: 0.95, y: 16 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.95, y: 16 }}
-          className="relative w-full max-w-xl rounded-3xl shadow-2xl border overflow-hidden z-10 p-6 sm:p-7 space-y-5"
+          className="relative w-full max-w-xl rounded-3xl shadow-2xl border overflow-hidden z-10 my-auto p-6 sm:p-7 space-y-5"
           style={{ backgroundColor: '#FFFCF7', borderColor: '#EAE6E1' }}
         >
           {/* Header */}
@@ -191,7 +197,28 @@ export const RentalHistoryModal: React.FC<RentalHistoryModalProps> = ({ item, on
                         </span>
                       </div>
                     </div>
-                    {getStatusBadge(rec.status)}
+                    <div className="flex items-center gap-2">
+                      {getStatusBadge(rec.status)}
+                      {rec.status === 'COMPLETED' && (
+                        rec.has_reviewed ? (
+                          <span className="text-[10px] font-bold text-[#42A879] flex items-center gap-1 bg-[#DDF3E7] px-2 py-0.5 rounded-md border border-[#B8E5CC]">
+                            <Star className="w-3 h-3 fill-[#42A879]" />
+                            <span>Reviewed</span>
+                          </span>
+                        ) : (
+                          <button
+                            type="button"
+                            onClick={() => setReviewingRecord(rec)}
+                            className="px-2.5 py-1 rounded-lg text-[10px] font-bold text-white transition-all shadow-2xs flex items-center gap-1 cursor-pointer active:scale-95 hover:opacity-95"
+                            style={{ backgroundColor: '#7563D9' }}
+                            title="Leave feedback for this customer"
+                          >
+                            <Star className="w-3 h-3 fill-[#F5A623] text-[#F5A623]" />
+                            <span>Rate Renter</span>
+                          </button>
+                        )
+                      )}
+                    </div>
                   </div>
 
                   <div className="flex items-center justify-between text-xs pt-1 text-slate-600" style={{ borderTop: '1px solid #EAE6E1' }}>
@@ -234,6 +261,24 @@ export const RentalHistoryModal: React.FC<RentalHistoryModalProps> = ({ item, on
           </div>
         </motion.div>
       </div>
-    </AnimatePresence>
+
+      {/* Review Feedback Modal for Owner reviewing Renter */}
+      {reviewingRecord && (
+        <LeaveReviewModal
+          isOpen={Boolean(reviewingRecord)}
+          onClose={() => setReviewingRecord(null)}
+          bookingId={reviewingRecord.id}
+          bookingReference={reviewingRecord.booking_reference}
+          itemTitle={item.title}
+          partnerName={reviewingRecord.renter_name}
+          defaultReviewType="RENTER"
+          onReviewSubmitted={() => {
+            queryClient.invalidateQueries({ queryKey: ['listing-rental-history', item.id] });
+            setReviewingRecord(null);
+          }}
+        />
+      )}
+    </AnimatePresence>,
+    document.body
   );
 };

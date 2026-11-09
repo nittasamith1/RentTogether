@@ -50,11 +50,14 @@ urlpatterns = [
     # Health Check Endpoint
     path('api/v1/health/', HealthCheckView.as_view(), name='health-check'),
 
-    # Phase 02, 03, 04 & 05 API Endpoints
+    # Phase 02, 03, 04, 05, 06 & 07 API Endpoints
     path('api/v1/auth/', include(auth_patterns)),
     path('api/v1/profiles/', include('apps.profiles.urls')),
     path('api/v1/marketplace/', include('apps.marketplace.urls')),
     path('api/v1/listings/', include('apps.listings.urls')),
+    path('api/v1/availability/', include('apps.availability.urls')),
+    path('api/v1/bookings/', include('apps.bookings.urls')),
+    path('api/v1/notifications/', include('apps.notifications.urls')),
     path('api/v1/colleges/active/', ActiveCollegeView.as_view(), name='college-active'),
     path('api/v1/admin/', include(admin_verification_patterns)),
 ]

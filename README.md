@@ -17,10 +17,11 @@ RentTogether is an AI-powered intra-campus resource sharing and rental platform 
 
 ## 🛠️ Tech Stack
 - **Backend:** Django 5.x + Django REST Framework + SimpleJWT
-- **Frontend:** React 18 + TypeScript + Vite + Tailwind CSS + Framer Motion
-- **Database:** SQLite (local development) / Neon PostgreSQL (production)
-- **Image Storage:** Cloudinary
-- **Environment:** Node.js 18+, Python 3.11+
+- **Frontend:** React 18 + TypeScript + Vite + Tailwind CSS + TanStack Query
+- **Database:** SQLite (local development) / Neon Serverless PostgreSQL (production)
+- **Media & CDN:** Cloudinary / Local Media fallback
+- **Containerization:** Docker + Docker Compose + Nginx (multi-stage production builds)
+- **Environment:** Node.js 20+, Python 3.12+
 
 ---
 
@@ -33,7 +34,7 @@ The project consists of two servers: the **Django backend API** (port `8000`) an
 Open a terminal in the project root:
 
 ```powershell
-# 1. Activate the Python virtual environment
+# 1. Activate Python virtual environment
 .venv\Scripts\activate
 
 # 2. Navigate to backend directory
@@ -42,7 +43,7 @@ cd backend
 # 3. Apply database migrations
 python manage.py migrate
 
-# 4. (Optional) Seed demo users and Aditya University configuration
+# 4. (Optional) Seed demo users, colleges, listings & campus data
 python manage.py seed_phase01
 
 # 5. Start the Django development server
@@ -73,13 +74,27 @@ npm run dev
 
 ---
 
+### 3. Docker Deployment (Single Command)
+
+To run the entire platform with production-grade Nginx and Gunicorn containers:
+
+```bash
+docker compose up --build
+```
+
+- Frontend SPA: **`http://localhost:5173/`** (served via Nginx with HTTP compression & asset caching)
+- Backend API: **`http://localhost:8000/`**
+- Health Check: **`http://localhost:8000/api/v1/health/`**
+
+---
+
 ## 🔑 Demo Credentials (Aditya University)
 
 You can log in manually or click the **1-Click Demo Login** buttons on the Login page:
 
 | Role | Email | Password | Permissions |
 |---|---|---|---|
-| **Verified Student** | `sai.reddy@adityauniversity.in` | `StudentPassword123!` | Dashboard, Marketplace, Rentals, Analytics |
+| **Verified Student** | `sai.reddy@adityauniversity.in` | `StudentPassword123!` | Dashboard, Marketplace, Rentals, Bookings, Analytics |
 | **Campus Admin** | `admin@adityauniversity.in` | `AdminPassword123!` | Student Verification Approval Portal |
 
 ---
@@ -87,18 +102,35 @@ You can log in manually or click the **1-Click Demo Login** buttons on the Login
 ## 🗺️ Key Application Pages
 
 - **Campus Dashboard:** [`http://localhost:5173/`](http://localhost:5173/)
-- **Campus Analytics & CO₂ Impact:** [`http://localhost:5173/insights`](http://localhost:5173/insights)
-- **Student Login:** [`http://localhost:5173/login`](http://localhost:5173/login)
-- **Student Registration:** [`http://localhost:5173/register`](http://localhost:5173/register)
+- **Marketplace & Filters:** [`http://localhost:5173/marketplace`](http://localhost:5173/marketplace)
+- **My Rentals & Return Flow:** [`http://localhost:5173/rentals`](http://localhost:5173/rentals)
+- **My Listed Items:** [`http://localhost:5173/listings`](http://localhost:5173/listings)
+- **Bookings & Availability Calendar:** [`http://localhost:5173/bookings`](http://localhost:5173/bookings)
+- **Offline Cash Payments:** [`http://localhost:5173/payments`](http://localhost:5173/payments)
+- **Campus Analytics & CO₂ Impact:** [`http://localhost:5173/analytics`](http://localhost:5173/analytics)
+- **Student Profile & Reviews:** [`http://localhost:5173/profile`](http://localhost:5173/profile)
 - **Admin Verification Portal:** [`http://localhost:5173/admin/verifications`](http://localhost:5173/admin/verifications)
 - **Django Admin Panel:** [`http://localhost:8000/admin/`](http://localhost:8000/admin/)
 
 ---
 
-## 🧪 Automated Test Suite
+## 🧪 Comprehensive Automated Test Suite
 
-To verify backend authentication and permission rules:
+Run full backend test coverage:
 
 ```powershell
-.venv\Scripts\python.exe backend/manage.py test apps.accounts
+# Run Availability & Calendar Tests
+.venv\Scripts\python.exe backend/manage.py test apps.availability.tests
+
+# Run Booking Lifecycle & Concurrency Tests
+.venv\Scripts\python.exe backend/manage.py test apps.bookings.tests
+
+# Run Marketplace & Search Tests
+.venv\Scripts\python.exe backend/manage.py test apps.marketplace.tests
+
+# Run Notifications & Wishlist Tests
+.venv\Scripts\python.exe backend/manage.py test apps.notifications.tests
+
+# Run Frontend Typecheck & Production Build
+npm --prefix frontend run build
 ```

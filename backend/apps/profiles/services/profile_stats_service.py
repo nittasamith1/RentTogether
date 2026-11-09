@@ -20,7 +20,7 @@ def calculate_owner_stats(user) -> dict:
 
     agg = completed_bookings.aggregate(
         total_count=Count('id'),
-        total_earnings=Sum('rental_price_inr')
+        total_earnings=Sum('total_rental_fee')
     )
 
     total_lent = agg['total_count'] or 0

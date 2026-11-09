@@ -1,3 +1,4 @@
+from decimal import Decimal
 from django.core.management.base import BaseCommand
 from apps.accounts.models import College, User
 from apps.profiles.models import StudentVerification
@@ -92,8 +93,8 @@ class Command(BaseCommand):
                 profile.roll_number = roll
                 profile.year_of_study = 4
                 profile.bio = "Final year CSE student at Aditya University. Sharing books, Arduino kits, and electronics."
-                profile.total_savings = 2450.00
-                profile.total_earnings = 1800.00
+                profile.total_savings_inr = Decimal("2450.00")
+                profile.total_earnings_inr = Decimal("1800.00")
                 profile.is_verified = True
                 profile.save()
 

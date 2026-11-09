@@ -93,6 +93,7 @@ export interface RentalHistoryRecord {
   deposit_amount_inr: number;
   pickup_spot: string;
   created_at: string;
+  has_reviewed?: boolean;
 }
 
 export interface ItemRentalHistoryResponse {
