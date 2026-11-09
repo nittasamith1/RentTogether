@@ -153,14 +153,12 @@ export const ItemCard = React.memo<ItemCardProps>(({ item, onSelect }) => {
                 ₹{hourlyPrice.toFixed(0)}/hr
               </span>
             </div>
-            {parseFloat(String(item.security_deposit)) > 0 && (
-              <span
-                className="text-[11px] px-2 py-0.5 rounded-md font-medium border"
-                style={{ backgroundColor: '#FFF8ED', color: '#85899B', borderColor: '#EAE6E1' }}
-              >
-                ₹{parseFloat(String(item.security_deposit))} deposit
-              </span>
-            )}
+            <span
+              className="text-[10px] px-2 py-0.5 rounded-md font-bold border"
+              style={{ backgroundColor: '#DDF3E7', color: '#2D7A5B', borderColor: '#B8E5CC' }}
+            >
+              Zero Deposit
+            </span>
           </div>
 
           {/* Owner info & Pickup */}

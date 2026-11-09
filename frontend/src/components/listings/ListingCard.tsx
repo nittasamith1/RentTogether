@@ -118,8 +118,8 @@ export const ListingCard: React.FC<ListingCardProps> = ({
               </span>
               <span className="text-xs font-normal ml-1" style={{ color: '#85899B' }}>/ day</span>
             </div>
-            <div className="text-right text-[11px] font-medium" style={{ color: '#85899B' }}>
-              Deposit: <span className="font-bold" style={{ color: '#303653' }}>₹{item.security_deposit}</span>
+            <div className="text-right text-[11px] font-semibold" style={{ color: '#2D7A5B' }}>
+              <span>Zero Deposit (₹0)</span>
             </div>
           </div>
 

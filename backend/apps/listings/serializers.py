@@ -74,6 +74,7 @@ class OwnerListingSummarySerializer(serializers.ModelSerializer):
     active_bookings_count = serializers.IntegerField(default=0, read_only=True)
     completed_bookings_count = serializers.IntegerField(default=0, read_only=True)
     hourly_rental_price = serializers.SerializerMethodField()
+    security_deposit = serializers.SerializerMethodField()
 
     class Meta:
         model = Item
@@ -96,6 +97,9 @@ class OwnerListingSummarySerializer(serializers.ModelSerializer):
             'created_at',
         ]
 
+    def get_security_deposit(self, obj) -> str:
+        return "0.00"
+
     def get_hourly_rental_price(self, obj) -> str:
         if obj.rental_price_per_day:
             return str((Decimal(str(obj.rental_price_per_day)) / Decimal('24')).quantize(Decimal('0.01')))
@@ -108,6 +112,7 @@ class OwnerListingDetailSerializer(serializers.ModelSerializer):
     active_bookings_count = serializers.SerializerMethodField()
     completed_bookings_count = serializers.SerializerMethodField()
     hourly_rental_price = serializers.SerializerMethodField()
+    security_deposit = serializers.SerializerMethodField()
 
     class Meta:
         model = Item
@@ -141,6 +146,9 @@ class OwnerListingDetailSerializer(serializers.ModelSerializer):
             'updated_at',
             'images',
         ]
+
+    def get_security_deposit(self, obj) -> str:
+        return "0.00"
 
     def get_hourly_rental_price(self, obj) -> str:
         if obj.rental_price_per_day:

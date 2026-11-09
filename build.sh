@@ -12,3 +12,4 @@ echo "===> Running database migrations..."
 python backend/manage.py migrate
 
 echo "===> Build complete for Render!"
+

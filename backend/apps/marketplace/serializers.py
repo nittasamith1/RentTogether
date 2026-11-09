@@ -104,6 +104,7 @@ class MarketplaceItemSummarySerializer(serializers.ModelSerializer):
     is_wishlisted = serializers.SerializerMethodField()
     owner = serializers.SerializerMethodField()
     hourly_rental_price = serializers.SerializerMethodField()
+    security_deposit = serializers.SerializerMethodField()
 
     class Meta:
         model = Item
@@ -128,6 +129,10 @@ class MarketplaceItemSummarySerializer(serializers.ModelSerializer):
             'owner',
             'created_at',
         ]
+
+    def get_security_deposit(self, obj) -> str:
+        # Version 1 platform strictly enforces zero security deposit for students
+        return "0.00"
 
     def get_hourly_rental_price(self, obj) -> str:
         from decimal import Decimal

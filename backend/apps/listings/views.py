@@ -264,19 +264,24 @@ class OwnerListingRentalHistoryView(views.APIView):
             if hasattr(b.renter, 'profile') and b.renter.profile and getattr(b.renter.profile, 'avatar', None):
                 renter_avatar = str(b.renter.profile.avatar)
 
+            start_d = b.start_date.isoformat() if b.start_date and hasattr(b.start_date, 'isoformat') else str(b.start_date or '')
+            end_d = b.end_date.isoformat() if b.end_date and hasattr(b.end_date, 'isoformat') else str(b.end_date or '')
+            ret_d = b.returned_at.isoformat() if getattr(b, 'returned_at', None) else None
+            price_val = float(b.total_rental_fee or 0.0)
+
             history.append({
                 'id': str(b.id),
-                'booking_reference': b.booking_reference,
+                'booking_reference': b.booking_reference or b.booking_code,
                 'renter_name': renter_name,
                 'renter_avatar': renter_avatar,
                 'status': b.status,
-                'start_date': b.start_date.isoformat(),
-                'end_date': b.end_date.isoformat(),
-                'actual_return_date': b.actual_return_date.isoformat() if b.actual_return_date else None,
-                'rental_price_inr': float(b.rental_price_inr),
-                'deposit_amount_inr': float(b.deposit_amount_inr),
-                'pickup_spot': b.pickup_spot,
-                'created_at': b.created_at.isoformat(),
+                'start_date': start_d,
+                'end_date': end_d,
+                'actual_return_date': ret_d,
+                'rental_price_inr': price_val,
+                'deposit_amount_inr': 0.0,
+                'pickup_spot': b.pickup_spot or '',
+                'created_at': b.created_at.isoformat() if b.created_at and hasattr(b.created_at, 'isoformat') else str(b.created_at or ''),
                 'has_reviewed': StudentReview.objects.filter(booking=b, reviewer=request.user).exists(),
             })
 

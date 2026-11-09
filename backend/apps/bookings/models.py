@@ -257,6 +257,10 @@ class Booking(models.Model):
     def deposit_amount_inr(self, value):
         self.security_deposit = value
 
+    @property
+    def actual_return_date(self):
+        return self.returned_at
+
 
     def clean(self):
         super().clean()

@@ -240,7 +240,7 @@ export const RentalHistoryModal: React.FC<RentalHistoryModalProps> = ({ item, on
                       <MapPin className="w-3 h-3" style={{ color: '#7563D9' }} />
                       <span>{rec.pickup_spot}</span>
                     </span>
-                    <span>Deposit: ₹{rec.deposit_amount_inr}</span>
+                    <span className="font-semibold" style={{ color: '#2D7A5B' }}>Zero Deposit (₹0)</span>
                   </div>
                 </div>
               ))
