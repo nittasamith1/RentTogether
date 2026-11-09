@@ -104,7 +104,7 @@ ASGI_APPLICATION = 'config.asgi.application'
 
 # Database Configuration
 # Supports Neon PostgreSQL with SSL mode, falls back to local SQLite when DATABASE_URL is not provided.
-DATABASE_URL = os.getenv('DATABASE_URL', '').strip()
+DATABASE_URL = os.getenv('DATABASE_URL', '').strip().strip('"\'')
 
 if 'test' in sys.argv:
     DATABASES = {
