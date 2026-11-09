@@ -25,7 +25,14 @@ RentTogether is an AI-powered intra-campus resource sharing and rental platform 
 
 ---
 
-## 🏃 Quick Start Guide (How to Run)
+## 🌐 Live Production Deployments
+- **Frontend (Vercel):** [https://renttogether.vercel.app/](https://renttogether.vercel.app/)
+- **Backend API (Render):** [https://renttogether.onrender.com/](https://renttogether.onrender.com/)
+- **API Health Check:** [https://renttogether.onrender.com/api/v1/health/](https://renttogether.onrender.com/api/v1/health/)
+- **Database:** Neon Serverless PostgreSQL (ap-southeast-1)
+- **Media Storage:** Cloudinary CDN
+
+---
 
 The project consists of two servers: the **Django backend API** (port `8000`) and the **Vite React frontend** (port `5173`).
 

@@ -11,6 +11,7 @@ import {
   X,
 } from 'lucide-react';
 import { authService } from '../../services/auth';
+import { API_BASE_URL } from '../../services/api';
 import { StudentVerification } from '../../types';
 
 export const AdminVerificationsPage: React.FC = () => {
@@ -334,7 +335,7 @@ export const AdminVerificationsPage: React.FC = () => {
                       inspectItem.id_card_url ||
                       (inspectItem.id_card_image?.startsWith('http')
                         ? inspectItem.id_card_image
-                        : `http://localhost:8000${inspectItem.id_card_image}`)
+                        : `${API_BASE_URL}${inspectItem.id_card_image}`)
                     }
                     alt="Student ID Card"
                     className="max-h-80 w-auto object-contain"

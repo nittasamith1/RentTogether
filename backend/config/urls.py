@@ -44,11 +44,12 @@ admin_verification_patterns = [
 ]
 
 urlpatterns = [
+    # Root & Health Check Endpoints (for Render health monitoring)
+    path('', HealthCheckView.as_view(), name='root-health'),
+    path('api/v1/health/', HealthCheckView.as_view(), name='health-check'),
+
     # Django Admin Portal
     path('admin/', admin.site.urls),
-
-    # Health Check Endpoint
-    path('api/v1/health/', HealthCheckView.as_view(), name='health-check'),
 
     # Phase 02, 03, 04, 05, 06 & 07 API Endpoints
     path('api/v1/auth/', include(auth_patterns)),

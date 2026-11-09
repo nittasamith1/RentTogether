@@ -29,7 +29,17 @@ SECRET_KEY = os.getenv(
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv('DEBUG', 'True').lower() in ('true', '1', 't')
 
-ALLOWED_HOSTS = [host.strip() for host in os.getenv('ALLOWED_HOSTS', 'localhost,127.0.0.1,0.0.0.0').split(',') if host.strip()] + ['testserver']
+ALLOWED_HOSTS = list(set(
+    [
+        host.strip()
+        for host in os.getenv(
+            'ALLOWED_HOSTS',
+            'localhost,127.0.0.1,0.0.0.0,renttogether.onrender.com,.onrender.com'
+        ).split(',')
+        if host.strip()
+    ]
+    + ['testserver', 'localhost', '127.0.0.1', '0.0.0.0', 'renttogether.onrender.com', '.onrender.com']
+))
 
 
 # Application definition
@@ -213,16 +223,59 @@ SIMPLE_JWT = {
 }
 
 
-# CORS Configuration
-CORS_ALLOWED_ORIGINS = [
-    origin.strip()
-    for origin in os.getenv(
-        'CORS_ALLOWED_ORIGINS',
-        'http://localhost:5173,http://localhost:3000,http://127.0.0.1:5173'
-    ).split(',')
-    if origin.strip()
+# CORS Configuration (Vercel Frontend <-> Render Backend)
+CORS_ALLOWED_ORIGINS = list(set(
+    [
+        origin.strip()
+        for origin in os.getenv(
+            'CORS_ALLOWED_ORIGINS',
+            'https://renttogether.vercel.app,https://renttogether.onrender.com,http://localhost:5173,http://localhost:3000,http://127.0.0.1:5173'
+        ).split(',')
+        if origin.strip()
+    ]
+    + [
+        'https://renttogether.vercel.app',
+        'https://renttogether.onrender.com',
+        'http://localhost:5173',
+        'http://localhost:3000',
+        'http://127.0.0.1:5173',
+    ]
+))
+CORS_ALLOWED_ORIGIN_REGEXES = [
+    r"^https:\/\/.*\.vercel\.app$",
+    r"^https:\/\/renttogether.*\.vercel\.app$",
 ]
 CORS_ALLOW_CREDENTIALS = True
+CORS_ALLOW_HEADERS = [
+    'accept',
+    'accept-encoding',
+    'authorization',
+    'content-type',
+    'dnt',
+    'origin',
+    'user-agent',
+    'x-csrftoken',
+    'x-requested-with',
+]
+
+# CSRF Trusted Origins (Mandatory for HTTPS Cross-Origin POST/PUT from Vercel to Render)
+CSRF_TRUSTED_ORIGINS = list(set(
+    [
+        origin.strip()
+        for origin in os.getenv(
+            'CSRF_TRUSTED_ORIGINS',
+            'https://renttogether.vercel.app,https://renttogether.onrender.com,http://localhost:5173,http://localhost:3000,http://127.0.0.1:5173'
+        ).split(',')
+        if origin.strip()
+    ]
+    + [
+        'https://renttogether.vercel.app',
+        'https://renttogether.onrender.com',
+        'http://localhost:5173',
+        'http://localhost:3000',
+        'http://127.0.0.1:5173',
+    ]
+))
 
 
 # Celery / Redis Settings
