@@ -1,27 +1,26 @@
-import React, { Suspense, lazy } from 'react';
+import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { AppLayout } from './components/layout/AppLayout';
-import { LoadingSpinner } from './components/common/LoadingSpinner';
 
-// Route-based code splitting: lazy load each page on demand
-const DashboardPage = lazy(() => import('./pages/DashboardPage').then(m => ({ default: m.DashboardPage })));
-const AnalyticsPage = lazy(() => import('./pages/AnalyticsPage').then(m => ({ default: m.AnalyticsPage })));
-const ProfilePage = lazy(() => import('./pages/ProfilePage').then(m => ({ default: m.ProfilePage })));
-const MarketplacePage = lazy(() => import('./pages/MarketplacePage').then(m => ({ default: m.MarketplacePage })));
-const WishlistPage = lazy(() => import('./pages/WishlistPage').then(m => ({ default: m.WishlistPage })));
-const MyListingsPage = lazy(() => import('./pages/listings/MyListingsPage').then(m => ({ default: m.MyListingsPage })));
-const CreateListingPage = lazy(() => import('./pages/listings/CreateListingPage').then(m => ({ default: m.CreateListingPage })));
-const BookingsCalendarPage = lazy(() => import('./pages/BookingsCalendarPage').then(m => ({ default: m.BookingsCalendarPage })));
-const MyRentalsPage = lazy(() => import('./pages/rentals/MyRentalsPage').then(m => ({ default: m.MyRentalsPage })));
-const PaymentsEscrowPage = lazy(() => import('./pages/payments/PaymentsEscrowPage').then(m => ({ default: m.PaymentsEscrowPage })));
-const SettingsPage = lazy(() => import('./pages/settings/SettingsPage').then(m => ({ default: m.SettingsPage })));
-const LoginPage = lazy(() => import('./pages/auth/LoginPage').then(m => ({ default: m.LoginPage })));
-const RegisterPage = lazy(() => import('./pages/auth/RegisterPage').then(m => ({ default: m.RegisterPage })));
-const VerifyOtpPage = lazy(() => import('./pages/auth/VerifyOtpPage').then(m => ({ default: m.VerifyOtpPage })));
-const VerificationPendingPage = lazy(() => import('./pages/auth/VerificationPendingPage').then(m => ({ default: m.VerificationPendingPage })));
-const AdminVerificationsPage = lazy(() => import('./pages/admin/AdminVerificationsPage').then(m => ({ default: m.AdminVerificationsPage })));
+// Eagerly imported pages for 0ms instantaneous navigation with zero full-page reloads or flickers
+import { DashboardPage } from './pages/DashboardPage';
+import { AnalyticsPage } from './pages/AnalyticsPage';
+import { ProfilePage } from './pages/ProfilePage';
+import { MarketplacePage } from './pages/MarketplacePage';
+import { WishlistPage } from './pages/WishlistPage';
+import { MyListingsPage } from './pages/listings/MyListingsPage';
+import { CreateListingPage } from './pages/listings/CreateListingPage';
+import { BookingsCalendarPage } from './pages/BookingsCalendarPage';
+import { MyRentalsPage } from './pages/rentals/MyRentalsPage';
+import { PaymentsEscrowPage } from './pages/payments/PaymentsEscrowPage';
+import { SettingsPage } from './pages/settings/SettingsPage';
+import { LoginPage } from './pages/auth/LoginPage';
+import { RegisterPage } from './pages/auth/RegisterPage';
+import { VerifyOtpPage } from './pages/auth/VerifyOtpPage';
+import { VerificationPendingPage } from './pages/auth/VerificationPendingPage';
+import { AdminVerificationsPage } from './pages/admin/AdminVerificationsPage';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -97,9 +96,8 @@ export const App: React.FC = () => {
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
         <BrowserRouter>
-          <Suspense fallback={<LoadingSpinner fullPage size="lg" label="Loading RentTogether..." />}>
-            <Routes>
-              {/* Public Authentication Pages */}
+          <Routes>
+            {/* Public Authentication Pages */}
               <Route
                 path="/login"
                 element={
@@ -161,7 +159,6 @@ export const App: React.FC = () => {
                 <Route path="*" element={<Navigate to="/" replace />} />
               </Route>
             </Routes>
-          </Suspense>
         </BrowserRouter>
       </AuthProvider>
     </QueryClientProvider>
