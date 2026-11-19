@@ -27,10 +27,11 @@ import { AdminDashboardPage } from './pages/admin/AdminDashboardPage';
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      staleTime: 0, // Real-time: always fresh from database
-      refetchOnWindowFocus: true,
-      refetchOnMount: true,
-      retry: 1,
+      staleTime: 30000, // 30 seconds fresh data window (instant transitions with zero lag)
+      gcTime: 10 * 60 * 1000, // 10 minutes cache retention in memory
+      refetchOnWindowFocus: false, // Prevent continuous refetch storms on window/tab focus
+      retry: 2,
+      retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 8000),
     },
   },
 });

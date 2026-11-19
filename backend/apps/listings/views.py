@@ -108,13 +108,19 @@ class MyListingsListView(views.APIView):
 
         qs = get_owner_listings(request.user, filters)
 
-        # Overview statistics across all owner items
-        all_owner_items = Item.objects.filter(owner=request.user)
+        # Overview statistics across all owner items — single optimized aggregation
+        from django.db.models import Count, Sum, Q
+        agg = Item.objects.filter(owner=request.user).aggregate(
+            total=Count('id', filter=~Q(status=Item.STATUS_REMOVED)),
+            active=Count('id', filter=Q(status=Item.STATUS_ACTIVE)),
+            paused=Count('id', filter=Q(status=Item.STATUS_PAUSED)),
+            completed=Sum('rental_count', filter=~Q(status=Item.STATUS_REMOVED), default=0),
+        )
         stats = {
-            'total_listings': all_owner_items.exclude(status=Item.STATUS_REMOVED).count(),
-            'active_listings': all_owner_items.filter(status=Item.STATUS_ACTIVE).count(),
-            'paused_listings': all_owner_items.filter(status=Item.STATUS_PAUSED).count(),
-            'total_completed_rentals': sum(item.rental_count for item in all_owner_items),
+            'total_listings': agg['total'] or 0,
+            'active_listings': agg['active'] or 0,
+            'paused_listings': agg['paused'] or 0,
+            'total_completed_rentals': agg['completed'] or 0,
         }
 
         paginator = MarketplacePagination()

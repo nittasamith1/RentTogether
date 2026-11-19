@@ -18,7 +18,7 @@ export function useCategories() {
   return useQuery<Category[]>({
     queryKey: [CATEGORIES_QUERY_KEY],
     queryFn: () => marketplaceService.getCategories(),
-    staleTime: 0,
+    staleTime: 5 * 60 * 1000, // 5 minutes cache for static campus categories
   });
 }
 
@@ -26,8 +26,7 @@ export function useMyListings(filters: MyListingsFilters = {}) {
   return useQuery<MyListingsResponse>({
     queryKey: [LISTINGS_QUERY_KEY, filters],
     queryFn: () => listingService.getMyListings(filters),
-    staleTime: 0,
-    refetchInterval: 15000,
+    staleTime: 30000,
   });
 }
 

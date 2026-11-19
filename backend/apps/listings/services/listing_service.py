@@ -99,7 +99,7 @@ def get_owner_listings(owner, filters: Optional[Dict[str, Any]] = None):
     """
     verify_student_eligibility(owner)
 
-    qs = Item.objects.filter(owner=owner).select_related('category').prefetch_related('images')
+    qs = Item.objects.filter(owner=owner).select_related('category')
 
     if not filters:
         filters = {}

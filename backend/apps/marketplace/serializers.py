@@ -174,37 +174,47 @@ class MarketplaceItemSummarySerializer(serializers.ModelSerializer):
         return desc[:120] + ('...' if len(desc) > 120 else '')
 
     def get_availability_status(self, obj) -> str:
-        available = is_item_available(obj)
-        return "AVAILABLE" if available else "RENTED"
+        # Fast in-memory check avoiding N+1 database roundtrips
+        if hasattr(obj, 'availability_status'):
+            return str(obj.availability_status)
+        return "AVAILABLE" if obj.status == Item.STATUS_ACTIVE else "RENTED"
 
     def get_completed_rental_count(self, obj) -> int:
-        if hasattr(obj, 'completed_rentals'):
-            return obj.completed_rentals
-        return obj.bookings.filter(status='COMPLETED').count()
+        # Read pre-aggregated rental_count from Item record (0 DB queries)
+        return getattr(obj, 'rental_count', 0)
 
     def get_is_wishlisted(self, obj) -> bool:
         if hasattr(obj, 'is_wishlisted'):
             return bool(obj.is_wishlisted)
         request = self.context.get('request')
         if request and request.user and request.user.is_authenticated:
-            return Wishlist.objects.filter(user=request.user, item=obj).exists()
+            # Cache the user's wishlisted item ID set for the lifetime of this request
+            if 'user_wishlist_ids' not in self.context:
+                self.context['user_wishlist_ids'] = set(
+                    str(uid) for uid in Wishlist.objects.filter(
+                        user=request.user
+                    ).values_list('item_id', flat=True)
+                )
+            return str(obj.id) in self.context['user_wishlist_ids']
         return False
 
     def get_owner(self, obj) -> dict:
+        # Utilize already-joined owner__profile from select_related (0 extra DB queries)
         profile = getattr(obj.owner, 'profile', None)
-        verification = getattr(obj.owner, 'verification', None)
-        score, count = calculate_owner_reputation(obj.owner_id)
-        badge = get_reputation_badge(score, count)
-        dept = (getattr(profile, 'department', '') or getattr(verification, 'department', ''))
-        year = (getattr(profile, 'year_of_study', 1) or getattr(verification, 'year_of_study', 1))
+        owner_score = getattr(profile, 'reputation_as_owner', None)
+        score = float(owner_score) if owner_score is not None else 5.0
+        lent_count = getattr(profile, 'total_items_lent', 0)
+        badge = get_reputation_badge(owner_score, lent_count or (1 if score else 0))
+        dept = getattr(profile, 'department', '')
+        year = getattr(profile, 'year_of_study', 1) or 1
         display_name = obj.owner.get_full_name() or obj.owner.username or "Student"
         return {
             "id": str(obj.owner.id),
             "display_name": display_name,
             "avatar": getattr(profile, 'avatar_url', ''),
-            "reputation": float(score) if score is not None else 5.0,
+            "reputation": score,
             "badge": badge,
-            "review_count": count,
+            "review_count": lent_count,
             "department": dept,
             "year_of_study": year,
         }

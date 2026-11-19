@@ -131,8 +131,9 @@ elif DATABASE_URL:
             ssl_require=True
         )
     }
-    # Neon connection pooling (PgBouncer) best practice: disable server-side cursors
+    # Neon serverless pooling optimizations
     DATABASES['default']['DISABLE_SERVER_SIDE_CURSORS'] = True
+    DATABASES['default']['CONN_HEALTH_CHECKS'] = True
 else:
     DATABASES = {
         'default': {
@@ -140,6 +141,16 @@ else:
             'NAME': BASE_DIR / 'db.sqlite3',
         }
     }
+
+
+# High-Speed In-Memory Cache (reduces round-trip database queries)
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+        'LOCATION': 'renttogether-fast-cache',
+        'TIMEOUT': 180,  # 3 minutes default TTL
+    }
+}
 
 
 # Custom User Model

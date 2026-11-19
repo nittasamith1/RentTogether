@@ -38,7 +38,8 @@ export const MyListingsPage: React.FC = () => {
     status: statusFilter === 'ALL' ? undefined : statusFilter,
   };
 
-  const { data, isLoading, isError, refetch } = useMyListings(queryFilters);
+  const { data, isLoading, isError, error, refetch } = useMyListings(queryFilters);
+  const isAuthError = (error as any)?.response?.status === 401 || (error as any)?.response?.status === 403;
 
   const stats = data?.stats || {
     total_listings: 0,
@@ -264,25 +265,46 @@ export const MyListingsPage: React.FC = () => {
           style={{ backgroundColor: '#FFF0F0', borderColor: '#F28B82' }}
         >
           <AlertCircle className="w-8 h-8 mx-auto" style={{ color: '#E87575' }} />
-          <h3 className="text-sm font-bold" style={{ color: '#303653' }}>Failed to load listings</h3>
+          <h3 className="text-sm font-bold" style={{ color: '#303653' }}>
+            {isAuthError ? 'Authentication Required' : 'Failed to load listings'}
+          </h3>
           <p className="text-xs max-w-md mx-auto" style={{ color: '#85899B' }}>
-            Could not retrieve your listings. The campus backend may be waking up, or your session may have expired.
+            {isAuthError
+              ? 'Your student session has expired. Please sign in again to view and manage your equipment.'
+              : 'Could not retrieve your listings. The campus backend may be waking up or reconnecting. Please click Retry below.'}
           </p>
           <div className="flex items-center justify-center gap-3 pt-1">
-            <button
-              onClick={() => refetch()}
-              className="px-5 py-2 text-white rounded-xl text-xs font-bold cursor-pointer hover:opacity-90 active:scale-95 transition-all shadow-xs"
-              style={{ backgroundColor: '#7563D9' }}
-            >
-              Retry Connection
-            </button>
-            <button
-              onClick={() => navigate('/login')}
-              className="px-5 py-2 rounded-xl text-xs font-bold cursor-pointer hover:opacity-90 active:scale-95 transition-all shadow-xs border"
-              style={{ backgroundColor: '#FFFFFF', borderColor: '#D8D0F5', color: '#7563D9' }}
-            >
-              Sign In Again
-            </button>
+            {isAuthError ? (
+              <button
+                onClick={() => {
+                  localStorage.removeItem('access_token');
+                  localStorage.removeItem('refresh_token');
+                  localStorage.removeItem('auth_user');
+                  navigate('/login');
+                }}
+                className="px-6 py-2.5 text-white rounded-xl text-xs font-bold cursor-pointer hover:opacity-90 active:scale-95 transition-all shadow-xs"
+                style={{ backgroundColor: '#7563D9' }}
+              >
+                Sign In Again
+              </button>
+            ) : (
+              <>
+                <button
+                  onClick={() => refetch()}
+                  className="px-5 py-2 text-white rounded-xl text-xs font-bold cursor-pointer hover:opacity-90 active:scale-95 transition-all shadow-xs"
+                  style={{ backgroundColor: '#7563D9' }}
+                >
+                  Retry Connection
+                </button>
+                <button
+                  onClick={() => navigate('/login')}
+                  className="px-5 py-2 rounded-xl text-xs font-bold cursor-pointer hover:opacity-90 active:scale-95 transition-all shadow-xs border"
+                  style={{ backgroundColor: '#FFFFFF', borderColor: '#D8D0F5', color: '#7563D9' }}
+                >
+                  Sign In Again
+                </button>
+              </>
+            )}
           </div>
         </div>
       ) : items.length === 0 ? (
