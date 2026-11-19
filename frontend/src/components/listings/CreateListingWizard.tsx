@@ -34,12 +34,12 @@ export const CreateListingWizard: React.FC<CreateListingWizardProps> = ({
   const [modelName, setModelName] = useState<string>('');
 
   const [condition, setCondition] = useState<'BRAND_NEW' | 'LIKE_NEW' | 'GOOD' | 'FAIR'>('LIKE_NEW');
-  const [originalPrice, setOriginalPrice] = useState<string>('1200');
-  const [itemAgeMonths, setItemAgeMonths] = useState<string>('6');
+  const [originalPrice, setOriginalPrice] = useState<string>('');
+  const [itemAgeMonths, setItemAgeMonths] = useState<string>('');
 
   const [images, setImages] = useState<File[]>([]);
 
-  const [rentalPrice, setRentalPrice] = useState<string>('35');
+  const [rentalPrice, setRentalPrice] = useState<string>('');
   const securityDeposit = '0';
   const [minRentalDays, setMinRentalDays] = useState<string>('1');
   const [maxRentalDays, setMaxRentalDays] = useState<string>('30');

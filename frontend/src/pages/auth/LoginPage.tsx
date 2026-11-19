@@ -45,6 +45,38 @@ export const LoginPage: React.FC = () => {
       .catch(() => { });
   }, []);
 
+  const handleQuickDemoStudent = async () => {
+    setEmail('demo_mail@adityauniversity.in');
+    setPassword('DemoPassword123!');
+    setErrorMessage('');
+    setLoading(true);
+    try {
+      const res = await authService.login('demo_mail@adityauniversity.in', 'DemoPassword123!');
+      login(res.access, res.refresh, res.user);
+      navigate('/');
+    } catch (err: any) {
+      setErrorMessage(err?.response?.data?.detail || 'Demo login failed. Please ensure the campus backend is running.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleQuickDemoAdmin = async () => {
+    setEmail('admin@adityauniversity.in');
+    setPassword('AdminPassword123!');
+    setErrorMessage('');
+    setLoading(true);
+    try {
+      const res = await authService.login('admin@adityauniversity.in', 'AdminPassword123!');
+      login(res.access, res.refresh, res.user);
+      navigate('/admin/verifications');
+    } catch (err: any) {
+      setErrorMessage(err?.response?.data?.detail || 'Admin login failed. Please ensure the campus backend is running.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMessage('');
@@ -278,6 +310,44 @@ export const LoginPage: React.FC = () => {
               )}
             </button>
           </form>
+
+          {/* Quick Demo Access */}
+          <div className="mt-5 pt-4 border-t border-[#EAE6E1]">
+            <p className="text-[11px] font-bold text-center tracking-wider uppercase mb-2.5" style={{ color: '#85899B' }}>
+              Quick Demo Access
+            </p>
+            <div className="grid grid-cols-2 gap-2.5">
+              <button
+                type="button"
+                onClick={handleQuickDemoStudent}
+                disabled={loading}
+                className="p-2.5 rounded-xl border text-left cursor-pointer transition-all hover:border-[#7563D9] active:scale-95 disabled:opacity-50"
+                style={{ backgroundColor: '#F6F3FF', borderColor: '#D8D0F5' }}
+              >
+                <div className="flex items-center gap-1.5 text-xs font-bold" style={{ color: '#7563D9' }}>
+                  <span>🎓 Demo Student</span>
+                </div>
+                <div className="text-[10px] truncate mt-0.5" style={{ color: '#85899B' }}>
+                  demo_mail@adityauniversity.in
+                </div>
+              </button>
+
+              <button
+                type="button"
+                onClick={handleQuickDemoAdmin}
+                disabled={loading}
+                className="p-2.5 rounded-xl border text-left cursor-pointer transition-all hover:border-[#F5A623] active:scale-95 disabled:opacity-50"
+                style={{ backgroundColor: '#FFFDF9', borderColor: '#FDE4B4' }}
+              >
+                <div className="flex items-center gap-1.5 text-xs font-bold" style={{ color: '#D97706' }}>
+                  <span>🛡️ Campus Admin</span>
+                </div>
+                <div className="text-[10px] truncate mt-0.5" style={{ color: '#85899B' }}>
+                  admin@adityauniversity.in
+                </div>
+              </button>
+            </div>
+          </div>
 
           <div className="mt-6 text-center text-xs" style={{ color: '#85899B' }}>
             Don't have an account?{' '}
