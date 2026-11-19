@@ -11,6 +11,7 @@ from apps.listings.views import (
 
 urlpatterns = [
     # Listing Creation
+    path('', CreateListingView.as_view(), name='listing-root-create'),
     path('create/', CreateListingView.as_view(), name='listing-create'),
 
     # My Listings (Owner inventory dashboard)

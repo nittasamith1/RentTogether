@@ -95,8 +95,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   useEffect(() => {
     if (user) {
       localStorage.setItem('auth_user', JSON.stringify(user));
+      if (!user.college_name) {
+        authService.getActiveCollege()
+          .then((col) => {
+            if (col) {
+              updateUser({
+                college_name: col.name,
+                college_code: col.code,
+              });
+            }
+          })
+          .catch(() => {});
+      }
     }
-  }, [user]);
+  }, [user, updateUser]);
 
   const contextValue = useMemo<AuthContextType>(() => ({
     user,

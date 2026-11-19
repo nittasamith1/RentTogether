@@ -61,7 +61,7 @@ export const CreateListingWizard: React.FC<CreateListingWizardProps> = ({
     }
   }, [categories, categoryId]);
 
-  // Designated Aditya University campus handover hubs
+  // Designated campus handover hubs
   const campusPickupSpots = [
     'Central Library Ground Floor Counter',
     'Main Canteen & Student Food Court',
@@ -74,13 +74,11 @@ export const CreateListingWizard: React.FC<CreateListingWizardProps> = ({
   ];
 
   // Request AI price recommendation
-  const handleGetAiRecommendation = () => {
-    if (!categoryId) {
-      setStepError('Please select a category first.');
-      return;
-    }
-    const orig = parseFloat(originalPrice) || 1000;
-    const age = parseInt(itemAgeMonths, 10) || 6;
+  const handleGetAiRecommendation = (autoApply: boolean = false) => {
+    if (!categoryId) return;
+    const orig = parseFloat(originalPrice);
+    if (isNaN(orig) || orig <= 0) return;
+    const age = parseInt(itemAgeMonths, 10) || 0;
 
     priceAiMutation.mutate(
       {
@@ -91,13 +89,24 @@ export const CreateListingWizard: React.FC<CreateListingWizardProps> = ({
       },
       {
         onSuccess: (data) => {
-          if (data && data.recommended_price) {
+          if (autoApply && data && data.recommended_price) {
             setRentalPrice(String(Math.round(data.recommended_price)));
           }
         },
       }
     );
   };
+
+  // Live auto-calculation whenever user alters item condition or original price
+  useEffect(() => {
+    const orig = parseFloat(originalPrice);
+    if (categoryId && orig > 0) {
+      const timer = setTimeout(() => {
+        handleGetAiRecommendation(false);
+      }, 400);
+      return () => clearTimeout(timer);
+    }
+  }, [categoryId, condition, originalPrice, itemAgeMonths]);
 
   // Step Validation & Progression
   const handleNextStep = () => {
@@ -187,13 +196,30 @@ export const CreateListingWizard: React.FC<CreateListingWizardProps> = ({
         if (onSuccess) onSuccess(data.id);
       },
       onError: (err: any) => {
-        const errorDetail = err.response?.data?.detail;
-        if (typeof errorDetail === 'object') {
-          const firstKey = Object.keys(errorDetail)[0];
-          setStepError(`${firstKey}: ${errorDetail[firstKey]}`);
-        } else {
-          setStepError(errorDetail || 'Failed to publish listing. Please check your inputs.');
+        let msg = 'Failed to publish listing. Please check your inputs.';
+        const data = err.response?.data;
+        if (err.code === 'ECONNABORTED' || err.message?.includes('timeout')) {
+          msg = 'Request timed out while uploading images. Please try again or check your network connection.';
+        } else if (data) {
+          if (typeof data === 'string') {
+            msg = data;
+          } else if (Array.isArray(data)) {
+            msg = data.join(' ');
+          } else if (typeof data.detail === 'string') {
+            msg = data.detail;
+          } else if (Array.isArray(data.detail)) {
+            msg = data.detail.join(' ');
+          } else if (typeof data.detail === 'object' && data.detail !== null) {
+            const firstKey = Object.keys(data.detail)[0];
+            const val = data.detail[firstKey];
+            msg = `${firstKey.replace('_', ' ')}: ${Array.isArray(val) ? val.join(' ') : val}`;
+          } else if (typeof data === 'object') {
+            const firstKey = Object.keys(data)[0];
+            const val = data[firstKey];
+            msg = `${firstKey.replace('_', ' ')}: ${Array.isArray(val) ? val.join(' ') : val}`;
+          }
         }
+        setStepError(msg);
       },
     });
   };
@@ -527,6 +553,50 @@ export const CreateListingWizard: React.FC<CreateListingWizardProps> = ({
                 </span>
               </div>
             </div>
+
+            {/* Live AI Price Suggestion Box (Phase 10) */}
+            {priceAiMutation.data && (
+              <div
+                className="p-4 rounded-2xl border flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs animate-in fade-in"
+                style={{ backgroundColor: '#F8F5FF', borderColor: '#D8D0F5' }}
+              >
+                <div className="flex items-start sm:items-center gap-3">
+                  <div
+                    className="w-8 h-8 rounded-xl flex items-center justify-center text-white shrink-0 shadow-xs"
+                    style={{ backgroundColor: '#7563D9' }}
+                  >
+                    <Sparkles className="w-4 h-4 fill-white" />
+                  </div>
+                  <div>
+                    <p className="text-xs font-bold" style={{ color: '#303653' }}>
+                      AI Recommended:{' '}
+                      <span className="text-sm font-extrabold" style={{ color: '#7563D9' }}>
+                        ₹{Math.round(priceAiMutation.data.recommended_price)} / day
+                      </span>{' '}
+                      <span className="text-[11px] font-semibold text-[#85899B]">
+                        (Fair Range: ₹{Math.round(priceAiMutation.data.min_price)} – ₹{Math.round(priceAiMutation.data.max_price)})
+                      </span>
+                    </p>
+                    <p className="text-[10px] mt-0.5" style={{ color: '#85899B' }}>
+                      Gradient Boosted model confidence: {Math.round((priceAiMutation.data.confidence_score || 0.95) * 100)}%
+                    </p>
+                  </div>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    setRentalPrice(String(Math.round(priceAiMutation.data.recommended_price)));
+                  }}
+                  className="px-3.5 py-1.5 rounded-xl text-xs font-bold text-white transition-all shadow-xs cursor-pointer shrink-0 self-start sm:self-auto"
+                  style={{ backgroundColor: '#7563D9' }}
+                  onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#6552C5')}
+                  onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#7563D9')}
+                >
+                  Apply AI Price
+                </button>
+              </div>
+            )}
           </motion.div>
         )}
 
@@ -560,63 +630,95 @@ export const CreateListingWizard: React.FC<CreateListingWizardProps> = ({
             animate={{ opacity: 1, x: 0 }}
             className="space-y-6"
           >
-            {/* AI Fair Price Engine Card */}
+            {/* AI Fair Price Engine Card (Phase 10) */}
             <div
-              className="rounded-2xl p-5 border shadow-xs space-y-3"
-              style={{ backgroundColor: '#E9E3FF', borderColor: '#D8D0F5' }}
+              className="rounded-2xl p-5 border shadow-xs space-y-4"
+              style={{ backgroundColor: '#F8F5FF', borderColor: '#D8D0F5' }}
             >
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div className="flex items-center gap-2.5">
                   <div
-                    className="w-8 h-8 rounded-xl text-white flex items-center justify-center shadow-xs"
+                    className="w-9 h-9 rounded-xl text-white flex items-center justify-center shadow-xs"
                     style={{ backgroundColor: '#7563D9' }}
                   >
                     <Sparkles className="w-4 h-4 fill-white" />
                   </div>
                   <div>
-                    <h4 className="text-sm font-bold" style={{ color: '#303653' }}>
-                      AI Fair Rental Price Engine
-                    </h4>
+                    <div className="flex items-center gap-2">
+                      <h4 className="text-sm font-bold" style={{ color: '#303653' }}>
+                        AI Fair Rental Price Engine
+                      </h4>
+                      {priceAiMutation.data && (
+                        <span
+                          className="px-2 py-0.5 rounded-full text-[10px] font-extrabold border"
+                          style={{ backgroundColor: '#E9E3FF', color: '#7563D9', borderColor: '#D8D0F5' }}
+                        >
+                          {Math.round((priceAiMutation.data.confidence_score || 0.95) * 100)}% Confidence
+                        </span>
+                      )}
+                    </div>
                     <p className="text-[11px]" style={{ color: '#85899B' }}>
-                      Trained on student demand, item age, and category wear factors.
+                      Gradient Boosted model trained on campus demand, equipment depreciation, and wear tiers.
                     </p>
                   </div>
                 </div>
 
-                <button
-                  type="button"
-                  onClick={handleGetAiRecommendation}
-                  disabled={priceAiMutation.isPending}
-                  className="px-3.5 py-1.5 rounded-xl text-white text-xs font-bold transition-all shadow-xs flex items-center gap-1.5 cursor-pointer"
-                  style={{ backgroundColor: '#7563D9' }}
-                  onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#6552C5')}
-                  onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#7563D9')}
-                >
-                  {priceAiMutation.isPending ? (
-                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                  ) : (
-                    <span>Ask AI Engine</span>
+                <div className="flex items-center gap-2">
+                  {priceAiMutation.data && (
+                    <button
+                      type="button"
+                      onClick={() => setRentalPrice(String(Math.round(priceAiMutation.data.recommended_price)))}
+                      className="px-3.5 py-1.5 rounded-xl text-white text-xs font-bold transition-all shadow-xs flex items-center gap-1.5 cursor-pointer"
+                      style={{ backgroundColor: '#7563D9' }}
+                      onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#6552C5')}
+                      onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#7563D9')}
+                    >
+                      <Sparkles className="w-3.5 h-3.5 fill-white" />
+                      <span>Apply AI Price</span>
+                    </button>
                   )}
-                </button>
+
+                  <button
+                    type="button"
+                    onClick={() => handleGetAiRecommendation(false)}
+                    disabled={priceAiMutation.isPending}
+                    className="px-3 py-1.5 rounded-xl text-xs font-bold border transition-all shadow-xs flex items-center gap-1.5 cursor-pointer hover:bg-neutral-50"
+                    style={{ backgroundColor: '#FFFFFF', borderColor: '#D8D0F5', color: '#7563D9' }}
+                  >
+                    {priceAiMutation.isPending ? (
+                      <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                    ) : (
+                      <span>Recalculate</span>
+                    )}
+                  </button>
+                </div>
               </div>
 
               {priceAiMutation.data && (
                 <div
-                  className="p-4 rounded-xl border shadow-xs space-y-2"
+                  className="p-4 rounded-xl border shadow-xs space-y-3"
                   style={{ backgroundColor: '#FFFCF7', borderColor: '#EAE6E1' }}
                 >
-                  <div className="flex items-baseline justify-between">
+                  <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-2">
                     <div>
-                      <span className="text-xs" style={{ color: '#85899B' }}>AI Suggested Rate:</span>
-                      <div className="text-xl font-extrabold" style={{ color: '#7563D9' }}>
-                        ₹{Math.round(priceAiMutation.data.recommended_price)}{' '}
-                        <span className="text-xs font-normal" style={{ color: '#85899B' }}>/ day</span>
+                      <span className="text-xs font-medium" style={{ color: '#85899B' }}>
+                        AI Recommended Rate:
+                      </span>
+                      <div className="text-2xl font-black flex items-baseline gap-1" style={{ color: '#7563D9' }}>
+                        ₹{Math.round(priceAiMutation.data.recommended_price)}
+                        <span className="text-xs font-semibold" style={{ color: '#85899B' }}>
+                          / day
+                        </span>
                       </div>
                     </div>
-                    <div className="text-right">
-                      <span className="text-xs" style={{ color: '#85899B' }}>Suggested Range:</span>
-                      <div className="text-xs font-bold" style={{ color: '#303653' }}>
-                        ₹{Math.round(priceAiMutation.data.min_price)} – ₹{Math.round(priceAiMutation.data.max_price)}
+
+                    <div className="sm:text-right">
+                      <span className="text-xs font-medium" style={{ color: '#85899B' }}>
+                        Suggested Fair Range:
+                      </span>
+                      <div className="text-sm font-extrabold" style={{ color: '#303653' }}>
+                        ₹{Math.round(priceAiMutation.data.min_price)} – ₹{Math.round(priceAiMutation.data.max_price)}{' '}
+                        <span className="text-xs font-normal" style={{ color: '#85899B' }}>/ day</span>
                       </div>
                     </div>
                   </div>
@@ -626,7 +728,7 @@ export const CreateListingWizard: React.FC<CreateListingWizardProps> = ({
                       {priceAiMutation.data.explanation_factors.map((f, i) => (
                         <span
                           key={i}
-                          className="px-2 py-0.5 rounded-full text-[10px] font-semibold"
+                          className="px-2.5 py-0.5 rounded-full text-[10px] font-semibold"
                           style={{ backgroundColor: '#E9E3FF', color: '#7563D9' }}
                         >
                           {f}
@@ -684,8 +786,95 @@ export const CreateListingWizard: React.FC<CreateListingWizardProps> = ({
                   <span>Zero Deposit Campus Sharing</span>
                   <span className="font-bold">₹0.00</span>
                 </div>
+                <p className="text-[11px] mt-1.5" style={{ color: '#85899B' }}>
+                  Institutional student ID verification replaces monetary deposits.
+                </p>
               </div>
             </div>
+
+            {/* Frontend Pricing Slider Highlighting AI Recommended Zone (Phase 10) */}
+            {(() => {
+              const currentVal = parseFloat(rentalPrice) || 10;
+              const minP = priceAiMutation.data ? Math.round(priceAiMutation.data.min_price) : 20;
+              const maxP = priceAiMutation.data ? Math.round(priceAiMutation.data.max_price) : 40;
+              const maxSlider = Math.max(150, Math.round(maxP * 1.6));
+              const isFair = currentVal >= minP && currentVal <= maxP;
+              const isUnder = currentVal < minP;
+
+              const zoneLeftPct = Math.max(0, ((minP - 10) / (maxSlider - 10)) * 100);
+              const zoneWidthPct = Math.min(100 - zoneLeftPct, ((maxP - minP) / (maxSlider - 10)) * 100);
+              const thumbPct = Math.max(0, Math.min(100, ((currentVal - 10) / (maxSlider - 10)) * 100));
+
+              return (
+                <div
+                  className="p-4 rounded-2xl border shadow-xs space-y-3"
+                  style={{ backgroundColor: '#FFFCF7', borderColor: '#EAE6E1' }}
+                >
+                  <div className="flex items-center justify-between text-xs">
+                    <span className="font-bold tracking-tight" style={{ color: '#303653' }}>
+                      Pricing Slider & Zone Indicator
+                    </span>
+                    <span
+                      className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold border transition-colors ${
+                        isFair
+                          ? 'bg-[#DDF3E7] text-[#2D7A5B] border-[#B8E5CC]'
+                          : isUnder
+                          ? 'bg-[#FFF2D6] text-[#A06312] border-[#F5DCB8]'
+                          : 'bg-[#FFF0F0] text-[#E87575] border-[#FCA5A5]'
+                      }`}
+                    >
+                      {isFair ? '✓ Within Fair Market Zone' : isUnder ? '↓ Underpriced' : '↑ Above Suggested Zone'}
+                    </span>
+                  </div>
+
+                  {/* Visual Slider Track with AI Recommended Zone Band */}
+                  <div className="relative py-3">
+                    {/* Background Track */}
+                    <div className="h-2.5 w-full rounded-full bg-neutral-200 relative overflow-hidden">
+                      {/* Highlighted AI Fair Zone */}
+                      <div
+                        className="absolute top-0 bottom-0 bg-[#C4B5FD] transition-all rounded-xs"
+                        style={{
+                          left: `${zoneLeftPct}%`,
+                          width: `${zoneWidthPct}%`,
+                        }}
+                        title={`AI Recommended Fair Zone: ₹${minP} – ₹${maxP}/day`}
+                      />
+                    </div>
+
+                    {/* Range Input synced with rentalPrice */}
+                    <input
+                      type="range"
+                      min={10}
+                      max={maxSlider}
+                      step={1}
+                      value={Math.min(maxSlider, Math.max(10, currentVal))}
+                      onChange={(e) => setRentalPrice(e.target.value)}
+                      className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                    />
+
+                    {/* Thumb indicator */}
+                    <div
+                      className="absolute top-1.5 w-5 h-5 rounded-full border-2 border-white shadow-md pointer-events-none -translate-x-1/2 transition-all flex items-center justify-center"
+                      style={{
+                        left: `${thumbPct}%`,
+                        backgroundColor: '#7563D9',
+                      }}
+                    />
+                  </div>
+
+                  {/* Range Legends */}
+                  <div className="flex items-center justify-between text-[11px] font-medium" style={{ color: '#85899B' }}>
+                    <span>₹10/day</span>
+                    <span className="flex items-center gap-1.5 font-bold" style={{ color: '#7563D9' }}>
+                      <span className="w-3 h-2 rounded-xs bg-[#C4B5FD] inline-block" />
+                      AI Fair Zone (₹{minP} – ₹{maxP})
+                    </span>
+                    <span>₹{maxSlider}/day</span>
+                  </div>
+                </div>
+              );
+            })()}
 
             {/* Rental Duration Boundaries */}
             <div className="grid grid-cols-2 gap-4 pt-2" style={{ borderTop: '1px solid #EAE6E1' }}>

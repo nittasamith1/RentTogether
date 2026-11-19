@@ -39,6 +39,7 @@ class Booking(models.Model):
     STATUS_COMPLETED = 'COMPLETED'
     STATUS_CANCELLED = 'CANCELLED'
     STATUS_DISPUTED = 'DISPUTED'
+    STATUS_OVERDUE = 'OVERDUE'
 
     # Aliases for legacy code
     STATUS_APPROVED = STATUS_APPROVED_PENDING_PAYMENT
@@ -57,6 +58,7 @@ class Booking(models.Model):
         (STATUS_COMPLETED, 'Completed'),
         (STATUS_CANCELLED, 'Cancelled'),
         (STATUS_DISPUTED, 'Disputed'),
+        (STATUS_OVERDUE, 'Overdue Return'),
     ]
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)

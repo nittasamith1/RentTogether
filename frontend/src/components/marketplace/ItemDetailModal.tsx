@@ -26,6 +26,8 @@ import { bookingService } from '../../services/bookingService';
 import { listingService } from '../../services/listingService';
 import { ItemAvailabilityCalendar } from '../availability/ItemAvailabilityCalendar';
 import { useItemAvailability, AVAILABILITY_KEYS } from '../../hooks/useAvailability';
+import { useComplementaryRecommendations } from '../../hooks/useRecommendations';
+import { getMediaUrl } from '../../utils/media';
 
 interface ItemDetailModalProps {
   itemId: string;
@@ -45,6 +47,7 @@ export const ItemDetailModal: React.FC<ItemDetailModalProps> = ({
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   const { toggleWishlist } = useWishlist();
   const [isTogglingStatus, setIsTogglingStatus] = useState<boolean>(false);
+  const { data: complementaryData } = useComplementaryRecommendations(itemId);
 
   // Helper date formatter: YYYY-MM-DD (local timezone aware)
   const formatYMD = (d: Date) => {
@@ -300,8 +303,8 @@ export const ItemDetailModal: React.FC<ItemDetailModalProps> = ({
 
   const galleryImages =
     item.images && item.images.length > 0
-      ? item.images.map((img) => img.image_url)
-      : [item.primary_image_url || 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=800&q=80'];
+      ? item.images.map((img) => getMediaUrl(img.image_url))
+      : [getMediaUrl(item.primary_image_url) || 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=800&q=80'];
 
   const currentDisplayImage = galleryImages[activeImageIndex] || galleryImages[0];
 
@@ -922,6 +925,113 @@ export const ItemDetailModal: React.FC<ItemDetailModalProps> = ({
           </div>
         </div>
 
+        {/* Phase 13: Students Also Rent These Together (AI Complementary Recommendations) */}
+        {complementaryData &&
+          (complementaryData.complementary_items.length > 0 ||
+            (complementaryData.suggested_accessories && complementaryData.suggested_accessories.length > 0)) && (
+            <div
+              className="px-6 py-5 border-t"
+              style={{ backgroundColor: '#FFFCF7', borderColor: '#EAE6E1' }}
+            >
+              <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center gap-2">
+                  <div
+                    className="w-7 h-7 rounded-xl flex items-center justify-center shadow-xs"
+                    style={{ backgroundColor: '#E9E3FF', color: '#7563D9' }}
+                  >
+                    <Sparkles className="w-3.5 h-3.5 stroke-[2.2]" />
+                  </div>
+                  <h4 className="text-xs font-extrabold uppercase tracking-wider" style={{ color: '#303653' }}>
+                    Students also rent these together
+                  </h4>
+                </div>
+                <span
+                  className="text-[10px] font-bold px-2 py-0.5 rounded-full"
+                  style={{ backgroundColor: '#DDF3E7', color: '#42A879' }}
+                >
+                  AI Paired Accessories
+                </span>
+              </div>
+
+              {/* Accessory Companion Pills */}
+              {complementaryData.suggested_accessories && complementaryData.suggested_accessories.length > 0 && (
+                <div className="flex flex-wrap items-center gap-1.5 mb-3">
+                  <span className="text-[11px] font-semibold text-[#85899B]">Essential Pairings:</span>
+                  {complementaryData.suggested_accessories.map((acc, idx) => (
+                    <span
+                      key={idx}
+                      className="px-2.5 py-0.5 rounded-lg text-[10px] font-bold border"
+                      style={{ backgroundColor: '#FFF8ED', borderColor: '#EAE6E1', color: '#7563D9' }}
+                    >
+                      + {acc}
+                    </span>
+                  ))}
+                </div>
+              )}
+
+              {/* Recommended Items Grid */}
+              {complementaryData.complementary_items.length > 0 && (
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                  {complementaryData.complementary_items.map((rel) => (
+                    <div
+                      key={rel.id}
+                      onClick={() => {
+                        if (onSelectRelated) {
+                          onSelectRelated({
+                            id: rel.id,
+                            title: rel.title,
+                            category_name: rel.category_name,
+                            daily_rental_price: rel.rental_price_per_day,
+                            security_deposit: rel.security_deposit,
+                            condition: rel.condition,
+                            primary_image_url: rel.primary_image_url,
+                            availability_status: rel.is_available ? 'AVAILABLE' : 'RENTED',
+                            is_wishlisted: false,
+                            owner: { id: '', display_name: rel.owner_name, college_name: '', reputation_score: 5 },
+                          } as unknown as ItemSummary);
+                        }
+                      }}
+                      className="rounded-xl p-2.5 border hover:border-[#7563D9] cursor-pointer transition shadow-xs group"
+                      style={{ backgroundColor: '#FFFFFF', borderColor: '#EAE6E1' }}
+                    >
+                      <div
+                        className="aspect-16/10 rounded-lg overflow-hidden mb-2 border"
+                        style={{ backgroundColor: '#E9E3FF', borderColor: '#D8D0F5' }}
+                      >
+                        <img
+                          src={
+                            rel.primary_image_url ||
+                            'https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=400&q=80'
+                          }
+                          alt={rel.title}
+                          className="w-full h-full object-cover group-hover:scale-105 transition"
+                        />
+                      </div>
+                      <span
+                        className="text-[9px] font-bold px-1.5 py-0.5 rounded"
+                        style={{ backgroundColor: '#E9E3FF', color: '#7563D9' }}
+                      >
+                        Frequently Paired
+                      </span>
+                      <h5
+                        className="text-[11px] font-bold line-clamp-1 group-hover:text-[#7563D9] mt-1"
+                        style={{ color: '#303653' }}
+                      >
+                        {rel.title}
+                      </h5>
+                      <p className="text-[11px] font-extrabold mt-0.5" style={{ color: '#303653' }}>
+                        ₹{parseFloat(String(rel.rental_price_per_day))}{' '}
+                        <span className="text-[9px] font-normal" style={{ color: '#85899B' }}>
+                          /day
+                        </span>
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+
         {/* Related Items Section */}
         {item.related_items && item.related_items.length > 0 && (
           <div
@@ -946,7 +1056,7 @@ export const ItemDetailModal: React.FC<ItemDetailModalProps> = ({
                     style={{ backgroundColor: '#E9E3FF', borderColor: '#D8D0F5' }}
                   >
                     <img
-                      src={rel.primary_image_url}
+                      src={getMediaUrl(rel.primary_image_url)}
                       alt={rel.title}
                       className="w-full h-full object-cover group-hover:scale-105 transition"
                     />

@@ -18,12 +18,8 @@ from apps.accounts.views import (
     PasswordResetRequestView,
     PasswordResetConfirmView,
 )
-from apps.administration.views import (
-    AdminVerificationListView,
-    AdminVerificationDetailView,
-    AdminVerificationApproveView,
-    AdminVerificationRejectView,
-)
+from apps.administration.views import StudentDisputeCreateListView
+from apps.listings.views import PriceRecommendationView
 
 auth_patterns = [
     path('register/', RegisterView.as_view(), name='auth-register'),
@@ -36,13 +32,6 @@ auth_patterns = [
     path('password-reset/confirm/', PasswordResetConfirmView.as_view(), name='password-reset-confirm'),
 ]
 
-admin_verification_patterns = [
-    path('verifications/', AdminVerificationListView.as_view(), name='admin-verifications-list'),
-    path('verifications/<uuid:id>/', AdminVerificationDetailView.as_view(), name='admin-verification-detail'),
-    path('verifications/<uuid:id>/approve/', AdminVerificationApproveView.as_view(), name='admin-verification-approve'),
-    path('verifications/<uuid:id>/reject/', AdminVerificationRejectView.as_view(), name='admin-verification-reject'),
-]
-
 urlpatterns = [
     # Root & Health Check Endpoints (for Render health monitoring)
     path('', HealthCheckView.as_view(), name='root-health'),
@@ -51,17 +40,46 @@ urlpatterns = [
     # Django Admin Portal
     path('admin/', admin.site.urls),
 
+    # Phase 10: AI Fair Price Prediction Engine
+    path('api/ai/predict-price/', PriceRecommendationView.as_view(), name='ai-predict-price-root'),
+    path('api/v1/ai/predict-price/', PriceRecommendationView.as_view(), name='ai-predict-price'),
+
+    # Phase 13: AI Content-Based & Complementary Recommendations
+    path('api/v1/ai/recommendations/', include('apps.recommendations.urls')),
+    path('api/ai/recommendations/', include('apps.recommendations.urls')),
+
+    # Phase 14: Campus Sustainability Impact Analytics & KPI Dashboard
+    path('api/v1/sustainability/', include('apps.sustainability.urls')),
+    path('api/sustainability/', include('apps.sustainability.urls')),
+
     # Phase 02, 03, 04, 05, 06 & 07 API Endpoints
     path('api/v1/auth/', include(auth_patterns)),
     path('api/v1/profiles/', include('apps.profiles.urls')),
     path('api/v1/marketplace/', include('apps.marketplace.urls')),
+    path('api/marketplace/', include('apps.marketplace.urls')),
     path('api/v1/listings/', include('apps.listings.urls')),
+    path('api/listings/', include('apps.listings.urls')),
     path('api/v1/availability/', include('apps.availability.urls')),
     path('api/v1/bookings/', include('apps.bookings.urls')),
     path('api/v1/notifications/', include('apps.notifications.urls')),
+    path('api/notifications/', include('apps.notifications.urls')),
     path('api/v1/colleges/active/', ActiveCollegeView.as_view(), name='college-active'),
-    path('api/v1/admin/', include(admin_verification_patterns)),
+
+    # Phase 15: College-Specific Admin Portal & On-Ground Dispute Mediation
+    path('api/v1/admin/', include('apps.administration.urls')),
+    path('api/admin/', include('apps.administration.urls')),
+    path('api/v1/disputes/', StudentDisputeCreateListView.as_view(), name='disputes-v1'),
+    path('api/disputes/', StudentDisputeCreateListView.as_view(), name='disputes-root'),
+
+    # Phase 12: Fraud Management
+    path('api/v1/admin/', include('apps.fraud_management.urls')),
+    path('api/admin/', include('apps.fraud_management.urls')),
+    path('api/v1/fraud/', include('apps.fraud_management.urls')),
 ]
 
-if settings.DEBUG:
-    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+from django.views.static import serve
+from django.urls import re_path
+
+urlpatterns += [
+    re_path(r'^media/(?P<path>.*)$', serve, {'document_root': settings.MEDIA_ROOT}),
+]

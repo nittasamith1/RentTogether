@@ -21,7 +21,8 @@ export const useMyRentals = (params?: { status?: string; search?: string }) => {
   return useQuery<BookingsListResponse, Error>({
     queryKey: BOOKING_KEYS.rentals(params),
     queryFn: () => bookingService.getMyRentals(params),
-    staleTime: 1000 * 30, // 30s
+    staleTime: 0,
+    refetchInterval: 10000, // Live real-time polling every 10s
   });
 };
 
@@ -29,7 +30,8 @@ export const useMyIncomingRequests = (params?: { status?: string; search?: strin
   return useQuery<BookingsListResponse, Error>({
     queryKey: BOOKING_KEYS.incomingRequests(params),
     queryFn: () => bookingService.getMyIncomingRequests(params),
-    staleTime: 1000 * 30,
+    staleTime: 0,
+    refetchInterval: 10000,
   });
 };
 
@@ -38,7 +40,8 @@ export const useBookingDetail = (bookingId?: string) => {
     queryKey: BOOKING_KEYS.detail(bookingId || ''),
     queryFn: () => bookingService.getBookingDetail(bookingId!),
     enabled: Boolean(bookingId),
-    staleTime: 1000 * 30,
+    staleTime: 0,
+    refetchInterval: 5000, // Live real-time updates for active handovers
   });
 };
 

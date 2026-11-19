@@ -13,8 +13,11 @@ import {
 import { authService } from '../../services/auth';
 import { API_BASE_URL } from '../../services/api';
 import { StudentVerification } from '../../types';
+import { useAuth } from '../../context/AuthContext';
 
 export const AdminVerificationsPage: React.FC = () => {
+  const { user } = useAuth();
+  const collegeName = user?.college_name || 'Campus';
   const [verifications, setVerifications] = useState<StudentVerification[]>([]);
   const [activeTab, setActiveTab] = useState<'PENDING' | 'VERIFIED' | 'REJECTED' | 'ALL'>('PENDING');
   const [searchQuery, setSearchQuery] = useState<string>('');
@@ -104,7 +107,7 @@ export const AdminVerificationsPage: React.FC = () => {
           </div>
           <h1 className="text-2xl font-bold text-[#0E131F]">Student Identity Verifications</h1>
           <p className="text-xs text-neutral-500 mt-0.5">
-            Review submitted student ID cards and institutional credentials for Aditya University.
+            Review submitted student ID cards and institutional credentials for {collegeName}.
           </p>
         </div>
 

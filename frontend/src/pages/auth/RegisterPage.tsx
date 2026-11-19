@@ -60,14 +60,8 @@ export const RegisterPage: React.FC = () => {
         setCollegeLoading(true);
         const data = await authService.getActiveCollege();
         setCollege(data);
-      } catch {
-        setCollege({
-          id: 'aditya-id',
-          name: 'Aditya University',
-          code: 'ADITYA',
-          domain_whitelist: ['adityauniversity.in', 'aditya.ac.in'],
-          is_active: true,
-        });
+      } catch (err: any) {
+        setFormError('Unable to load active campus directory from database. Please try again.');
       } finally {
         setCollegeLoading(false);
       }
@@ -204,7 +198,7 @@ export const RegisterPage: React.FC = () => {
           <p className="text-xs mt-1 max-w-md mx-auto" style={{ color: '#85899B' }}>
             {collegeLoading
               ? 'Loading active campus configuration...'
-              : `One account for renting & lending exclusively for ${college?.name || 'Aditya University'} students.`}
+              : `One account for renting & lending exclusively for ${college?.name || 'verified'} students.`}
           </p>
         </div>
 

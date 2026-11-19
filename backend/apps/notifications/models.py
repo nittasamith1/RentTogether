@@ -32,9 +32,23 @@ class Notification(models.Model):
         related_name='notifications'
     )
     metadata = models.JSONField(default=dict, blank=True)
+    link_url = models.CharField(max_length=255, blank=True, null=True, default='')
     is_read = models.BooleanField(default=False, db_index=True)
     read_at = models.DateTimeField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
+
+    def save(self, *args, **kwargs):
+        if self.link_url is None:
+            self.link_url = f"/bookings/{self.booking_id}" if self.booking_id else ""
+        super().save(*args, **kwargs)
+
+    @property
+    def user(self):
+        return self.recipient
+
+    @user.setter
+    def user(self, value):
+        self.recipient = value
 
     class Meta:
         db_table = 'notifications_notification'

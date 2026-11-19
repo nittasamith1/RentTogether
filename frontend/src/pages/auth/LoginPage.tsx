@@ -35,6 +35,15 @@ export const LoginPage: React.FC = () => {
   const [forgotStep, setForgotStep] = useState<'EMAIL' | 'OTP_RESET'>('EMAIL');
   const [forgotLoading, setForgotLoading] = useState<boolean>(false);
   const [forgotMsg, setForgotMsg] = useState<{ text: string; isError: boolean } | null>(null);
+  const [collegeName, setCollegeName] = useState<string>('Campus');
+
+  useEffect(() => {
+    authService.getActiveCollege()
+      .then((col) => {
+        if (col && col.name) setCollegeName(col.name);
+      })
+      .catch(() => { });
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -75,16 +84,16 @@ export const LoginPage: React.FC = () => {
   };
 
   const handleDemoStudentLogin = async () => {
-    setEmail('sai.reddy@adityauniversity.in');
+    setEmail('24b11ai478@adityauniversity.in');
     setPassword('StudentPassword123!');
     setErrorMessage('');
     try {
       setLoading(true);
-      const res = await authService.login('sai.reddy@adityauniversity.in', 'StudentPassword123!');
+      const res = await authService.login('24b11ai478@adityauniversity.in', 'StudentPassword123!');
       login(res.access, res.refresh, res.user);
       navigate('/');
     } catch (err: any) {
-      setErrorMessage(err.response?.data?.detail || 'Demo student login failed. Please ensure backend is running.');
+      setErrorMessage(err.response?.data?.detail || 'Student login failed. Please ensure backend is running.');
     } finally {
       setLoading(false);
     }
@@ -174,7 +183,7 @@ export const LoginPage: React.FC = () => {
           </Link>
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold mb-2" style={{ backgroundColor: '#E9E3FF', border: '1px solid #D8D0F5', color: '#7563D9' }}>
             <ShieldCheck className="w-3.5 h-3.5" />
-            <span>Aditya University Campus Network</span>
+            <span>{collegeName} Campus Network</span>
           </div>
           <h2 className="text-xl font-extrabold" style={{ color: '#303653' }}>Student &amp; Faculty Portal</h2>
           <p className="text-xs mt-1 max-w-xs" style={{ color: '#85899B' }}>
@@ -308,8 +317,8 @@ export const LoginPage: React.FC = () => {
                 onMouseEnter={e => (e.currentTarget.style.backgroundColor = '#E9E3FF')}
                 onMouseLeave={e => (e.currentTarget.style.backgroundColor = 'rgba(233,227,255,0.6)')}
               >
-                🎓 Demo Student
-                <span className="block text-[10px] font-medium mt-0.5" style={{ color: '#7563D9' }}>Sai Reddy (Aditya Univ)</span>
+                🎓 Verified Student
+                <span className="block text-[10px] font-medium mt-0.5" style={{ color: '#7563D9' }}>Samith Nitta (Aditya Univ)</span>
               </button>
               <button
                 type="button"
@@ -351,9 +360,8 @@ export const LoginPage: React.FC = () => {
 
               {forgotMsg && (
                 <div
-                  className={`mb-4 p-3 rounded-xl text-xs flex items-center gap-2 ${
-                    forgotMsg.isError ? 'bg-red-50 text-red-700 border border-red-200' : 'bg-emerald-50 text-emerald-700 border border-emerald-200'
-                  }`}
+                  className={`mb-4 p-3 rounded-xl text-xs flex items-center gap-2 ${forgotMsg.isError ? 'bg-red-50 text-red-700 border border-red-200' : 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                    }`}
                 >
                   {forgotMsg.isError ? <AlertCircle className="w-4 h-4 shrink-0" /> : <CheckCircle2 className="w-4 h-4 shrink-0" />}
                   <span>{forgotMsg.text}</span>

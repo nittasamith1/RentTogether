@@ -139,29 +139,41 @@ RentTogether/
 ├── backend/                       # Django 5 REST Framework Backend
 │   ├── apps/
 │   │   ├── accounts/              # Custom User, Institutional Verification, Student Profiles
+│   │   ├── administration/        # Admin Portal, Verifications, Disputes, Platform Analytics
 │   │   ├── availability/          # Availability Rules, Blocks & Real-time Slots
 │   │   ├── bookings/              # State Machine, Concurrency Locking, Handover & Returns
-│   │   ├── listings/              # Item Listings, Categories, Image Uploads
+│   │   ├── fraud_management/      # AI Listing Anomaly & Fraud Isolation Engine
+│   │   ├── listings/              # Item Listings, Categories, Image Uploads, AI Pricing
 │   │   ├── marketplace/           # Public Marketplace, Search & Advanced Filtering
-│   │   ├── notifications/         # Notification System & History Cleanup
-│   │   └── reviews/               # Bidirectional Ratings & Written Feedback
-│   ├── config/                    # Django Settings, URLs, WSGI/ASGI configurations
-│   ├── media/                     # Fallback local media storage
+│   │   ├── notifications/         # Real-time Notification System & Background Reminders
+│   │   ├── recommendations/       # Personalized Department Picks & Popular Campus Gear
+│   │   ├── reviews/               # Bidirectional Ratings & Written Feedback
+│   │   └── sustainability/        # Campus & Student Carbon / Waste / Financial Savings Engine
+│   ├── ml_engine/                 # Trained Machine Learning Models & Training Pipelines
+│   │   ├── artifacts/             # Serialized Joblib Models (Pricing & Fraud Isolation)
+│   │   ├── datasets/              # Campus Rental Pricing & Anomaly Datasets
+│   │   └── training/              # Retraining Scripts for Model Pipelines
+│   ├── config/                    # Django Settings, URLs, Celery, WSGI/ASGI configurations
 │   ├── Dockerfile                 # Multi-stage production container
 │   ├── manage.py                  # Django CLI management entry point
-│   └── requirements.txt           # Python dependencies (Django, DRF, psycopg2, gunicorn, etc.)
+│   └── requirements.txt           # Python dependencies (Django, DRF, Scikit-learn, Celery, etc.)
 ├── frontend/                      # React 18 + TypeScript + Vite SPA
 │   ├── src/
 │   │   ├── components/            # Reusable UI Components (Cards, Modals, Forms, Calendar)
-│   │   │   ├── bookings/          # Availability Calendar, Handover Modal, OTP inputs
-│   │   │   ├── common/            # Navbar, Footer, Badge, Loading spinners
-│   │   │   ├── marketplace/       # ItemCard, FilterBar, SearchBar, CategoryPill
-│   │   │   └── reviews/           # RatingModal, StarRating, ReviewList
-│   │   ├── context/               # AuthContext, NotificationContext, Theme
-│   │   ├── hooks/                 # Custom React hooks (useBookings, useAvailability, etc.)
+│   │   │   ├── bookings/          # Availability Calendar, Handover Modal, QR Scanner / OTP inputs
+│   │   │   ├── common/            # Navbar, Sidebar, CampusNetworkCard, Dialogs
+│   │   │   ├── listings/          # CreateListingWizard, ListingCard, RentalHistoryModal
+│   │   │   ├── marketplace/       # ItemCard, ItemDetailModal, PopularResources, Filters
+│   │   │   ├── sustainability/    # SustainabilityImpactWidget, Eco Badges
+│   │   │   └── reviews/           # LeaveReviewModal, StarRating, ReviewList
+│   │   ├── context/               # AuthContext, DialogContext
+│   │   ├── hooks/                 # Custom React hooks (useBookings, useListings, useSustainability, useAdmin)
 │   │   ├── pages/                 # Full Page Views (Dashboard, Marketplace, Rentals, Admin)
+│   │   │   ├── admin/             # AdminDashboardPage, AdminVerificationsPage
+│   │   │   └── auth/              # LoginPage, RegisterPage, VerificationPendingPage
 │   │   ├── services/              # Axios HTTP client, API service endpoints
-│   │   └── types/                 # TypeScript interfaces and schema types
+│   │   ├── types/                 # TypeScript interfaces and schema types
+│   │   └── utils/                 # Media URL helpers, date formatting, analytics helpers
 │   ├── index.html                 # Single Page Application HTML root
 │   ├── package.json               # Node.js dependencies and scripts
 │   ├── tailwind.config.js         # Custom Tailwind theme and design tokens
@@ -180,14 +192,16 @@ RentTogether/
 
 | Layer | Technologies |
 |---|---|
-| **Frontend UI / SPA** | React 18.3, TypeScript 5.5, Vite 5.4, Tailwind CSS 3.4, Lucide Icons, Headless UI |
+| **Frontend UI / SPA** | React 18.3, TypeScript 5.5, Vite 5.4, Tailwind CSS 3.4, Framer Motion, Lucide Icons |
 | **State & Data Fetching** | TanStack Query (React Query v5), React Router DOM v6, Axios |
-| **Backend Framework** | Python 3.12, Django 5.1, Django REST Framework 3.15, Django Filter |
-| **Authentication & Tokens** | SimpleJWT (HMAC-SHA256, auto-refresh rotation), Django Crypto |
-| **Database & Concurrency** | Neon Serverless PostgreSQL 18.6, Connection Pooling, `SELECT FOR UPDATE` Locking |
-| **Image & Media Storage** | Cloudinary REST API / Python SDK with automatic image compression and WebP conversion |
-| **Production Server** | Gunicorn 21.2 (WSGI HTTP Server), Nginx (Reverse Proxy & Static Asset Compression) |
-| **Cloud Hosting** | Vercel (Frontend Global CDN), Render (Backend Python 3 Web Service) |
+| **Backend Framework** | Python 3.12+, Django 5.1, Django REST Framework 3.15, Django Filter |
+| **AI / Machine Learning** | Scikit-learn (Random Forest Regressor & Isolation Forest Anomaly Detection), Joblib, NumPy, Pandas |
+| **Task Queue & Scheduler**| Celery 5.4, Redis 7 (Scheduled cleanup, return reminders, auto-cancellations) |
+| **Authentication & Tokens**| SimpleJWT (HMAC-SHA256, auto-refresh rotation), Institutional Email OTP verification |
+| **Database & Concurrency** | Neon Serverless PostgreSQL 18.6, Connection Pooling, `SELECT FOR UPDATE` Pessimistic Locking |
+| **Image & Media Storage** | Cloudinary REST API / Python SDK with automatic WebP compression and transformations |
+| **Production Server** | Gunicorn 21.2 (WSGI HTTP Server), WhiteNoise static file compression |
+| **Cloud Hosting** | Vercel (Frontend Global Edge CDN), Render (Backend Python 3 Web Service) |
 
 ---
 
@@ -296,8 +310,8 @@ You can log in manually or use the **1-Click Demo Login** buttons on the Login p
 
 | Role | Email | Password | Access / Permissions |
 |---|---|---|---|
-| **Verified Student** | `sai.reddy@adityauniversity.in` | `StudentPassword123!` | Dashboard, Marketplace, Rentals, Bookings, Analytics |
-| **Campus Admin** | `admin@adityauniversity.in` | `AdminPassword123!` | Student ID Verification & Approval Portal |
+| **Verified Student** | `24b11ai478@adityauniversity.in` | `StudentPassword123!` | Full Student Experience: Marketplace, Rentals, Bookings, AI Insights, Sustainability |
+| **Campus Admin** | `admin@adityauniversity.in` | `AdminPassword123!` | Administrator Portal: ID Verification Queue, Dispute Mediation, Fraud Inspection |
 
 ---
 
@@ -305,15 +319,17 @@ You can log in manually or use the **1-Click Demo Login** buttons on the Login p
 
 | Path | Purpose |
 |---|---|
-| `/` | **Campus Dashboard:** Summary of active rentals, lending earnings, and campus sustainability |
-| `/marketplace` | **Marketplace:** Search, category filters, hourly/daily pricing, real-time availability |
-| `/listings` | **My Listed Gear:** Item management, toggle availability, edit prices, view rental history |
-| `/rentals` | **Active Rentals:** Pickup OTP, return checklist, QR codes, and photo evidence upload |
-| `/bookings` | **Booking Calendar:** Interactive booking schedule and conflict resolution |
-| `/payments` | **In-Person Cash:** Receipts and transaction history for offline cash exchanges |
-| `/analytics` | **Impact Tracker:** Total rupees saved and kilograms of CO₂ emissions prevented |
-| `/profile` | **Student Profile:** Verification status, department, semester, and peer reviews |
-| `/admin/verifications`| **Admin Verification Portal:** Student ID card review and approvals |
+| `/` | **Student Dashboard:** Pixel-perfect warm-cream canvas overview, active rental status, sustainability KPI cards |
+| `/marketplace` | **Marketplace / Explore:** Search with query debounce, department filters, hourly/daily pricing, availability |
+| `/listings` | **My Inventory:** Campus gear management, toggle active availability, edit pricing, inspect rental history |
+| `/listings/create` | **5-Step Resource Listing Wizard:** AI price recommendation, condition assessment, verified campus handover |
+| `/rentals` | **Rental Timeline & Handovers:** QR code display, 6-digit OTP verification, inspection checklist, return flows |
+| `/bookings` | **Booking Calendar:** Interactive booking schedule and conflict-free reservation management |
+| `/ai-insights` | **Campus Intelligence:** AI demand trends, optimal listing categories, predicted rental yields |
+| `/sustainability`| **Sustainability Engine:** Embodied electronic waste avoided, carbon offset metrics, tree equivalents |
+| `/profile` | **Student Profile:** Department, semester, campus trust score, institutional badge, peer reviews |
+| `/admin` | **Admin Dashboard:** Campus platform metrics, dispute arbitration, AI fraud alerts |
+| `/admin/verifications`| **Admin Verification Portal:** Student ID review, one-click approvals and rejections |
 
 ---
 
@@ -333,10 +349,19 @@ Run the test suite:
 # Run Marketplace Search & Filter Tests
 .venv\Scripts\python.exe backend/manage.py test apps.marketplace.tests
 
-# Run Notification & History Cleanup Tests
+# Run AI Machine Learning Pricing & Fraud Detection Tests
+.venv\Scripts\python.exe backend/manage.py test apps.listings.tests.test_pricing_engine_phase10 apps.fraud_management.tests
+
+# Run Campus Sustainability & Circular Economy Impact Tests
+.venv\Scripts\python.exe backend/manage.py test apps.sustainability.tests
+
+# Run Campus Admin Portal & Dispute Arbitration Tests
+.venv\Scripts\python.exe backend/manage.py test apps.administration.tests
+
+# Run Notification & Task Queue Scheduler Tests
 .venv\Scripts\python.exe backend/manage.py test apps.notifications.tests
 
-# Run Full Frontend TypeScript & Lint Checks
+# Run Full Frontend TypeScript Compilation & Asset Build
 npm --prefix frontend run build
 ```
 

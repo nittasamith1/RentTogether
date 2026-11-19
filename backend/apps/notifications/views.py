@@ -65,7 +65,7 @@ class UnreadNotificationCountView(views.APIView):
 
 class MarkNotificationReadView(views.APIView):
     """
-    POST /api/v1/notifications/<uuid:id>/read/
+    POST/PATCH /api/v1/notifications/<uuid:id>/read/
     Marks a single notification as read.
     """
     permission_classes = [permissions.IsAuthenticated]
@@ -80,10 +80,13 @@ class MarkNotificationReadView(views.APIView):
         serializer = NotificationSerializer(notification)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+    def patch(self, request, id):
+        return self.post(request, id)
+
 
 class MarkAllNotificationsReadView(views.APIView):
     """
-    POST /api/v1/notifications/read-all/
+    POST/PATCH /api/v1/notifications/read-all/ or /api/notifications/mark-all-read/
     Marks all unread notifications for the student as read in bulk.
     """
     permission_classes = [permissions.IsAuthenticated]
@@ -99,6 +102,9 @@ class MarkAllNotificationsReadView(views.APIView):
             "detail": "All notifications marked as read.",
             "updated_count": updated_count
         }, status=status.HTTP_200_OK)
+
+    def patch(self, request):
+        return self.post(request)
 
 
 class DeleteNotificationView(views.APIView):

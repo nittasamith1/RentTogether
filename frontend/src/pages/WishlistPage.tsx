@@ -13,6 +13,7 @@ import { useWishlist } from '../hooks/useWishlist';
 import { useDialog } from '../context/DialogContext';
 import { ItemDetailModal } from '../components/marketplace/ItemDetailModal';
 import { ItemCardSkeleton } from '../components/common/Skeleton';
+import { getMediaUrl } from '../utils/media';
 
 export const WishlistPage: React.FC = () => {
   const navigate = useNavigate();
@@ -196,7 +197,7 @@ export const WishlistPage: React.FC = () => {
                   <div className="relative aspect-4/3 w-full overflow-hidden" style={{ backgroundColor: '#E9E3FF' }}>
                     {item.primary_image_url ? (
                       <img
-                        src={item.primary_image_url}
+                        src={getMediaUrl(item.primary_image_url)}
                         alt={item.title}
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                         loading="lazy"

@@ -24,6 +24,7 @@ from apps.bookings.views import (
 
 urlpatterns = [
     # Creation & Queries
+    path('', CreateBookingView.as_view(), name='booking-root'),
     path('create/', CreateBookingView.as_view(), name='booking-create'),
     path('my-rentals/', MyRentalsListView.as_view(), name='my-rentals'),
     path('my-requests/', MyIncomingRequestsListView.as_view(), name='my-incoming-requests'),
@@ -33,9 +34,11 @@ urlpatterns = [
 
     # Lifecycle State Transitions
     path('<uuid:booking_id>/accept/', AcceptBookingView.as_view(), name='booking-accept'),
+    path('<uuid:booking_id>/approve/', AcceptBookingView.as_view(), name='booking-approve'),
     path('<uuid:booking_id>/reject/', RejectBookingView.as_view(), name='booking-reject'),
     path('<uuid:booking_id>/cancel/', CancelBookingView.as_view(), name='booking-cancel'),
     path('<uuid:booking_id>/confirm-cash/', ConfirmCashPaymentView.as_view(), name='booking-confirm-cash'),
+    path('<uuid:booking_id>/confirm-cash-payment/', ConfirmCashPaymentView.as_view(), name='booking-confirm-cash-payment'),
     path('<uuid:booking_id>/cash/confirm/', ConfirmCashPaymentView.as_view(), name='booking-cash-confirm'),
     path('<uuid:booking_id>/payment/initiate/', InitiatePaymentView.as_view(), name='booking-payment-initiate'),
     path('<uuid:booking_id>/handover/confirm/', ConfirmHandoverView.as_view(), name='booking-handover-confirm'),
@@ -47,7 +50,9 @@ urlpatterns = [
     path('<uuid:booking_id>/handover-pass/', HandoverPassView.as_view(), name='booking-handover-pass'),
     path('<uuid:booking_id>/handover-pass/regenerate/', RegenerateHandoverPassView.as_view(), name='booking-handover-pass-regenerate'),
     path('<uuid:booking_id>/verify-pickup/', VerifyPickupView.as_view(), name='booking-verify-pickup'),
+    path('<uuid:booking_id>/handover/verify-pickup/', VerifyPickupView.as_view(), name='booking-handover-verify-pickup'),
     path('<uuid:booking_id>/verify-return/', VerifyReturnView.as_view(), name='booking-verify-return'),
+    path('<uuid:booking_id>/handover/verify-return/', VerifyReturnView.as_view(), name='booking-handover-verify-return'),
     path('<uuid:booking_id>/evidence/', HandoverEvidenceView.as_view(), name='booking-evidence'),
 ]
 

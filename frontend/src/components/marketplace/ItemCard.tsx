@@ -2,6 +2,7 @@ import React from 'react';
 import { Heart, Star, MapPin, Clock } from 'lucide-react';
 import { ItemSummary } from '../../services/marketplace';
 import { useWishlist } from '../../hooks/useWishlist';
+import { getMediaUrl } from '../../utils/media';
 
 interface ItemCardProps {
   item: ItemSummary;
@@ -46,7 +47,7 @@ export const ItemCard = React.memo<ItemCardProps>(({ item, onSelect }) => {
       <div className="relative aspect-4/3 w-full overflow-hidden" style={{ backgroundColor: '#E9E3FF' }}>
         {item.primary_image_url ? (
           <img
-            src={item.primary_image_url}
+            src={getMediaUrl(item.primary_image_url)}
             alt={item.title}
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
             loading="lazy"

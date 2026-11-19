@@ -5,7 +5,19 @@ from apps.marketplace.models import Category
 from apps.marketplace.serializers import CategorySerializer
 
 
+def format_media_url(url: str, request=None) -> str:
+    if not url:
+        return ""
+    if url.startswith(('http://', 'https://', 'data:', 'blob:')):
+        return url
+    if request:
+        return request.build_absolute_uri(url)
+    return url
+
+
 class ItemImageListingSerializer(serializers.ModelSerializer):
+    image_url = serializers.SerializerMethodField()
+
     class Meta:
         model = ItemImage
         fields = [
@@ -16,6 +28,10 @@ class ItemImageListingSerializer(serializers.ModelSerializer):
             'display_order',
             'created_at',
         ]
+
+    def get_image_url(self, obj) -> str:
+        request = self.context.get('request')
+        return format_media_url(obj.image_url, request)
 
 
 class CreateListingSerializer(serializers.Serializer):
@@ -75,6 +91,7 @@ class OwnerListingSummarySerializer(serializers.ModelSerializer):
     completed_bookings_count = serializers.IntegerField(default=0, read_only=True)
     hourly_rental_price = serializers.SerializerMethodField()
     security_deposit = serializers.SerializerMethodField()
+    primary_image_url = serializers.SerializerMethodField()
 
     class Meta:
         model = Item
@@ -97,6 +114,15 @@ class OwnerListingSummarySerializer(serializers.ModelSerializer):
             'created_at',
         ]
 
+    def get_primary_image_url(self, obj) -> str:
+        request = self.context.get('request')
+        url = obj.primary_image_url
+        if not url:
+            first_img = obj.images.filter(is_primary=True).first() or obj.images.first()
+            if first_img:
+                url = first_img.image_url
+        return format_media_url(url, request)
+
     def get_security_deposit(self, obj) -> str:
         return "0.00"
 
@@ -113,6 +139,7 @@ class OwnerListingDetailSerializer(serializers.ModelSerializer):
     completed_bookings_count = serializers.SerializerMethodField()
     hourly_rental_price = serializers.SerializerMethodField()
     security_deposit = serializers.SerializerMethodField()
+    primary_image_url = serializers.SerializerMethodField()
 
     class Meta:
         model = Item
@@ -165,11 +192,61 @@ class OwnerListingDetailSerializer(serializers.ModelSerializer):
             return obj.completed_bookings_count
         return obj.bookings.filter(status='COMPLETED').count()
 
+    def get_primary_image_url(self, obj) -> str:
+        request = self.context.get('request')
+        url = obj.primary_image_url
+        if not url:
+            first_img = obj.images.filter(is_primary=True).first() or obj.images.first()
+            if first_img:
+                url = first_img.image_url
+        return format_media_url(url, request)
+
 
 class PriceRecommendationRequestSerializer(serializers.Serializer):
-    category = serializers.CharField(max_length=100)
-    original_price = serializers.DecimalField(max_digits=10, decimal_places=2, min_value=Decimal('0.01'))
-    condition = serializers.ChoiceField(choices=Item.CONDITION_CHOICES, default=Item.CONDITION_GOOD)
+    category = serializers.CharField(max_length=100, required=False, allow_blank=True)
+    category_id = serializers.CharField(max_length=100, required=False, allow_blank=True)
+    original_price = serializers.DecimalField(max_digits=10, decimal_places=2, min_value=Decimal('0.01'), required=False)
+    original_retail_price = serializers.DecimalField(max_digits=10, decimal_places=2, min_value=Decimal('0.01'), required=False)
+    condition = serializers.ChoiceField(choices=Item.CONDITION_CHOICES, default=Item.CONDITION_GOOD, required=False)
     item_age_months = serializers.IntegerField(min_value=0, default=0, required=False)
+    age_in_months = serializers.IntegerField(min_value=0, default=0, required=False)
+    age_months = serializers.IntegerField(min_value=0, default=0, required=False)
+    item_brand_tier = serializers.ChoiceField(choices=["BUDGET", "MID_TIER", "PREMIUM"], default="MID_TIER", required=False)
+    campus_demand_score = serializers.FloatField(min_value=1.0, max_value=5.0, default=3.0, required=False)
     requested_duration_days = serializers.IntegerField(min_value=1, default=1, required=False)
+    rental_duration_days = serializers.IntegerField(min_value=1, default=1, required=False)
+    current_price = serializers.DecimalField(max_digits=10, decimal_places=2, min_value=Decimal('0.01'), required=False)
+
+    def validate(self, attrs):
+        # Resolve category
+        category = attrs.get('category')
+        category_id = attrs.get('category_id')
+        if not category and not category_id:
+            raise serializers.ValidationError({"category": "Either category or category_id must be provided."})
+
+        if not category and category_id:
+            from apps.marketplace.models import Category
+            try:
+                cat_obj = Category.objects.filter(id=category_id).first()
+                attrs['category'] = cat_obj.slug if cat_obj else str(category_id)
+            except Exception:
+                attrs['category'] = str(category_id)
+
+        # Resolve price
+        price = attrs.get('original_price') or attrs.get('original_retail_price')
+        if not price or price <= 0:
+            raise serializers.ValidationError({"original_price": "Original purchase price must be greater than zero."})
+        attrs['original_price'] = price
+
+        # Resolve age
+        age = attrs.get('item_age_months') or attrs.get('age_in_months') or attrs.get('age_months') or 0
+        attrs['item_age_months'] = age
+        attrs['age_months'] = age
+
+        # Resolve duration
+        duration = attrs.get('rental_duration_days') or attrs.get('requested_duration_days') or 1
+        attrs['rental_duration_days'] = duration
+        attrs['requested_duration_days'] = duration
+
+        return attrs
 

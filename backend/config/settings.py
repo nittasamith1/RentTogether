@@ -286,6 +286,26 @@ CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
 CELERY_TIMEZONE = TIME_ZONE
 
+# Celery Beat Schedule — Phase 16 Background Workers
+CELERY_BEAT_SCHEDULE = {
+    'check-unanswered-booking-requests-every-30-mins': {
+        'task': 'apps.bookings.tasks.check_unanswered_booking_requests',
+        'schedule': 1800.0,  # 30 mins
+    },
+    'send-return-due-reminders-hourly': {
+        'task': 'apps.bookings.tasks.send_return_due_reminders',
+        'schedule': 3600.0,  # 1 hour
+    },
+    'mark-overdue-bookings-every-2-hours': {
+        'task': 'apps.bookings.tasks.mark_overdue_bookings',
+        'schedule': 7200.0,  # 2 hours
+    },
+    'expire-unpaid-bookings-every-15-mins': {
+        'task': 'apps.bookings.tasks.expire_payment_requests',
+        'schedule': 900.0,   # 15 mins
+    },
+}
+
 # Email Configuration
 EMAIL_HOST = os.getenv('EMAIL_HOST', 'smtp.gmail.com')
 EMAIL_PORT = int(os.getenv('EMAIL_PORT', 587))
@@ -303,19 +323,23 @@ if EMAIL_HOST_USER and EMAIL_HOST_PASSWORD:
 else:
     EMAIL_BACKEND = os.getenv('EMAIL_BACKEND', 'django.core.mail.backends.console.EmailBackend')
 
-# Cloudinary Configuration
-CLOUDINARY_CLOUD_NAME = os.getenv('CLOUDINARY_CLOUD_NAME', '')
-CLOUDINARY_API_KEY = os.getenv('CLOUDINARY_API_KEY', '')
-CLOUDINARY_API_SECRET = os.getenv('CLOUDINARY_API_SECRET', '')
+# Cloudinary Configuration (Global Low-Latency CDN)
+CLOUDINARY_URL = os.getenv('CLOUDINARY_URL', '').strip()
+CLOUDINARY_CLOUD_NAME = os.getenv('CLOUDINARY_CLOUD_NAME', '').strip()
+CLOUDINARY_API_KEY = os.getenv('CLOUDINARY_API_KEY', '').strip()
+CLOUDINARY_API_SECRET = os.getenv('CLOUDINARY_API_SECRET', '').strip()
 
-if CLOUDINARY_CLOUD_NAME and CLOUDINARY_API_KEY and CLOUDINARY_API_SECRET:
+if CLOUDINARY_URL or (CLOUDINARY_CLOUD_NAME and CLOUDINARY_API_KEY and CLOUDINARY_API_SECRET):
     import cloudinary
-    cloudinary.config(
-        cloud_name=CLOUDINARY_CLOUD_NAME,
-        api_key=CLOUDINARY_API_KEY,
-        api_secret=CLOUDINARY_API_SECRET,
-        secure=True
-    )
+    if CLOUDINARY_URL:
+        cloudinary.config(cloudinary_url=CLOUDINARY_URL, secure=True)
+    else:
+        cloudinary.config(
+            cloud_name=CLOUDINARY_CLOUD_NAME,
+            api_key=CLOUDINARY_API_KEY,
+            api_secret=CLOUDINARY_API_SECRET,
+            secure=True
+        )
 
 # Production Security Headers
 if not DEBUG:

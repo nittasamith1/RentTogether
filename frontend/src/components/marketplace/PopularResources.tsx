@@ -2,6 +2,7 @@ import React, { useRef } from 'react';
 import { Flame, ChevronLeft, ChevronRight, Star, Heart } from 'lucide-react';
 import { ItemSummary } from '../../services/marketplace';
 import { useWishlist } from '../../hooks/useWishlist';
+import { getMediaUrl } from '../../utils/media';
 
 interface PopularResourcesProps {
   items: ItemSummary[];
@@ -87,7 +88,7 @@ export const PopularResources: React.FC<PopularResourcesProps> = ({ items, onSel
           >
             <div className="relative aspect-16/10 w-full overflow-hidden" style={{ backgroundColor: '#E9E3FF' }}>
               <img
-                src={item.primary_image_url}
+                src={getMediaUrl(item.primary_image_url)}
                 alt={item.title}
                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                 onError={(e) => {

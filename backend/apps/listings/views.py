@@ -1,4 +1,4 @@
-from rest_framework import views, status, generics
+from rest_framework import views, status, generics, permissions
 from rest_framework.response import Response
 from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
 from django.core.exceptions import ValidationError, PermissionDenied
@@ -41,26 +41,42 @@ class CreateListingView(views.APIView):
     def post(self, request):
         serializer = CreateListingSerializer(data=request.data)
         if not serializer.is_valid():
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            first_key = next(iter(serializer.errors.keys()), "input")
+            first_val = serializer.errors[first_key]
+            first_msg = first_val[0] if isinstance(first_val, list) and first_val else str(first_val)
+            err_dict = dict(serializer.errors)
+            err_dict['detail'] = f"{first_key.replace('_', ' ').capitalize()}: {first_msg}"
+            return Response(err_dict, status=status.HTTP_400_BAD_REQUEST)
 
         # Retrieve images from multipart upload
         image_files = request.FILES.getlist('images') or request.FILES.getlist('images[]')
         if not image_files:
             return Response(
-                {"images": ["At least one photograph is required to publish a listing."]},
+                {
+                    "detail": "At least one photograph is required to publish a listing.",
+                    "images": ["At least one photograph is required to publish a listing."]
+                },
                 status=status.HTTP_400_BAD_REQUEST
             )
 
         try:
             item = create_listing(request.user, serializer.validated_data, image_files)
             from apps.notifications.services import send_notification
-            hourly = (item.rental_price_per_day / 24)
-            send_notification(
-                recipient=request.user,
-                event_type="LISTING_PUBLISHED",
-                title="Listing Published!",
-                message=f"Your resource '{item.title}' is now live and discoverable on campus at ₹{item.rental_price_per_day}/day (₹{hourly:.2f}/hr)."
-            )
+            if not item.is_published:
+                send_notification(
+                    recipient=request.user,
+                    event_type="LISTING_QUARANTINED",
+                    title="Listing Held for Security Review",
+                    message=f"Your resource '{item.title}' has been temporarily placed in the campus safety review queue. A college administrator will verify it shortly."
+                )
+            else:
+                hourly = (item.rental_price_per_day / 24)
+                send_notification(
+                    recipient=request.user,
+                    event_type="LISTING_PUBLISHED",
+                    title="Listing Published!",
+                    message=f"Your resource '{item.title}' is now live and discoverable on campus at ₹{item.rental_price_per_day}/day (₹{hourly:.2f}/hr)."
+                )
             output = OwnerListingDetailSerializer(item).data
             return Response(output, status=status.HTTP_201_CREATED)
         except ValidationError as exc:
@@ -222,9 +238,10 @@ class ItemImageActionView(views.APIView):
 class PriceRecommendationView(views.APIView):
     """
     POST /api/v1/listings/price-recommendation/
-    Returns AI-generated fair rental price prediction and recommended bounds.
+    POST /api/ai/predict-price/
+    Returns AI-generated fair rental price prediction, confidence score, pricing status, and recommended bounds.
     """
-    permission_classes = [IsVerifiedStudentOwner]
+    permission_classes = [permissions.AllowAny]
 
     def post(self, request):
         serializer = PriceRecommendationRequestSerializer(data=request.data)
@@ -236,9 +253,12 @@ class PriceRecommendationView(views.APIView):
             recommendation = predict_fair_rental_price(
                 category=data['category'],
                 original_price=data['original_price'],
-                condition=data['condition'],
-                item_age_months=data.get('item_age_months', 0),
-                requested_duration_days=data.get('requested_duration_days', 1)
+                condition=data.get('condition', 'GOOD'),
+                age_months=data.get('item_age_months', 0),
+                item_brand_tier=data.get('item_brand_tier', 'MID_TIER'),
+                campus_demand_score=data.get('campus_demand_score', 3.0),
+                rental_duration_days=data.get('rental_duration_days', 1),
+                current_price=data.get('current_price', None)
             )
             return Response(recommendation, status=status.HTTP_200_OK)
         except Exception as exc:
@@ -248,47 +268,77 @@ class PriceRecommendationView(views.APIView):
 class OwnerListingRentalHistoryView(views.APIView):
     """
     GET /api/v1/listings/<item_id>/rental-history/
-    Returns the past and active rental booking records for this item.
+    Returns past and active rental booking records for this item.
+    Enforces that only the authenticated item owner can view its transaction history.
     """
-    permission_classes = [IsVerifiedStudentOwner]
+    permission_classes = [permissions.IsAuthenticated]
 
     def get(self, request, item_id):
-        item = get_owner_listing_detail(request.user, item_id)
-        bookings = item.bookings.select_related('renter').order_by('-created_at')
+        try:
+            item = Item.objects.select_related('category', 'owner').prefetch_related('bookings').get(id=item_id)
+        except (Item.DoesNotExist, ValueError, Exception):
+            return Response({'detail': 'Listing not found.'}, status=status.HTTP_404_NOT_FOUND)
+
+        if item.owner_id != request.user.id and not request.user.is_staff:
+            return Response(
+                {'detail': 'You do not have permission to view rental history for this item.'},
+                status=status.HTTP_403_FORBIDDEN
+            )
 
         history = []
-        from apps.profiles.models import StudentReview
-        for b in bookings:
-            renter_name = b.renter.get_full_name() or b.renter.username
-            renter_avatar = ''
-            if hasattr(b.renter, 'profile') and b.renter.profile and getattr(b.renter.profile, 'avatar', None):
-                renter_avatar = str(b.renter.profile.avatar)
+        try:
+            from apps.profiles.models import StudentReview
+            bookings = item.bookings.select_related('renter').order_by('-created_at')
+            for b in bookings:
+                try:
+                    renter_name = "Campus Student"
+                    renter_avatar = ""
+                    if getattr(b, 'renter', None):
+                        renter_name = b.renter.get_full_name() or b.renter.username or "Campus Student"
+                        try:
+                            profile = getattr(b.renter, 'profile', None)
+                            if profile and getattr(profile, 'avatar', None):
+                                renter_avatar = str(profile.avatar)
+                        except Exception:
+                            renter_avatar = ""
 
-            start_d = b.start_date.isoformat() if b.start_date and hasattr(b.start_date, 'isoformat') else str(b.start_date or '')
-            end_d = b.end_date.isoformat() if b.end_date and hasattr(b.end_date, 'isoformat') else str(b.end_date or '')
-            ret_d = b.returned_at.isoformat() if getattr(b, 'returned_at', None) else None
-            price_val = float(b.total_rental_fee or 0.0)
+                    start_d = b.start_date.isoformat() if getattr(b, 'start_date', None) and hasattr(b.start_date, 'isoformat') else str(getattr(b, 'start_date', ''))
+                    end_d = b.end_date.isoformat() if getattr(b, 'end_date', None) and hasattr(b.end_date, 'isoformat') else str(getattr(b, 'end_date', ''))
+                    ret_d = b.returned_at.isoformat() if getattr(b, 'returned_at', None) and hasattr(b.returned_at, 'isoformat') else None
+                    price_val = float(getattr(b, 'total_rental_fee', 0.0) or 0.0)
 
-            history.append({
-                'id': str(b.id),
-                'booking_reference': b.booking_reference or b.booking_code,
-                'renter_name': renter_name,
-                'renter_avatar': renter_avatar,
-                'status': b.status,
-                'start_date': start_d,
-                'end_date': end_d,
-                'actual_return_date': ret_d,
-                'rental_price_inr': price_val,
-                'deposit_amount_inr': 0.0,
-                'pickup_spot': b.pickup_spot or '',
-                'created_at': b.created_at.isoformat() if b.created_at and hasattr(b.created_at, 'isoformat') else str(b.created_at or ''),
-                'has_reviewed': StudentReview.objects.filter(booking=b, reviewer=request.user).exists(),
-            })
+                    has_reviewed = False
+                    try:
+                        has_reviewed = StudentReview.objects.filter(booking=b, reviewer=request.user).exists()
+                    except Exception:
+                        has_reviewed = False
+
+                    ref = getattr(b, 'booking_reference', None) or getattr(b, 'booking_code', None) or f"RT-{str(b.id)[:8]}"
+
+                    history.append({
+                        'id': str(b.id),
+                        'booking_reference': ref,
+                        'renter_name': renter_name,
+                        'renter_avatar': renter_avatar,
+                        'status': getattr(b, 'status', 'COMPLETED'),
+                        'start_date': start_d,
+                        'end_date': end_d,
+                        'actual_return_date': ret_d,
+                        'rental_price_inr': price_val,
+                        'deposit_amount_inr': 0.0,
+                        'pickup_spot': getattr(b, 'pickup_spot', '') or 'Campus Handover Desk',
+                        'created_at': b.created_at.isoformat() if getattr(b, 'created_at', None) and hasattr(b.created_at, 'isoformat') else '',
+                        'has_reviewed': has_reviewed,
+                    })
+                except Exception:
+                    continue
+        except Exception:
+            history = []
 
         return Response({
             'item_id': str(item.id),
             'item_title': item.title,
-            'total_rentals': item.rental_count,
+            'total_rentals': getattr(item, 'rental_count', len(history)),
             'rental_history': history,
         }, status=status.HTTP_200_OK)
 

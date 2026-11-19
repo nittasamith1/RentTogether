@@ -22,8 +22,11 @@ import { ItemCardSkeleton } from '../components/common/Skeleton';
 import { PopularResources } from '../components/marketplace/PopularResources';
 import { MarketplaceFilterSidebar } from '../components/marketplace/MarketplaceFilterSidebar';
 import { ItemDetailModal } from '../components/marketplace/ItemDetailModal';
+import { useAuth } from '../context/AuthContext';
 
 export const MarketplacePage: React.FC = () => {
+  const { user } = useAuth();
+  const collegeName = user?.college_name || 'Campus';
   const [searchParams, setSearchParams] = useSearchParams();
   const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
   const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(false);
@@ -64,17 +67,15 @@ export const MarketplacePage: React.FC = () => {
     setSearchParams(new URLSearchParams(), { replace: true });
   };
 
-  // Queries
+  // Live real-time database queries
   const { data: categories = [] } = useQuery({
     queryKey: ['marketplace-categories'],
     queryFn: marketplaceService.getCategories,
-    staleTime: 1000 * 60 * 5,
   });
 
   const { data: popularItems = [] } = useQuery({
     queryKey: ['marketplace-popular'],
     queryFn: marketplaceService.getPopularItems,
-    staleTime: 1000 * 60 * 3,
   });
 
   const {
@@ -83,7 +84,6 @@ export const MarketplacePage: React.FC = () => {
   } = useQuery({
     queryKey: ['marketplace-items', filters],
     queryFn: () => marketplaceService.getItems(filters),
-    staleTime: 1000 * 60 * 2,
   });
 
   const items = itemsData?.results || [];
@@ -139,7 +139,7 @@ export const MarketplacePage: React.FC = () => {
               style={{ backgroundColor: '#E9E3FF', borderColor: '#D8D0F5', color: '#7563D9' }}
             >
               <Building2 className="w-3.5 h-3.5" />
-              <span>Aditya University Campus Catalog</span>
+              <span>{collegeName} Campus Catalog</span>
               <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: '#7563D9' }} />
               <span>Intra-Campus Trusted Network</span>
             </div>
@@ -165,7 +165,7 @@ export const MarketplacePage: React.FC = () => {
               className="rounded-2xl p-3 sm:p-4 flex flex-col items-center justify-center flex-1 sm:flex-initial sm:min-w-[110px] border shadow-xs text-center"
               style={{ backgroundColor: '#DFEDFF', borderColor: '#C5DCFA' }}
             >
-              <span className="text-lg sm:text-xl font-black" style={{ color: '#6398D6' }}>8</span>
+              <span className="text-lg sm:text-xl font-black" style={{ color: '#6398D6' }}>{categories.length}</span>
               <span className="text-[10px] sm:text-[11px] font-semibold" style={{ color: '#3A6BB5' }}>Categories</span>
             </div>
             <div

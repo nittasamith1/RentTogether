@@ -123,15 +123,24 @@ class StudentRegistrationSerializer(serializers.Serializer):
         if id_card_image:
             try:
                 import cloudinary.uploader
-                if os.getenv('CLOUDINARY_CLOUD_NAME'):
+                c_name = os.getenv('CLOUDINARY_CLOUD_NAME', '').strip()
+                c_url = os.getenv('CLOUDINARY_URL', '').strip()
+                if c_url or c_name:
                     upload_result = cloudinary.uploader.upload(
                         id_card_image,
                         folder=f"renttogether/{college.code.lower()}/id_cards",
-                        resource_type="image"
+                        resource_type="image",
+                        timeout=12,
+                        transformation=[
+                            {"width": 1000, "height": 700, "crop": "limit", "quality": "auto:good"},
+                            {"fetch_format": "auto"}
+                        ]
                     )
                     id_card_url = upload_result.get('secure_url', '')
             except Exception:
                 pass  # Fall back to file field storage
+            if hasattr(id_card_image, 'seek'):
+                id_card_image.seek(0)
 
         # 3. Create StudentVerification
         StudentVerification.objects.create(

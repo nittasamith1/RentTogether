@@ -7,6 +7,19 @@ export default {
   theme: {
     extend: {
       colors: {
+        canvas: '#FBF9F5',
+        midnight: {
+          sidebar: '#0A1128',
+          dark: '#0F172A',
+        },
+        amber: {
+          primary: '#FBBF24',
+          dark: '#F59E0B',
+        },
+        slate: {
+          text: '#1E293B',
+          muted: '#64748B',
+        },
         brand: {
           primary: '#7563D9',
           hover: '#6552C5',

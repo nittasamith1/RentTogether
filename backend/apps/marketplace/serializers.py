@@ -52,13 +52,29 @@ class CategorySerializer(serializers.ModelSerializer):
         return 0
 
 
+def format_media_url(url: str, request=None) -> str:
+    if not url:
+        return ""
+    if url.startswith(('http://', 'https://', 'data:', 'blob:')):
+        return url
+    if request:
+        return request.build_absolute_uri(url)
+    return url
+
+
 class ItemImageSerializer(serializers.ModelSerializer):
     """
     Gallery photo serializer.
     """
+    image_url = serializers.SerializerMethodField()
+
     class Meta:
         model = ItemImage
         fields = ['id', 'image_url', 'is_primary', 'display_order']
+
+    def get_image_url(self, obj) -> str:
+        request = self.context.get('request')
+        return format_media_url(obj.image_url, request)
 
 
 class OwnerPublicSummarySerializer(serializers.Serializer):
@@ -76,7 +92,9 @@ class OwnerPublicSummarySerializer(serializers.Serializer):
     year_of_study = serializers.IntegerField(default=1)
 
     def get_avatar(self, obj) -> str:
-        return getattr(obj, 'avatar_url', '')
+        request = self.context.get('request')
+        url = getattr(obj, 'avatar_url', '')
+        return format_media_url(url, request)
 
     def get_reputation(self, obj) -> float:
         score, _ = calculate_owner_reputation(obj.user_id)
@@ -105,6 +123,7 @@ class MarketplaceItemSummarySerializer(serializers.ModelSerializer):
     owner = serializers.SerializerMethodField()
     hourly_rental_price = serializers.SerializerMethodField()
     security_deposit = serializers.SerializerMethodField()
+    primary_image_url = serializers.SerializerMethodField()
 
     class Meta:
         model = Item
@@ -133,6 +152,15 @@ class MarketplaceItemSummarySerializer(serializers.ModelSerializer):
     def get_security_deposit(self, obj) -> str:
         # Version 1 platform strictly enforces zero security deposit for students
         return "0.00"
+
+    def get_primary_image_url(self, obj) -> str:
+        request = self.context.get('request')
+        url = obj.primary_image_url
+        if not url:
+            first_img = obj.images.filter(is_primary=True).first() or obj.images.first()
+            if first_img:
+                url = first_img.image_url
+        return format_media_url(url, request)
 
     def get_hourly_rental_price(self, obj) -> str:
         from decimal import Decimal

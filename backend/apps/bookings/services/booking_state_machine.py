@@ -559,17 +559,19 @@ class BookingStateMachine:
                 recipient=booking.renter,
                 actor=owner_user,
                 event_type="BOOKING_COMPLETED",
-                title="Rental Completed — Deposit Released!",
-                message=f"Owner verified {booking.item_title} in good condition. Your deposit of ₹{booking.security_deposit} has been released.",
-                booking=booking
+                title="Rental Completed — Item Verified!",
+                message=f"Owner verified {booking.item_title} in good condition. Rental successfully closed.",
+                booking=booking,
+                link_url=f"/bookings/{booking.id}"
             )
             send_notification(
                 recipient=booking.owner,
                 actor=owner_user,
                 event_type="BOOKING_COMPLETED",
                 title="Rental Closed",
-                message=f"You successfully completed the rental for {booking.item_title}. Earnings added to ledger.",
-                booking=booking
+                message=f"You successfully completed the rental for {booking.item_title}. Rental earnings added to your campus ledger.",
+                booking=booking,
+                link_url=f"/bookings/{booking.id}"
             )
         else:
             booking.status = Booking.STATUS_DISPUTED

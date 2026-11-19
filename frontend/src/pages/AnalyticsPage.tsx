@@ -16,7 +16,7 @@ import { useMyRentals } from '../hooks/useBookings';
 export const AnalyticsPage: React.FC = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
-  const collegeName = user?.college_name || 'Aditya University';
+  const collegeName = user?.college_name || 'Campus';
 
   // Real Queries
   const { data: profile } = useProfile();

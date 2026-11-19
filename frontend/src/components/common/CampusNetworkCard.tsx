@@ -8,8 +8,8 @@ interface CampusNetworkCardProps {
 }
 
 export const CampusNetworkCard: React.FC<CampusNetworkCardProps> = ({
-  collegeName = 'Aditya University',
-  collegeCode = 'ADITYA',
+  collegeName = 'Campus',
+  collegeCode = '',
   className = '',
 }) => {
   return (

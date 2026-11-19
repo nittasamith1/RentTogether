@@ -1,0 +1,58 @@
+{
+  "winning_model": "XGBoost Regressor (Gradient Boosting)",
+  "features": {
+    "categorical": [
+      "category",
+      "condition",
+      "item_brand_tier"
+    ],
+    "numerical": [
+      "original_retail_price",
+      "age_in_months",
+      "campus_demand_score",
+      "rental_duration_days"
+    ],
+    "all": [
+      "category",
+      "condition",
+      "item_brand_tier",
+      "original_retail_price",
+      "age_in_months",
+      "campus_demand_score",
+      "rental_duration_days"
+    ]
+  },
+  "target": "fair_rental_price_per_day",
+  "metrics": {
+    "cv_r2_mean": 0.9721,
+    "test_mae": 1.9532,
+    "test_rmse": 4.6248,
+    "test_r2": 0.9743
+  },
+  "all_model_comparisons": {
+    "Linear Regression (Baseline)": {
+      "cv_r2_mean": 0.8962,
+      "test_mae": 5.8308,
+      "test_rmse": 9.3748,
+      "test_r2": 0.8943
+    },
+    "Random Forest Regressor": {
+      "cv_r2_mean": 0.9453,
+      "test_mae": 3.1633,
+      "test_rmse": 6.7346,
+      "test_r2": 0.9455
+    },
+    "XGBoost Regressor (Gradient Boosting)": {
+      "cv_r2_mean": 0.9721,
+      "test_mae": 1.9532,
+      "test_rmse": 4.6248,
+      "test_r2": 0.9743
+    }
+  },
+  "test_sample_count": 700,
+  "train_sample_count": 2800,
+  "definition_of_done": {
+    "r2_exceeds_target": true,
+    "rmse_below_target": true
+  }
+}

@@ -242,12 +242,18 @@ class StudentProfileUpdateSerializer(serializers.ModelSerializer):
         if avatar_file:
             instance.avatar = avatar_file
             # Cloudinary secure upload handling if configured
-            if os.getenv('CLOUDINARY_CLOUD_NAME'):
+            c_name = os.getenv('CLOUDINARY_CLOUD_NAME', '').strip()
+            c_url = os.getenv('CLOUDINARY_URL', '').strip()
+            if c_url or c_name:
                 try:
                     upload_res = cloudinary.uploader.upload(
                         avatar_file,
                         folder="renttogether/avatars",
-                        transformation=[{'width': 400, 'height': 400, 'crop': 'fill', 'gravity': 'face'}]
+                        transformation=[
+                            {'width': 400, 'height': 400, 'crop': 'fill', 'gravity': 'face', 'quality': 'auto:good'},
+                            {'fetch_format': 'auto'}
+                        ],
+                        timeout=12,
                     )
                     instance.avatar_url = upload_res.get('secure_url', '')
                 except Exception:
@@ -406,12 +412,19 @@ class StudentVerificationResubmitSerializer(serializers.Serializer):
         image_file = validated['id_card_image']
         verification.id_card_image = image_file
 
-        if os.getenv('CLOUDINARY_CLOUD_NAME'):
+        c_name = os.getenv('CLOUDINARY_CLOUD_NAME', '').strip()
+        c_url = os.getenv('CLOUDINARY_URL', '').strip()
+        if c_url or c_name:
             try:
                 upload_res = cloudinary.uploader.upload(
                     image_file,
                     folder="renttogether/student_ids",
-                    type="authenticated"
+                    type="authenticated",
+                    timeout=12,
+                    transformation=[
+                        {"width": 1000, "height": 700, "crop": "limit", "quality": "auto:good"},
+                        {"fetch_format": "auto"}
+                    ]
                 )
                 verification.id_card_url = upload_res.get('secure_url', '')
             except Exception:

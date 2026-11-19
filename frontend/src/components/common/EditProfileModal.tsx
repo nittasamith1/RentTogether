@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { X, Upload, Check, AlertCircle, MapPin, Phone, FileText } from 'lucide-react';
 import { profileService } from '../../services/profile';
 import { DetailedStudentProfile } from '../../types';
+import { getMediaUrl } from '../../utils/media';
 
 interface EditProfileModalProps {
   isOpen: boolean;
@@ -125,7 +126,7 @@ export const EditProfileModal: React.FC<EditProfileModalProps> = ({
             <div className="w-16 h-16 rounded-full overflow-hidden bg-slate-200 shrink-0 border-2 border-white shadow-xs relative">
               {avatarPreview ? (
                 <img
-                  src={avatarPreview}
+                  src={getMediaUrl(avatarPreview)}
                   alt="Profile Preview"
                   className="w-full h-full object-cover"
                 />
@@ -193,7 +194,7 @@ export const EditProfileModal: React.FC<EditProfileModalProps> = ({
           <div>
             <label className="flex items-center gap-1.5 text-xs font-bold text-slate-700 mb-1.5">
               <MapPin className="w-3.5 h-3.5 text-[#5B4DFF]" />
-              <span>Preferred Aditya University Meetup Spots</span>
+              <span>Preferred Campus Meetup Spots</span>
             </label>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
               {CAMPUS_PICKUP_OPTIONS.map((spot) => {
@@ -227,9 +228,9 @@ export const EditProfileModal: React.FC<EditProfileModalProps> = ({
 
           {/* Locked Identity Banner */}
           <div className="p-3 bg-amber-50/70 border border-amber-200/60 rounded-xl text-[11px] text-amber-900 leading-relaxed">
-            <strong>Aditya University Identity Security:</strong> Roll number (
-            {currentProfile.roll_number || '21A91A0501'}), Department (
-            {currentProfile.department || 'CSE'}), and Institutional Email are securely verified
+            <strong>Campus Identity Security:</strong> Roll number (
+            {currentProfile.roll_number || 'Pending'}), Department (
+            {currentProfile.department || 'Pending'}), and Institutional Email are securely verified
             and cannot be altered.
           </div>
 

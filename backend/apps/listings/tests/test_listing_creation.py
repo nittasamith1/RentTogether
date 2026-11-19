@@ -93,6 +93,46 @@ class ListingCreationAPITests(APITestCase):
         self.assertEqual(item.owner, self.verified_student)
         self.assertEqual(item.rental_price_per_day, Decimal('50.00'))
 
+    def test_listing_creation_automatically_quarantines_price_gouging(self):
+        """Phase 12: Isolation Forest flags ₹5,000/day calculator and quarantines it."""
+        from apps.fraud_management.models import FraudAlert
+        self.client.force_authenticate(user=self.verified_student)
+        img = generate_test_image("gouging_item.jpg", "blue")
+
+        payload = {
+            'title': 'Casio fx-991CW ClassWiz Scientific Calculator',
+            'category_id': str(self.category.id),
+            'description': 'Standard scientific calculator for exams.',
+            'brand': 'Casio',
+            'model_name': 'fx-991CW',
+            'original_price': '1200.00',
+            'item_age_months': 6,
+            'condition': 'LIKE_NEW',
+            'rental_price_per_day': '5000.00', # 5000 INR/day for a 1200 INR calculator!
+            'security_deposit': '0.00',
+            'min_rental_days': 1,
+            'max_rental_days': 7,
+            'pickup_location': 'Library Counter',
+            'pickup_instructions': 'Collect in afternoon',
+            'images': [img]
+        }
+
+        response = self.client.post(self.create_url, payload, format='multipart')
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+        # Listing must be automatically quarantined (hidden from marketplace)
+        item = Item.objects.get(id=response.data['id'])
+        self.assertFalse(item.is_published)
+        self.assertEqual(item.status, Item.STATUS_PAUSED)
+
+        # High-risk FraudAlert record must exist
+        alert = FraudAlert.objects.filter(listing=item).first()
+        self.assertIsNotNone(alert)
+        self.assertGreaterEqual(alert.risk_score, 75)
+        self.assertEqual(alert.risk_level, FraudAlert.RISK_HIGH)
+        self.assertEqual(alert.status, FraudAlert.STATUS_PENDING_REVIEW)
+
+
     def test_unverified_student_cannot_create_listing(self):
         self.client.force_authenticate(user=self.unverified_student)
         payload = {

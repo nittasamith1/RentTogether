@@ -80,6 +80,15 @@ def create_listing(owner, data: Dict[str, Any], image_files: Optional[List[Any]]
         # Upload and link photographs
         process_and_save_item_images(item, image_files)
 
+    # Phase 12: Automated AI Fraud & Anomaly Risk Detection (Isolation Forest)
+    try:
+        from apps.fraud_management.services import evaluate_listing_risk
+        primary_image = image_files[0] if image_files else None
+        evaluate_listing_risk(item, owner, image_file=primary_image)
+    except Exception as exc:
+        import logging
+        logging.getLogger(__name__).warning(f"Fraud evaluation failed gracefully: {exc}")
+
     return item
 
 

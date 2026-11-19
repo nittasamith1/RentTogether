@@ -135,7 +135,7 @@ export const VerificationPendingPage: React.FC = () => {
               <div>
                 <h2 className="text-xl font-extrabold" style={{ color: '#303653' }}>Identity Verified!</h2>
                 <p className="text-xs mt-1" style={{ color: '#85899B' }}>
-                  Your Aditya University campus membership has been approved by the campus administrator.
+                  Your campus membership has been approved by the campus administrator.
                 </p>
               </div>
 
@@ -154,7 +154,7 @@ export const VerificationPendingPage: React.FC = () => {
                 </div>
                 <div className="flex justify-between">
                   <span style={{ color: '#85899B' }}>Institution:</span>
-                  <span className="font-semibold" style={{ color: '#303653' }}>{verification?.college_name || 'Aditya University'}</span>
+                  <span className="font-semibold" style={{ color: '#303653' }}>{verification?.college_name || user?.college_name || 'Campus'}</span>
                 </div>
               </div>
 
@@ -332,7 +332,7 @@ export const VerificationPendingPage: React.FC = () => {
                   </div>
                   <div className="flex justify-between">
                     <span style={{ color: '#85899B' }}>Campus:</span>
-                    <span className="font-medium">{verification.college_name || 'Aditya University'}</span>
+                    <span className="font-medium">{verification.college_name || user?.college_name || 'Campus'}</span>
                   </div>
                 </div>
               )}

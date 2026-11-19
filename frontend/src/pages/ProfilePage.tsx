@@ -19,6 +19,7 @@ import { DetailedStudentProfile, PublicStudentProfile, StudentReviewItem } from 
 import { EditProfileModal } from '../components/common/EditProfileModal';
 import { LeaveReviewModal } from '../components/common/LeaveReviewModal';
 import { useMyRentals, useMyIncomingRequests } from '../hooks/useBookings';
+import { getMediaUrl } from '../utils/media';
 
 export const ProfilePage: React.FC = () => {
   const { id: peerId } = useParams<{ id?: string }>();
@@ -32,6 +33,10 @@ export const ProfilePage: React.FC = () => {
   const [reviews, setReviews] = useState<StudentReviewItem[]>([]);
   const [activeTab, setActiveTab] = useState<'ALL' | 'OWNER' | 'RENTER'>('ALL');
   const [isLoading, setIsLoading] = useState<boolean>(true);
+
+  const collegeName = isOwnProfile
+    ? (user?.college_name || detailedProfile?.college_name || 'Campus')
+    : (publicProfile?.college_name || user?.college_name || 'Campus');
 
   // Queries to detect completed rental transactions with this student for authentic review authorization
   const { data: userRentals } = useMyRentals({ status: 'COMPLETED' });
@@ -154,7 +159,14 @@ export const ProfilePage: React.FC = () => {
                 style={{ backgroundColor: '#7563D9' }}
               >
                 {avatarUrl ? (
-                  <img src={avatarUrl} alt={displayName} className="w-full h-full object-cover" />
+                  <img
+                    src={getMediaUrl(avatarUrl)}
+                    alt={displayName}
+                    className="w-full h-full object-cover"
+                    onError={(e) => {
+                      (e.currentTarget as HTMLElement).style.display = 'none';
+                    }}
+                  />
                 ) : (
                   <span>{initial}</span>
                 )}
@@ -178,19 +190,19 @@ export const ProfilePage: React.FC = () => {
                   style={{ backgroundColor: '#DDF3E7', color: '#42A879', borderColor: '#B8E5CC' }}
                 >
                   <CheckCircle className="w-3.5 h-3.5" />
-                  <span>Aditya University Verified</span>
+                  <span>{collegeName} Verified</span>
                 </span>
               </div>
 
               <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs" style={{ color: '#85899B' }}>
                 <span className="font-semibold" style={{ color: '#303653' }}>
                   {isOwnProfile
-                    ? detailedProfile?.department || 'Computer Science'
-                    : publicProfile?.department || 'Engineering'}
+                    ? detailedProfile?.department || 'Department Pending'
+                    : publicProfile?.department || 'Department Pending'}
                 </span>
                 <span>•</span>
                 <span>
-                  Year {isOwnProfile ? detailedProfile?.year_of_study || 3 : publicProfile?.year_of_study || 3}
+                  Year {isOwnProfile ? (detailedProfile?.year_of_study || '-') : (publicProfile?.year_of_study || '-')}
                 </span>
                 {isOwnProfile && detailedProfile?.roll_number && (
                   <>
@@ -205,8 +217,8 @@ export const ProfilePage: React.FC = () => {
               {/* Bio snippet */}
               <p className="text-xs max-w-xl leading-relaxed pt-1" style={{ color: '#85899B' }}>
                 {isOwnProfile
-                  ? detailedProfile?.bio || 'Campus peer sharing academic gear and lab equipment.'
-                  : 'Aditya University student active in academic equipment sharing.'}
+                  ? (detailedProfile?.bio || 'Campus member active in equipment sharing.')
+                  : `${collegeName} student active in academic equipment sharing.`}
               </p>
             </div>
           </div>
@@ -554,31 +566,27 @@ export const ProfilePage: React.FC = () => {
       >
         <div className="flex items-center gap-2">
           <MapPin className="w-4 h-4" style={{ color: '#7563D9' }} />
-          <h3 className="text-sm font-bold" style={{ color: '#303653' }}>Preferred Aditya University Meetup Hubs</h3>
+          <h3 className="text-sm font-bold" style={{ color: '#303653' }}>Preferred {collegeName} Meetup Hubs</h3>
         </div>
         <p className="text-xs" style={{ color: '#85899B' }}>
           Convenient handover points for gear collection, inspection, and returns within the campus.
         </p>
 
         <div className="flex flex-wrap gap-2 pt-1">
-          {(detailedProfile?.preferred_pickup_spots &&
-          detailedProfile.preferred_pickup_spots.length > 0
-            ? detailedProfile.preferred_pickup_spots
-            : [
-                'Central Library',
-                'Main Canteen & Food Court',
-                'Ratan Tata Engineering Block',
-              ]
-          ).map((spot) => (
-            <span
-              key={spot}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border text-xs font-semibold"
-              style={{ backgroundColor: '#E9E3FF', borderColor: '#D8D0F5', color: '#7563D9' }}
-            >
-              <div className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: '#7563D9' }} />
-              <span>{spot}</span>
-            </span>
-          ))}
+          {detailedProfile?.preferred_pickup_spots && detailedProfile.preferred_pickup_spots.length > 0 ? (
+            detailedProfile.preferred_pickup_spots.map((spot) => (
+              <span
+                key={spot}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border text-xs font-semibold"
+                style={{ backgroundColor: '#E9E3FF', borderColor: '#D8D0F5', color: '#7563D9' }}
+              >
+                <div className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: '#7563D9' }} />
+                <span>{spot}</span>
+              </span>
+            ))
+          ) : (
+            <p className="text-xs text-[#85899B] italic">No preferred pickup spots specified yet.</p>
+          )}
         </div>
       </div>
 

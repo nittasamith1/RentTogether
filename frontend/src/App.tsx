@@ -22,11 +22,14 @@ import { RegisterPage } from './pages/auth/RegisterPage';
 import { VerifyOtpPage } from './pages/auth/VerifyOtpPage';
 import { VerificationPendingPage } from './pages/auth/VerificationPendingPage';
 import { AdminVerificationsPage } from './pages/admin/AdminVerificationsPage';
+import { AdminDashboardPage } from './pages/admin/AdminDashboardPage';
 
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      staleTime: 1000 * 60 * 2, // 2 minutes
+      staleTime: 0, // Real-time: always fresh from database
+      refetchOnWindowFocus: true,
+      refetchOnMount: true,
       retry: 1,
     },
   },
@@ -129,13 +132,16 @@ export const App: React.FC = () => {
                 }
               >
                 <Route index element={<DashboardPage />} />
+                <Route path="dashboard" element={<DashboardPage />} />
                 <Route path="marketplace" element={<MarketplacePage />} />
                 <Route path="explore" element={<MarketplacePage />} />
+                <Route path="items/:id" element={<MarketplacePage />} />
                 <Route path="wishlist" element={<WishlistPage />} />
                 <Route path="rentals" element={<MyRentalsPage />} />
                 <Route path="listings" element={<MyListingsPage />} />
                 <Route path="listings/create" element={<CreateListingPage />} />
                 <Route path="listings/new" element={<CreateListingPage />} />
+                <Route path="list-item" element={<CreateListingPage />} />
                 <Route path="bookings" element={<BookingsCalendarPage />} />
                 <Route path="calendar" element={<Navigate to="/bookings" replace />} />
                 <Route path="payments" element={<PaymentsEscrowPage />} />
@@ -149,6 +155,38 @@ export const App: React.FC = () => {
                 <Route path="settings" element={<SettingsPage />} />
 
                 {/* Admin Portal within AppLayout */}
+                <Route
+                  path="admin"
+                  element={
+                    <AdminRoute>
+                      <AdminDashboardPage />
+                    </AdminRoute>
+                  }
+                />
+                <Route
+                  path="admin/dashboard"
+                  element={
+                    <AdminRoute>
+                      <AdminDashboardPage />
+                    </AdminRoute>
+                  }
+                />
+                <Route
+                  path="admin/disputes"
+                  element={
+                    <AdminRoute>
+                      <AdminDashboardPage />
+                    </AdminRoute>
+                  }
+                />
+                <Route
+                  path="admin-portal"
+                  element={
+                    <AdminRoute>
+                      <AdminDashboardPage />
+                    </AdminRoute>
+                  }
+                />
                 <Route
                   path="admin/verifications"
                   element={

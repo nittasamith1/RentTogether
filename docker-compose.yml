@@ -1,34 +1,55 @@
 version: '3.8'
 
 services:
-  backend:
-    build:
-      context: ./backend
-      dockerfile: Dockerfile
-    container_name: renttogether_backend
+  redis:
+    image: redis:7-alpine
+    container_name: renttogether_redis
+    ports:
+      - "6379:6379"
     restart: unless-stopped
+
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: renttogether_api
+    command: gunicorn config.wsgi:application --bind 0.0.0.0:8000 --workers 3 --threads 2
+    volumes:
+      - ./backend:/app
     ports:
       - "8000:8000"
     environment:
-      - PYTHONUNBUFFERED=1
-    env_file:
-      - ./backend/.env
-    volumes:
-      - ./backend:/app
-      - backend_media:/app/media
-    command: python manage.py runserver 0.0.0.0:8000
-
-  frontend:
-    build:
-      context: ./frontend
-      dockerfile: Dockerfile
-    container_name: renttogether_frontend
-    restart: unless-stopped
-    ports:
-      - "5173:80"
+      - DEBUG=True
+      - REDIS_URL=redis://redis:6379/0
+      - DJANGO_SETTINGS_MODULE=config.settings
     depends_on:
-      - backend
+      - redis
+    restart: unless-stopped
 
-volumes:
-  backend_media:
+  celery_worker:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: renttogether_worker
+    command: celery -A config worker --loglevel=info
+    environment:
+      - REDIS_URL=redis://redis:6379/0
+      - DJANGO_SETTINGS_MODULE=config.settings
+    depends_on:
+      - redis
+      - web
+    restart: unless-stopped
 
+  celery_beat:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: renttogether_beat
+    command: celery -A config beat --loglevel=info
+    environment:
+      - REDIS_URL=redis://redis:6379/0
+      - DJANGO_SETTINGS_MODULE=config.settings
+    depends_on:
+      - redis
+      - web
+    restart: unless-stopped

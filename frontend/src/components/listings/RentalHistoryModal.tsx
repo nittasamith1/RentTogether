@@ -23,7 +23,7 @@ interface RentalHistoryModalProps {
 export const RentalHistoryModal: React.FC<RentalHistoryModalProps> = ({ item, onClose }) => {
   const queryClient = useQueryClient();
   const [reviewingRecord, setReviewingRecord] = useState<any | null>(null);
-  const { data, isLoading, isError } = useListingRentalHistory(item ? item.id : null);
+  const { data, isLoading, isError, refetch } = useListingRentalHistory(item ? item.id : null);
 
   if (!item) return null;
 
@@ -159,11 +159,21 @@ export const RentalHistoryModal: React.FC<RentalHistoryModalProps> = ({ item, on
               </div>
             ) : isError ? (
               <div
-                className="p-4 rounded-2xl text-xs flex items-center gap-2 border"
+                className="p-4 rounded-2xl text-xs flex items-center justify-between gap-3 border"
                 style={{ backgroundColor: '#FFF0F0', borderColor: '#F28B82', color: '#E87575' }}
               >
-                <AlertCircle className="w-4 h-4 shrink-0" />
-                <span>Failed to load rental history. Please try again.</span>
+                <div className="flex items-center gap-2">
+                  <AlertCircle className="w-4 h-4 shrink-0" />
+                  <span>Failed to load rental history. Please try again.</span>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => refetch()}
+                  className="px-3 py-1.5 rounded-xl text-xs font-bold text-white transition-all shadow-xs cursor-pointer active:scale-95 hover:opacity-90"
+                  style={{ backgroundColor: '#E87575' }}
+                >
+                  Retry
+                </button>
               </div>
             ) : records.length === 0 ? (
               <div className="py-10 text-center space-y-2">

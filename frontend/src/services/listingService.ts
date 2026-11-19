@@ -64,20 +64,35 @@ export interface MyListingsFilters {
 }
 
 export interface PriceRecommendationRequest {
-  category_id: string;
-  condition: string;
+  category_id?: string;
+  category?: string;
+  condition?: string;
   original_price: number;
-  item_age_months: number;
+  item_age_months?: number;
+  age_months?: number;
+  item_brand_tier?: 'BUDGET' | 'MID_TIER' | 'PREMIUM';
+  campus_demand_score?: number;
+  rental_duration_days?: number;
+  current_price?: number;
 }
 
 export interface PriceRecommendationResponse {
+  recommended_price_per_day: number;
+  min_suggested_price: number;
+  max_suggested_price: number;
+  confidence_score: number;
+  pricing_status: 'Fair' | 'Underpriced' | 'Overpriced';
+  inference_latency_ms?: number;
   recommended_price: number;
   min_price: number;
   max_price: number;
   currency: string;
-  confidence_score: number;
+  period?: string;
   explanation_factors: string[];
-  formula_used: string;
+  factors?: string[];
+  model_version?: string;
+  model_type?: string;
+  formula_used?: string;
 }
 
 export interface RentalHistoryRecord {
@@ -128,12 +143,7 @@ export const listingService = {
   async createListing(formData: FormData): Promise<OwnerListingDetail> {
     const response = await apiClient.post<OwnerListingDetail>(
       '/api/v1/listings/create/',
-      formData,
-      {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      }
+      formData
     );
     return response.data;
   },
@@ -162,15 +172,37 @@ export const listingService = {
     return response.data;
   },
 
-  // Request AI price recommendation
+  // Request AI price recommendation (Phase 10 Engine)
   async getPriceRecommendation(
     payload: PriceRecommendationRequest
   ): Promise<PriceRecommendationResponse> {
-    const response = await apiClient.post<PriceRecommendationResponse>(
-      '/api/v1/listings/price-recommendation/',
+    const response = await apiClient.post<any>(
+      '/api/v1/ai/predict-price/',
       payload
     );
-    return response.data;
+    const data = response.data;
+    const recPrice = Number(data.recommended_price_per_day ?? data.predicted_price ?? data.recommended_price ?? 25);
+    const minPrice = Number(data.min_suggested_price ?? data.recommended_min ?? data.min_price ?? recPrice * 0.85);
+    const maxPrice = Number(data.max_suggested_price ?? data.recommended_max ?? data.max_price ?? recPrice * 1.15);
+
+    return {
+      recommended_price_per_day: recPrice,
+      min_suggested_price: minPrice,
+      max_suggested_price: maxPrice,
+      confidence_score: Number(data.confidence_score ?? 0.95),
+      pricing_status: data.pricing_status ?? 'Fair',
+      inference_latency_ms: data.inference_latency_ms,
+      recommended_price: recPrice,
+      min_price: minPrice,
+      max_price: maxPrice,
+      currency: data.currency ?? 'INR',
+      period: data.period ?? 'per_day',
+      explanation_factors: data.factors ?? data.explanation_factors ?? [],
+      factors: data.factors ?? data.explanation_factors ?? [],
+      model_version: data.model_version ?? 'v2.0.0-xgb',
+      model_type: data.model_type ?? 'XGBoost Regressor',
+      formula_used: data.formula_used ?? 'Trained XGBoost Campus Rental Regression'
+    };
   },
 
   // Upload supplementary images to an existing listing

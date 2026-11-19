@@ -158,7 +158,7 @@ export const LeaveReviewModal: React.FC<LeaveReviewModalProps> = ({
             </div>
             <h3 className="text-lg font-bold text-slate-900">Review Submitted!</h3>
             <p className="text-xs text-slate-500 max-w-xs">
-              Thank you for strengthening verified peer trust in Aditya University.
+              Thank you for strengthening verified peer trust on campus.
             </p>
           </div>
         ) : (

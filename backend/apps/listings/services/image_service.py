@@ -7,12 +7,18 @@ from django.core.exceptions import ValidationError
 from apps.listings.models import Item, ItemImage
 
 try:
+    import sys
     import cloudinary
     import cloudinary.uploader
-    CLOUDINARY_AVAILABLE = bool(
-        getattr(settings, 'CLOUDINARY_CLOUD_NAME', '') and
-        getattr(settings, 'CLOUDINARY_API_KEY', '') and
-        getattr(settings, 'CLOUDINARY_API_SECRET', '')
+    _cloud_url = getattr(settings, 'CLOUDINARY_URL', '').strip()
+    _cloud_name = getattr(settings, 'CLOUDINARY_CLOUD_NAME', '').strip()
+    IS_TESTING = 'test' in sys.argv or getattr(settings, 'IS_TESTING', False)
+    CLOUDINARY_AVAILABLE = (not IS_TESTING) and bool(
+        _cloud_url or (
+            _cloud_name and
+            getattr(settings, 'CLOUDINARY_API_KEY', '').strip() and
+            getattr(settings, 'CLOUDINARY_API_SECRET', '').strip()
+        )
     )
 except ImportError:
     CLOUDINARY_AVAILABLE = False
@@ -40,27 +46,43 @@ def validate_image_file(file_obj):
 
 def upload_image_to_storage(file_obj, item_id: str) -> Tuple[str, str]:
     """
-    Uploads an image either to Cloudinary (in production) or local default storage.
+    Uploads an image directly to Cloudinary CDN for ultra-low-latency real-time delivery.
+    Seamlessly falls back to reliable storage if Cloudinary is unreachable or credentials mismatch,
+    guaranteeing that student listings always publish successfully and instantly.
     Returns (image_url, cloudinary_public_id).
     """
     if CLOUDINARY_AVAILABLE:
         try:
+            if hasattr(file_obj, 'seek'):
+                file_obj.seek(0)
             folder_path = f"renttogether/items/{item_id}"
             res = cloudinary.uploader.upload(
                 file_obj,
                 folder=folder_path,
+                timeout=4,
+                resource_type="image",
                 transformation=[
-                    {"width": 1200, "height": 900, "crop": "limit", "quality": "auto"},
+                    {"width": 1200, "height": 900, "crop": "limit", "quality": "auto:good"},
                     {"fetch_format": "auto"}
                 ]
             )
-            return res.get('secure_url', res.get('url', '')), res.get('public_id', '')
+            # res['secure_url'] is the HTTPS CDN asset URL stored directly in Neon
+            secure_url = res.get('secure_url', '')
+            public_id = res.get('public_id', '')
+            if secure_url:
+                return secure_url, public_id
         except Exception as exc:
-            # Fallback to local storage if Cloudinary upload fails
-            pass
+            import logging
+            logging.getLogger(__name__).warning(
+                f"Cloudinary upload failed ({exc}); falling back to local storage."
+            )
+            if hasattr(file_obj, 'seek'):
+                file_obj.seek(0)
 
-    # Local fallback storage
-    filename = f"items/{item_id}/{uuid.uuid4().hex}_{file_obj.name}"
+    # Reliable fallback storage (works instantly with zero network delay)
+    if hasattr(file_obj, 'seek'):
+        file_obj.seek(0)
+    filename = f"items/{item_id}/{uuid.uuid4().hex}_{getattr(file_obj, 'name', 'image.jpg')}"
     saved_path = default_storage.save(filename, file_obj)
     url = default_storage.url(saved_path)
     return url, ""

@@ -5,60 +5,66 @@ import {
   ArrowRight,
   Sparkles,
   CheckCircle2,
-  Layers,
-  Clock,
   Calendar,
   Package,
   Plus,
   Flame,
   ShieldCheck,
   Heart,
+  Leaf,
+  GraduationCap,
+  Clock,
+  RefreshCw,
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useMyRentals, useMyIncomingRequests } from '../hooks/useBookings';
-import { useMyListings } from '../hooks/useListings';
 import { useProfile } from '../hooks/useProfile';
 import { useWishlist } from '../hooks/useWishlist';
+import { useMyImpact } from '../hooks/useSustainability';
+import { usePersonalizedRecommendations } from '../hooks/useRecommendations';
+import { SustainabilityImpactWidget } from '../components/sustainability/SustainabilityImpactWidget';
 import { marketplaceService, ItemSummary } from '../services/marketplace';
 import { ItemDetailModal } from '../components/marketplace/ItemDetailModal';
 import { ItemCardSkeleton } from '../components/common/Skeleton';
+import { getMediaUrl } from '../utils/media';
 
 export const DashboardPage: React.FC = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const { toggleWishlist } = useWishlist();
   const displayName = user?.first_name || user?.name?.split(' ')[0] || 'Student';
-  const collegeName = user?.college_name || 'Aditya University';
-
-  // 1. Real Queries for Dashboard Data
-  const { data: rentalsData, isLoading: loadingRentals } = useMyRentals();
-  const { data: incomingData, isLoading: loadingIncoming } = useMyIncomingRequests();
-  const { data: myListingsData, isLoading: loadingListings } = useMyListings();
+  // 1. Real Queries for Dashboard Data (Live database fetching)
+  const { data: rentalsData } = useMyRentals();
+  const { data: incomingData } = useMyIncomingRequests();
   const { data: profile } = useProfile();
+  const { data: sustainabilityImpact, isLoading: loadingImpact } = useMyImpact();
+  const { data: personalizedData, isLoading: loadingRecs } = usePersonalizedRecommendations(6);
+
+  const collegeName = user?.college_name || profile?.college_name || 'Campus';
 
   const { data: popularItems = [], isLoading: loadingPopular } = useQuery<ItemSummary[]>({
     queryKey: ['popular-items-dashboard'],
     queryFn: () => marketplaceService.getPopularItems(),
-    staleTime: 1000 * 60 * 5,
+    refetchInterval: 15000, // Live real-time database updates
   });
 
   // State
   const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
 
-  // Calculations
+  // Calculations directly from database records
   const totalRentals = rentalsData?.count || 0;
   const activeRentalsCount =
     rentalsData?.results?.filter(
       (r) => r.status === 'ACTIVE' || r.status === 'PAID_CONFIRMED'
     ).length || 0;
 
-  const totalListings = myListingsData?.stats?.total_listings || 0;
-  const activeListingsCount = myListingsData?.stats?.active_listings || 0;
-
-  const pendingIncomingCount =
-    incomingData?.results?.filter((r) => r.status === 'PENDING_APPROVAL').length || 0;
-
   const savingsAmount = Math.round(Number(profile?.total_savings_inr || 0));
+
+  // Dynamic KPI values fetched strictly from database
+  const activeRentalsKpi = sustainabilityImpact?.active_rentals ?? activeRentalsCount;
+  const completedRentalsKpi = sustainabilityImpact?.completed_rentals ?? totalRentals;
+  const moneySavedKpi = Math.round(sustainabilityImpact?.money_saved_inr ?? savingsAmount);
+  const wasteAvoidedKpi = sustainabilityImpact?.waste_avoided_kg ?? 0;
 
   // Active / Pending action bookings (combining renter & owner)
   const actionBookings = [
@@ -124,9 +130,9 @@ export const DashboardPage: React.FC = () => {
         </div>
       </div>
 
-      {/* 2. Real-Time KPI Cards */}
+      {/* 2. Phase 14: Real-Time KPI Cards (Matching Mockup) */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        {/* Card 1: My Rentals — Soft Lavender */}
+        {/* Card 1: [3] Active Rentals — Soft Lavender */}
         <div
           onClick={() => navigate('/rentals')}
           className="rounded-3xl p-5 border shadow-xs hover:shadow-card-hover transition-all flex flex-col justify-between cursor-pointer"
@@ -134,77 +140,47 @@ export const DashboardPage: React.FC = () => {
         >
           <div className="flex items-start justify-between">
             <div className="w-9 h-9 rounded-xl flex items-center justify-center" style={{ backgroundColor: '#7563D9' }}>
-              <Package className="w-4 h-4 stroke-[2.5] text-white" />
+              <Clock className="w-4 h-4 stroke-[2.5] text-white" />
             </div>
             <ArrowRight className="w-4 h-4 text-[#7563D9]" />
           </div>
           <div className="mt-4">
-            <div className="text-xs font-semibold" style={{ color: '#7563D9' }}>My Rentals</div>
+            <div className="text-xs font-semibold" style={{ color: '#7563D9' }}>Active Rentals</div>
             <div className="text-2xl font-black mt-0.5" style={{ color: '#303653' }}>
-              {loadingRentals ? '...' : totalRentals}
+              {loadingImpact ? '...' : activeRentalsKpi}
             </div>
             <div className="text-[11px] font-medium mt-1 flex items-center gap-1" style={{ color: '#5B48B8' }}>
-              <Clock className="w-3 h-3" />
-              <span>{activeRentalsCount} active rentals</span>
+              <Package className="w-3 h-3" />
+              <span>Ongoing borrowed & lent gear</span>
             </div>
           </div>
         </div>
 
-        {/* Card 2: My Listings — Sky Blue */}
+        {/* Card 2: [8] Completed Rentals — Sky Blue */}
         <div
-          onClick={() => navigate('/listings')}
+          onClick={() => navigate('/rentals')}
           className="rounded-3xl p-5 border shadow-xs hover:shadow-card-hover transition-all flex flex-col justify-between cursor-pointer"
           style={{ backgroundColor: '#DFEDFF', borderColor: '#C5DCFA' }}
         >
           <div className="flex items-start justify-between">
             <div className="w-9 h-9 rounded-xl flex items-center justify-center" style={{ backgroundColor: '#6398D6' }}>
-              <Layers className="w-4 h-4 stroke-[2.5] text-white" />
+              <CheckCircle2 className="w-4 h-4 stroke-[2.5] text-white" />
             </div>
             <ArrowRight className="w-4 h-4 text-[#6398D6]" />
           </div>
           <div className="mt-4">
-            <div className="text-xs font-semibold" style={{ color: '#3A6BB5' }}>My Equipment Listings</div>
+            <div className="text-xs font-semibold" style={{ color: '#3A6BB5' }}>Completed Rentals</div>
             <div className="text-2xl font-black mt-0.5" style={{ color: '#303653' }}>
-              {loadingListings ? '...' : totalListings}
+              {loadingImpact ? '...' : completedRentalsKpi}
             </div>
             <div className="text-[11px] font-medium mt-1 flex items-center gap-1" style={{ color: '#3A6BB5' }}>
-              <CheckCircle2 className="w-3 h-3" />
-              <span>{activeListingsCount} discoverable now</span>
+              <RefreshCw className="w-3 h-3" />
+              <span>Resources shared & returned</span>
             </div>
           </div>
         </div>
 
-        {/* Card 3: Incoming Requests — Fresh Mint */}
-        <div
-          onClick={() => navigate('/bookings')}
-          className="rounded-3xl p-5 border shadow-xs hover:shadow-card-hover transition-all flex flex-col justify-between cursor-pointer"
-          style={{ backgroundColor: '#DDF3E7', borderColor: '#B8E5CC' }}
-        >
-          <div className="flex items-start justify-between">
-            <div className="w-9 h-9 rounded-xl flex items-center justify-center" style={{ backgroundColor: '#42A879' }}>
-              <Calendar className="w-4 h-4 stroke-[2.5] text-white" />
-            </div>
-            {pendingIncomingCount > 0 && (
-              <span
-                className="px-2 py-0.5 rounded-full text-[10px] font-bold text-white"
-                style={{ backgroundColor: '#E8A447' }}
-              >
-                Needs Review
-              </span>
-            )}
-          </div>
-          <div className="mt-4">
-            <div className="text-xs font-semibold" style={{ color: '#2D7A5B' }}>Incoming Requests</div>
-            <div className="text-2xl font-black mt-0.5" style={{ color: '#303653' }}>
-              {loadingIncoming ? '...' : pendingIncomingCount}
-            </div>
-            <div className="text-[11px] font-medium mt-1" style={{ color: '#2D7A5B' }}>
-              {pendingIncomingCount > 0 ? `${pendingIncomingCount} pending your approval` : 'All caught up'}
-            </div>
-          </div>
-        </div>
-
-        {/* Card 4: Campus Savings — Soft Peach */}
+        {/* Card 3: [₹2,450] Money Saved — Soft Peach */}
         <div
           onClick={() => navigate('/analytics')}
           className="rounded-3xl p-5 border shadow-xs hover:shadow-card-hover transition-all flex flex-col justify-between cursor-pointer"
@@ -217,16 +193,42 @@ export const DashboardPage: React.FC = () => {
             <ArrowRight className="w-4 h-4 text-[#C45C20]" />
           </div>
           <div className="mt-4">
-            <div className="text-xs font-semibold" style={{ color: '#C45C20' }}>Campus Savings</div>
+            <div className="text-xs font-semibold" style={{ color: '#C45C20' }}>Money Saved</div>
             <div className="text-2xl font-black mt-0.5" style={{ color: '#303653' }}>
-              ₹{savingsAmount.toLocaleString('en-IN')}
+              ₹{loadingImpact ? '...' : moneySavedKpi.toLocaleString('en-IN')}
             </div>
             <div className="text-[11px] font-medium mt-1" style={{ color: '#C45C20' }}>
               Compared to retail purchases
             </div>
           </div>
         </div>
+
+        {/* Card 4: Waste Avoided — Fresh Mint */}
+        <div
+          onClick={() => navigate('/analytics')}
+          className="rounded-3xl p-5 border shadow-xs hover:shadow-card-hover transition-all flex flex-col justify-between cursor-pointer"
+          style={{ backgroundColor: '#DDF3E7', borderColor: '#B8E5CC' }}
+        >
+          <div className="flex items-start justify-between">
+            <div className="w-9 h-9 rounded-xl flex items-center justify-center" style={{ backgroundColor: '#42A879' }}>
+              <Leaf className="w-4 h-4 stroke-[2.5] text-white" />
+            </div>
+            <ArrowRight className="w-4 h-4 text-[#42A879]" />
+          </div>
+          <div className="mt-4">
+            <div className="text-xs font-semibold" style={{ color: '#2D7A5B' }}>Waste Avoided</div>
+            <div className="text-2xl font-black mt-0.5" style={{ color: '#303653' }}>
+              {loadingImpact ? '...' : `${wasteAvoidedKpi} kg`}
+            </div>
+            <div className="text-[11px] font-medium mt-1" style={{ color: '#2D7A5B' }}>
+              Embodied e-waste prevented
+            </div>
+          </div>
+        </div>
       </div>
+
+      {/* 2.5. Campus Sustainability Impact Widget (Phase 14) */}
+      <SustainabilityImpactWidget impact={sustainabilityImpact} isLoading={loadingImpact} />
 
       {/* 3. Real Active Bookings & Campus Intelligence */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-stretch">
@@ -370,21 +372,21 @@ export const DashboardPage: React.FC = () => {
                 </span>
               </div>
               <p className="text-xs mt-1 leading-relaxed" style={{ color: '#85899B' }}>
-                Our ML pricing engine evaluates item age, condition, and purchase cost to recommend optimal daily rates and security deposits for {collegeName}.
+                Our ML pricing engine evaluates item age, condition, and purchase cost to recommend optimal daily rental rates with zero deposit across campus.
               </p>
             </div>
 
             <div className="p-3.5 rounded-2xl border bg-white" style={{ borderColor: '#EAE6E1' }}>
               <div className="flex items-center justify-between">
                 <span className="text-xs font-bold" style={{ color: '#303653' }}>
-                  Zero-Hassle Campus Escrow
+                  Zero-Deposit Campus Protection
                 </span>
                 <span className="text-[10px] font-bold font-mono text-[#6398D6]">
-                  100% Protected
+                  100% Verified
                 </span>
               </div>
               <p className="text-xs mt-1 leading-relaxed" style={{ color: '#85899B' }}>
-                Security deposits are held in a segregated college vault and auto-refund upon post-return inspection without peer dispute risk.
+                All equipment exchanges operate with ₹0 deposit. Dual QR handovers, ID verification, and inspection passes ensure peer accountability and dispute protection.
               </p>
             </div>
           </div>
@@ -403,6 +405,124 @@ export const DashboardPage: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {/* 3.5. AI Personalized Recommendations / Department Picks (Phase 13) */}
+      {personalizedData?.recommendations && personalizedData.recommendations.length > 0 && (
+        <div
+          className="rounded-3xl p-6 border shadow-xs space-y-4"
+          style={{ backgroundColor: '#FFFCF7', borderColor: '#EAE6E1' }}
+        >
+          <div className="flex items-center justify-between pb-1">
+            <div className="flex items-center gap-2.5">
+              <div
+                className="w-10 h-10 rounded-2xl flex items-center justify-center shadow-xs"
+                style={{ backgroundColor: '#E9E3FF', color: '#7563D9' }}
+              >
+                <Sparkles className="w-5 h-5 stroke-[2.2]" />
+              </div>
+              <div>
+                <div className="flex items-center gap-2">
+                  <h2 className="text-base font-bold" style={{ color: '#303653' }}>
+                    Recommended For You
+                  </h2>
+                  <span
+                    className="px-2.5 py-0.5 rounded-full text-[10px] font-bold border flex items-center gap-1"
+                    style={{ backgroundColor: '#DDF3E7', color: '#42A879', borderColor: '#B8E5CC' }}
+                  >
+                    <GraduationCap className="w-3 h-3" />
+                    <span>
+                      {personalizedData.department
+                        ? `${personalizedData.department.toUpperCase()} Department Picks`
+                        : 'Smart Campus Match'}
+                    </span>
+                  </span>
+                </div>
+                <p className="text-xs mt-0.5" style={{ color: '#85899B' }}>
+                  AI suggestions based on your department academic calendar and previous equipment usage.
+                </p>
+              </div>
+            </div>
+
+            <Link
+              to="/marketplace"
+              className="text-xs font-bold text-[#7563D9] flex items-center gap-1 hover:underline"
+            >
+              <span>Explore all</span>
+              <ArrowRight className="w-3.5 h-3.5" />
+            </Link>
+          </div>
+
+          {loadingRecs ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4 pt-1">
+              {[1, 2, 3, 4, 5, 6].map((n) => (
+                <ItemCardSkeleton key={n} />
+              ))}
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4 pt-1">
+              {personalizedData.recommendations.map((item) => (
+                <div
+                  key={item.id}
+                  onClick={() => setSelectedItemId(item.id)}
+                  className="p-3.5 rounded-2xl border transition-all cursor-pointer group flex flex-col justify-between hover:shadow-card-hover"
+                  style={{ backgroundColor: '#FFFFFF', borderColor: '#EAE6E1' }}
+                >
+                  <div className="h-28 rounded-xl overflow-hidden relative border border-[#EAE6E1] flex items-center justify-center bg-[#FFF8ED]">
+                    {item.primary_image_url ? (
+                      <img
+                        src={getMediaUrl(item.primary_image_url)}
+                        alt={item.title}
+                        loading="lazy"
+                        decoding="async"
+                        onError={(e) => {
+                          (e.currentTarget as HTMLImageElement).src =
+                            'https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=400&q=80';
+                        }}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                      />
+                    ) : (
+                      <Package className="w-8 h-8 text-[#85899B]" />
+                    )}
+                    <span
+                      className="absolute top-1.5 left-1.5 px-2 py-0.5 rounded-full text-[9px] font-bold border pointer-events-none"
+                      style={{ backgroundColor: '#FFFCF7', color: '#7563D9', borderColor: '#EAE6E1' }}
+                    >
+                      {item.category_name}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        toggleWishlist({ id: item.id, is_wishlisted: false });
+                      }}
+                      className="absolute top-1.5 right-1.5 p-1 rounded-full shadow-xs bg-white/90 text-neutral-400 hover:text-red-500"
+                    >
+                      <Heart className="w-3 h-3 text-[#85899B]" />
+                    </button>
+                  </div>
+
+                  <div className="mt-2.5 space-y-1">
+                    <span
+                      className="inline-block px-1.5 py-0.5 rounded text-[9px] font-bold tracking-tight"
+                      style={{ backgroundColor: '#E9E3FF', color: '#7563D9' }}
+                    >
+                      {item.recommendation_reason || item.match_reason || 'Smart Match'}
+                    </span>
+                    <h4 className="text-xs font-bold text-[#303653] line-clamp-1">{item.title}</h4>
+                    <div className="flex items-center justify-between pt-1 border-t border-[#EAE6E1]">
+                      <span className="text-xs font-extrabold text-[#7563D9]">
+                        ₹{item.rental_price_per_day}
+                        <span className="text-[10px] text-[#85899B] font-normal">/day</span>
+                      </span>
+                      <span className="text-[9px] font-bold text-[#42A879]">₹0 Dep</span>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
 
       {/* 4. Real Popular / Trending Items on Campus */}
       <div
@@ -466,10 +586,14 @@ export const DashboardPage: React.FC = () => {
                 <div className="h-36 rounded-xl overflow-hidden relative border border-[#EAE6E1] flex items-center justify-center bg-[#FFF8ED]">
                   {item.primary_image_url ? (
                     <img
-                      src={item.primary_image_url}
+                      src={getMediaUrl(item.primary_image_url)}
                       alt={item.title}
                       loading="lazy"
                       decoding="async"
+                      onError={(e) => {
+                        (e.currentTarget as HTMLImageElement).src =
+                          'https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=600&q=80';
+                      }}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                     />
                   ) : (

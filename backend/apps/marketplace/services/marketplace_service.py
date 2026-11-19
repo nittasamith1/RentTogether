@@ -53,7 +53,7 @@ def get_marketplace_items_queryset(user, params: dict):
     )
 
     # 1. Search Query
-    search_text = params.get('search', '').strip()
+    search_text = (params.get('search') or params.get('q') or '').strip()
     if search_text:
         qs = apply_full_text_search(qs, search_text)
 

@@ -11,6 +11,7 @@ import {
 import { OwnerListingSummary } from '../../services/listingService';
 import { ListingStatusBadge } from './ListingStatusBadge';
 import { useUpdateListingStatus, useDeleteListing } from '../../hooks/useListings';
+import { getMediaUrl } from '../../utils/media';
 
 interface ListingCardProps {
   item: OwnerListingSummary;
@@ -26,6 +27,7 @@ export const ListingCard: React.FC<ListingCardProps> = ({
   onViewHistory,
 }) => {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState<boolean>(false);
+  const [imgError, setImgError] = useState<boolean>(false);
   const statusMutation = useUpdateListingStatus();
   const deleteMutation = useDeleteListing();
 
@@ -57,16 +59,24 @@ export const ListingCard: React.FC<ListingCardProps> = ({
       <div>
         {/* Card Image Area with Status & Category Overlay */}
         <div className="relative aspect-4/3 w-full overflow-hidden" style={{ backgroundColor: '#E9E3FF' }}>
-          {item.primary_image_url ? (
+          {item.primary_image_url && !imgError ? (
             <img
-              src={item.primary_image_url}
+              src={getMediaUrl(item.primary_image_url)}
               alt={item.title}
+              onError={() => setImgError(true)}
               className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
             />
           ) : (
-            <div className="w-full h-full flex flex-col items-center justify-center" style={{ color: '#85899B' }}>
-              <Layers className="w-8 h-8 stroke-[1.5]" />
-              <span className="text-xs font-semibold mt-1">RentTogether</span>
+            <div
+              className="w-full h-full flex flex-col items-center justify-center p-3 text-center"
+              style={{
+                background: 'linear-gradient(135deg, #E9E3FF 0%, #D8CDFF 100%)',
+                color: '#7563D9',
+              }}
+            >
+              <Layers className="w-8 h-8 stroke-[1.5] mb-1" />
+              <span className="text-xs font-bold text-[#303653] line-clamp-1 max-w-[85%]">{item.title}</span>
+              <span className="text-[10px] font-semibold text-[#7563D9]">{item.category_name}</span>
             </div>
           )}
 

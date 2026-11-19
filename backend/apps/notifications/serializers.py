@@ -6,6 +6,7 @@ class NotificationSerializer(serializers.ModelSerializer):
     actor_name = serializers.SerializerMethodField()
     booking_id = serializers.UUIDField(source='booking.id', read_only=True, allow_null=True)
     booking_code = serializers.CharField(source='booking.booking_code', read_only=True, allow_null=True)
+    action_url = serializers.CharField(source='link_url', read_only=True)
 
     class Meta:
         model = Notification
@@ -14,6 +15,8 @@ class NotificationSerializer(serializers.ModelSerializer):
             'event_type',
             'title',
             'message',
+            'link_url',
+            'action_url',
             'actor_name',
             'booking_id',
             'booking_code',

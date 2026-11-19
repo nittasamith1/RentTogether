@@ -40,8 +40,8 @@ const navItems: NavItem[] = [
 
 export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
   const { user } = useAuth();
-  const collegeName = user?.college_name || 'Aditya University';
-  const collegeCode = user?.college_code || 'ADITYA';
+  const collegeName = user?.college_name || 'Campus';
+  const collegeCode = user?.college_code || '';
 
   return (
     <>

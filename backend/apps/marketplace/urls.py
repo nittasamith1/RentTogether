@@ -15,6 +15,7 @@ urlpatterns = [
 
     # Marketplace Item Listings (search, filters, sorting)
     path('items/', MarketplaceItemListView.as_view(), name='marketplace-items'),
+    path('search/', MarketplaceItemListView.as_view(), name='marketplace-search'),
 
     # Item Detail Inspection
     path('items/<uuid:item_id>/', MarketplaceItemDetailView.as_view(), name='marketplace-item-detail'),
