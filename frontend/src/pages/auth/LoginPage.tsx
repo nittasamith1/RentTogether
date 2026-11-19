@@ -91,50 +91,6 @@ export const LoginPage: React.FC = () => {
     }
   };
 
-  const handleDemoStudentLogin = async () => {
-    setEmail('24b11ai478@adityauniversity.in');
-    setPassword('StudentPassword123!');
-    setErrorMessage('');
-    try {
-      setLoading(true);
-      const res = await authService.login('24b11ai478@adityauniversity.in', 'StudentPassword123!');
-      login(res.access, res.refresh, res.user);
-      navigate('/');
-    } catch (err: any) {
-      if (err.code === 'ECONNABORTED' || err.message?.includes('timeout')) {
-        setErrorMessage('Backend is waking up from idle state. Please retry in 15 seconds.');
-      } else if (!err.response) {
-        setErrorMessage('Connecting to campus backend... If the service was idle, please retry in 10-15 seconds.');
-      } else {
-        setErrorMessage(err.response?.data?.detail || 'Student login failed. Please ensure backend is running.');
-      }
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleDemoAdminLogin = async () => {
-    setEmail('admin@adityauniversity.in');
-    setPassword('AdminPassword123!');
-    setErrorMessage('');
-    try {
-      setLoading(true);
-      const res = await authService.login('admin@adityauniversity.in', 'AdminPassword123!');
-      login(res.access, res.refresh, res.user);
-      navigate('/admin/verifications');
-    } catch (err: any) {
-      if (err.code === 'ECONNABORTED' || err.message?.includes('timeout')) {
-        setErrorMessage('Backend is waking up from idle state. Please retry in 15 seconds.');
-      } else if (!err.response) {
-        setErrorMessage('Connecting to campus backend... If the service was idle, please retry in 10-15 seconds.');
-      } else {
-        setErrorMessage(err.response?.data?.detail || 'Demo admin login failed. Please ensure backend is running.');
-      }
-    } finally {
-      setLoading(false);
-    }
-  };
-
   const handleSendResetCode = async (e: React.FormEvent) => {
     e.preventDefault();
     setForgotMsg(null);
@@ -322,34 +278,6 @@ export const LoginPage: React.FC = () => {
               )}
             </button>
           </form>
-
-          {/* Quick Demo Login Buttons */}
-          <div className="mt-6 pt-5 space-y-2" style={{ borderTop: '1px solid #EAE6E1' }}>
-            <p className="text-[11px] font-bold uppercase tracking-wider text-center" style={{ color: '#85899B' }}>
-              Quick 1-Click Evaluation Accounts
-            </p>
-            <div className="grid grid-cols-2 gap-2 pt-1">
-              <button
-                type="button"
-                onClick={handleDemoStudentLogin}
-                className="py-2.5 px-3 rounded-xl text-xs font-bold transition-all text-center cursor-pointer"
-                style={{ border: '1px solid #D8D0F5', backgroundColor: 'rgba(233,227,255,0.6)', color: '#303653' }}
-                onMouseEnter={e => (e.currentTarget.style.backgroundColor = '#E9E3FF')}
-                onMouseLeave={e => (e.currentTarget.style.backgroundColor = 'rgba(233,227,255,0.6)')}
-              >
-                🎓 Verified Student
-                <span className="block text-[10px] font-medium mt-0.5" style={{ color: '#7563D9' }}>Samith Nitta (Aditya Univ)</span>
-              </button>
-              <button
-                type="button"
-                onClick={handleDemoAdminLogin}
-                className="py-2.5 px-3 rounded-xl border border-amber-100 bg-amber-50/60 hover:bg-amber-100/80 text-amber-900 text-xs font-bold transition-all text-center cursor-pointer"
-              >
-                🛡️ Campus Admin
-                <span className="block text-[10px] font-medium text-amber-700/90 mt-0.5">Identity Approver</span>
-              </button>
-            </div>
-          </div>
 
           <div className="mt-6 text-center text-xs" style={{ color: '#85899B' }}>
             Don't have an account?{' '}

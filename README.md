@@ -304,9 +304,9 @@ docker compose up --build
 
 ---
 
-## 🔑 Demo Credentials (Aditya University)
+## 🔑 Campus Credentials (Aditya University)
 
-You can log in manually or use the **1-Click Demo Login** buttons on the Login page:
+Log in using the verified campus credentials:
 
 | Role | Email | Password | Access / Permissions |
 |---|---|---|---|
