@@ -265,16 +265,25 @@ export const MyListingsPage: React.FC = () => {
         >
           <AlertCircle className="w-8 h-8 mx-auto" style={{ color: '#E87575' }} />
           <h3 className="text-sm font-bold" style={{ color: '#303653' }}>Failed to load listings</h3>
-          <p className="text-xs" style={{ color: '#85899B' }}>
-            Please ensure the backend API server is running on <code className="px-1.5 py-0.5 rounded bg-white font-mono text-[11px] text-[#303653]">http://localhost:8000</code> and your database connection is active.
+          <p className="text-xs max-w-md mx-auto" style={{ color: '#85899B' }}>
+            Could not retrieve your listings. The campus backend may be waking up, or your session may have expired.
           </p>
-          <button
-            onClick={() => refetch()}
-            className="px-5 py-2 text-white rounded-xl text-xs font-bold cursor-pointer hover:opacity-90 active:scale-95 transition-all shadow-xs"
-            style={{ backgroundColor: '#E87575' }}
-          >
-            Retry Connection
-          </button>
+          <div className="flex items-center justify-center gap-3 pt-1">
+            <button
+              onClick={() => refetch()}
+              className="px-5 py-2 text-white rounded-xl text-xs font-bold cursor-pointer hover:opacity-90 active:scale-95 transition-all shadow-xs"
+              style={{ backgroundColor: '#7563D9' }}
+            >
+              Retry Connection
+            </button>
+            <button
+              onClick={() => navigate('/login')}
+              className="px-5 py-2 rounded-xl text-xs font-bold cursor-pointer hover:opacity-90 active:scale-95 transition-all shadow-xs border"
+              style={{ backgroundColor: '#FFFFFF', borderColor: '#D8D0F5', color: '#7563D9' }}
+            >
+              Sign In Again
+            </button>
+          </div>
         </div>
       ) : items.length === 0 ? (
         /* Empty State */
