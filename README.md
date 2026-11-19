@@ -310,7 +310,8 @@ Log in using the verified campus credentials:
 
 | Role | Email | Password | Access / Permissions |
 |---|---|---|---|
-| **Verified Student** | `24b11ai478@adityauniversity.in` | `StudentPassword123!` | Full Student Experience: Marketplace, Rentals, Bookings, AI Insights, Sustainability |
+| **Verified Student (Senior)** | `sai.reddy@adityauniversity.in` | `StudentPassword123!` | Final year CSE student with verified listings, reviews, ratings, and rental history |
+| **Verified Student (Owner)** | `24b11ai478@adityauniversity.in` | `StudentPassword123!` | Full Student Experience: Marketplace, Rentals, Bookings, AI Insights, Sustainability |
 | **Campus Admin** | `admin@adityauniversity.in` | `AdminPassword123!` | Administrator Portal: ID Verification Queue, Dispute Mediation, Fraud Inspection |
 
 ---
