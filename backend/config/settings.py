@@ -229,13 +229,14 @@ CORS_ALLOWED_ORIGINS = list(set(
         origin.strip()
         for origin in os.getenv(
             'CORS_ALLOWED_ORIGINS',
-            'https://renttogether.vercel.app,https://renttogether.onrender.com,http://localhost:5173,http://localhost:3000,http://127.0.0.1:5173'
+            'https://renttogether.vercel.app,https://renttogether.onrender.com,https://renttogether-backend.onrender.com,http://localhost:5173,http://localhost:3000,http://127.0.0.1:5173'
         ).split(',')
         if origin.strip()
     ]
     + [
         'https://renttogether.vercel.app',
         'https://renttogether.onrender.com',
+        'https://renttogether-backend.onrender.com',
         'http://localhost:5173',
         'http://localhost:3000',
         'http://127.0.0.1:5173',
@@ -244,6 +245,7 @@ CORS_ALLOWED_ORIGINS = list(set(
 CORS_ALLOWED_ORIGIN_REGEXES = [
     r"^https:\/\/.*\.vercel\.app$",
     r"^https:\/\/renttogether.*\.vercel\.app$",
+    r"^https:\/\/renttogether.*\.onrender\.com$",
 ]
 CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOW_HEADERS = [
@@ -264,13 +266,14 @@ CSRF_TRUSTED_ORIGINS = list(set(
         origin.strip()
         for origin in os.getenv(
             'CSRF_TRUSTED_ORIGINS',
-            'https://renttogether.vercel.app,https://renttogether.onrender.com,http://localhost:5173,http://localhost:3000,http://127.0.0.1:5173'
+            'https://renttogether.vercel.app,https://renttogether.onrender.com,https://renttogether-backend.onrender.com,http://localhost:5173,http://localhost:3000,http://127.0.0.1:5173'
         ).split(',')
         if origin.strip()
     ]
     + [
         'https://renttogether.vercel.app',
         'https://renttogether.onrender.com',
+        'https://renttogether-backend.onrender.com',
         'http://localhost:5173',
         'http://localhost:3000',
         'http://127.0.0.1:5173',

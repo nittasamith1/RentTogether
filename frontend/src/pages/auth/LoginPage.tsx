@@ -35,7 +35,7 @@ export const LoginPage: React.FC = () => {
   const [forgotStep, setForgotStep] = useState<'EMAIL' | 'OTP_RESET'>('EMAIL');
   const [forgotLoading, setForgotLoading] = useState<boolean>(false);
   const [forgotMsg, setForgotMsg] = useState<{ text: string; isError: boolean } | null>(null);
-  const [collegeName, setCollegeName] = useState<string>('Campus');
+  const [collegeName, setCollegeName] = useState<string>('Aditya University');
 
   useEffect(() => {
     authService.getActiveCollege()
@@ -64,6 +64,14 @@ export const LoginPage: React.FC = () => {
         navigate('/');
       }
     } catch (err: any) {
+      if (!err.response) {
+        if (err.code === 'ECONNABORTED' || err.message?.includes('timeout')) {
+          setErrorMessage('Backend is waking up from idle state. Please retry in 15 seconds.');
+        } else {
+          setErrorMessage('Connecting to campus backend... If the service was idle, please retry in 10-15 seconds.');
+        }
+        return;
+      }
       const resp = err.response?.data;
       if (resp?.code === 'EMAIL_NOT_VERIFIED') {
         navigate(`/verify-email?email=${encodeURIComponent(resp.email || email)}`);
@@ -93,7 +101,13 @@ export const LoginPage: React.FC = () => {
       login(res.access, res.refresh, res.user);
       navigate('/');
     } catch (err: any) {
-      setErrorMessage(err.response?.data?.detail || 'Student login failed. Please ensure backend is running.');
+      if (err.code === 'ECONNABORTED' || err.message?.includes('timeout')) {
+        setErrorMessage('Backend is waking up from idle state. Please retry in 15 seconds.');
+      } else if (!err.response) {
+        setErrorMessage('Connecting to campus backend... If the service was idle, please retry in 10-15 seconds.');
+      } else {
+        setErrorMessage(err.response?.data?.detail || 'Student login failed. Please ensure backend is running.');
+      }
     } finally {
       setLoading(false);
     }
@@ -109,7 +123,13 @@ export const LoginPage: React.FC = () => {
       login(res.access, res.refresh, res.user);
       navigate('/admin/verifications');
     } catch (err: any) {
-      setErrorMessage(err.response?.data?.detail || 'Demo admin login failed. Please ensure backend is running.');
+      if (err.code === 'ECONNABORTED' || err.message?.includes('timeout')) {
+        setErrorMessage('Backend is waking up from idle state. Please retry in 15 seconds.');
+      } else if (!err.response) {
+        setErrorMessage('Connecting to campus backend... If the service was idle, please retry in 10-15 seconds.');
+      } else {
+        setErrorMessage(err.response?.data?.detail || 'Demo admin login failed. Please ensure backend is running.');
+      }
     } finally {
       setLoading(false);
     }
@@ -183,7 +203,7 @@ export const LoginPage: React.FC = () => {
           </Link>
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold mb-2" style={{ backgroundColor: '#E9E3FF', border: '1px solid #D8D0F5', color: '#7563D9' }}>
             <ShieldCheck className="w-3.5 h-3.5" />
-            <span>{collegeName} Campus Network</span>
+            <span>{collegeName.endsWith('Network') ? collegeName : `${collegeName} Network`}</span>
           </div>
           <h2 className="text-xl font-extrabold" style={{ color: '#303653' }}>Student &amp; Faculty Portal</h2>
           <p className="text-xs mt-1 max-w-xs" style={{ color: '#85899B' }}>
