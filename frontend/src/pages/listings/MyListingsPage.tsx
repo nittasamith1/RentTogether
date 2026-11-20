@@ -28,10 +28,20 @@ export const MyListingsPage: React.FC = () => {
   const [historyItem, setHistoryItem] = useState<OwnerListingSummary | null>(null);
   const [detailItemId, setDetailItemId] = useState<string | null>(null);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const [isRetrying, setIsRetrying] = useState<boolean>(false);
 
   const showToast = (msg: string) => {
     setToastMessage(msg);
     setTimeout(() => setToastMessage(null), 3500);
+  };
+
+  const handleRetry = async () => {
+    setIsRetrying(true);
+    try {
+      await refetch();
+    } finally {
+      setIsRetrying(false);
+    }
   };
 
   const queryFilters = {
@@ -39,7 +49,10 @@ export const MyListingsPage: React.FC = () => {
   };
 
   const { data, isLoading, isError, error, refetch } = useMyListings(queryFilters);
-  const isAuthError = (error as any)?.response?.status === 401 || (error as any)?.response?.status === 403;
+  const isAuthError =
+    (error as any)?.response?.status === 401 ||
+    (error as any)?.response?.status === 403 ||
+    !localStorage.getItem('access_token');
 
   const stats = data?.stats || {
     total_listings: 0,
@@ -290,11 +303,13 @@ export const MyListingsPage: React.FC = () => {
             ) : (
               <>
                 <button
-                  onClick={() => refetch()}
-                  className="px-5 py-2 text-white rounded-xl text-xs font-bold cursor-pointer hover:opacity-90 active:scale-95 transition-all shadow-xs"
+                  onClick={handleRetry}
+                  disabled={isRetrying}
+                  className="px-5 py-2 text-white rounded-xl text-xs font-bold cursor-pointer hover:opacity-90 active:scale-95 transition-all shadow-xs inline-flex items-center gap-1.5 disabled:opacity-60"
                   style={{ backgroundColor: '#7563D9' }}
                 >
-                  Retry Connection
+                  {isRetrying && <div className="w-3 h-3 border-2 border-white/30 border-t-white rounded-full animate-spin" />}
+                  <span>{isRetrying ? 'Reconnecting...' : 'Retry Connection'}</span>
                 </button>
                 <button
                   onClick={() => navigate('/login')}

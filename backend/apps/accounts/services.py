@@ -12,10 +12,24 @@ logger = logging.getLogger(__name__)
 def get_active_college() -> College:
     """
     Returns the single active college configured for Version 1.
+    Caches the lookup in-memory to prevent repeated database round-trips.
     """
+    import sys
+    is_testing = 'test' in sys.argv
+    if not is_testing:
+        from django.core.cache import cache
+        cache_key = 'active_college_tenant'
+        college = cache.get(cache_key)
+        if college:
+            return college
+
     college = College.objects.filter(is_active=True).first()
     if not college:
         raise ValidationError("No active college is currently configured on the platform.")
+
+    if not is_testing:
+        from django.core.cache import cache
+        cache.set('active_college_tenant', college, 600)
     return college
 
 

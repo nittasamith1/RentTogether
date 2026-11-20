@@ -49,7 +49,8 @@ class HealthCheckView(APIView):
         }
 
         if db_error:
-            response_data["database_error"] = db_error
+            from django.conf import settings
+            response_data["database_error"] = db_error if settings.DEBUG else "Database connection unavailable."
             return JsonResponse(response_data, status=503)
 
         return JsonResponse(response_data, status=200)

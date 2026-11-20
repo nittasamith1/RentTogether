@@ -188,16 +188,24 @@ class StudentProfileSerializer(serializers.ModelSerializer):
         ]
 
     def get_owner_stats(self, obj) -> dict:
+        if hasattr(obj, '_cached_owner_stats') and obj._cached_owner_stats:
+            return obj._cached_owner_stats
         return calculate_owner_stats(obj.user)
 
     def get_renter_stats(self, obj) -> dict:
+        if hasattr(obj, '_cached_renter_stats') and obj._cached_renter_stats:
+            return obj._cached_renter_stats
         return calculate_renter_stats(obj.user)
 
     def get_owner_badge(self, obj) -> str:
+        if hasattr(obj, '_cached_owner_stats') and obj._cached_owner_stats:
+            return obj._cached_owner_stats.get('owner_badge', 'New Member')
         score, count = calculate_owner_reputation(obj.user_id)
         return get_reputation_badge(score, count)
 
     def get_renter_badge(self, obj) -> str:
+        if hasattr(obj, '_cached_renter_stats') and obj._cached_renter_stats:
+            return obj._cached_renter_stats.get('renter_badge', 'New Member')
         score, count = calculate_renter_reputation(obj.user_id)
         return get_reputation_badge(score, count)
 
@@ -214,6 +222,38 @@ class StudentProfileUpdateSerializer(serializers.ModelSerializer):
         child=serializers.CharField(max_length=150),
         required=False
     )
+
+    def to_internal_value(self, data):
+        # Gracefully normalize preferred_pickup_spots across JSON and multipart QueryDict
+        import json
+        normalized_data = data.copy() if hasattr(data, 'copy') else dict(data)
+        if hasattr(data, 'getlist'):
+            raw_spots = data.getlist('preferred_pickup_spots')
+            if raw_spots:
+                parsed_list = []
+                for s in raw_spots:
+                    if isinstance(s, str) and (s.startswith('[') and s.endswith(']')):
+                        try:
+                            val = json.loads(s)
+                            if isinstance(val, list):
+                                parsed_list.extend(str(item) for item in val)
+                            else:
+                                parsed_list.append(str(val))
+                        except Exception:
+                            parsed_list.append(s)
+                    else:
+                        parsed_list.append(s)
+                normalized_data.setlist('preferred_pickup_spots', parsed_list)
+        elif isinstance(normalized_data.get('preferred_pickup_spots'), str):
+            raw_s = normalized_data['preferred_pickup_spots']
+            if raw_s.startswith('[') and raw_s.endswith(']'):
+                try:
+                    parsed_val = json.loads(raw_s)
+                    if isinstance(parsed_val, list):
+                        normalized_data['preferred_pickup_spots'] = parsed_val
+                except Exception:
+                    pass
+        return super().to_internal_value(normalized_data)
 
     class Meta:
         model = StudentProfile

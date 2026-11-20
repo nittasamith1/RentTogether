@@ -63,6 +63,8 @@ export const ListingCard: React.FC<ListingCardProps> = ({
             <img
               src={getMediaUrl(item.primary_image_url)}
               alt={item.title}
+              loading="lazy"
+              decoding="async"
               onError={() => setImgError(true)}
               className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
             />

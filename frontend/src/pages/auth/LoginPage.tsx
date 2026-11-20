@@ -26,6 +26,7 @@ export const LoginPage: React.FC = () => {
   const [showPassword, setShowPassword] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
   const [errorMessage, setErrorMessage] = useState<string>('');
+  const [statusNotice, setStatusNotice] = useState<string>('');
 
   // Forgot password modal state
   const [showForgotModal, setShowForgotModal] = useState<boolean>(false);
@@ -45,49 +46,58 @@ export const LoginPage: React.FC = () => {
       .catch(() => { });
   }, []);
 
-  const handleQuickDemoStudent = async () => {
-    setEmail('demo_mail@adityauniversity.in');
-    setPassword('DemoPassword123!');
+  const executeLogin = async (targetEmail: string, targetPassword: string) => {
+    const cleanEmail = targetEmail.trim();
+    setEmail(cleanEmail);
+    setPassword(targetPassword);
     setErrorMessage('');
+    setStatusNotice('');
     setLoading(true);
-    try {
-      const res = await authService.login('demo_mail@adityauniversity.in', 'DemoPassword123!');
-      login(res.access, res.refresh, res.user);
-      navigate('/');
-    } catch (err: any) {
-      setErrorMessage(err?.response?.data?.detail || 'Demo login failed. Please ensure the campus backend is running.');
-    } finally {
-      setLoading(false);
-    }
-  };
 
-  const handleQuickDemoAdmin = async () => {
-    setEmail('admin@adityauniversity.in');
-    setPassword('AdminPassword123!');
-    setErrorMessage('');
-    setLoading(true);
-    try {
-      const res = await authService.login('admin@adityauniversity.in', 'AdminPassword123!');
-      login(res.access, res.refresh, res.user);
-      navigate('/admin/verifications');
-    } catch (err: any) {
-      setErrorMessage(err?.response?.data?.detail || 'Admin login failed. Please ensure the campus backend is running.');
-    } finally {
-      setLoading(false);
-    }
-  };
+    const warmupTimer = setTimeout(() => {
+      setStatusNotice('Waking up campus backend from idle state... Please hold on.');
+    }, 1500);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setErrorMessage('');
-    if (!email || !password) {
-      setErrorMessage('Please enter both your institutional email and password.');
-      return;
-    }
+    const tryLogin = async (): Promise<any> => {
+      return await authService.login(cleanEmail, targetPassword);
+    };
 
     try {
-      setLoading(true);
-      const res = await authService.login(email.trim(), password);
+      let res;
+      try {
+        res = await tryLogin();
+      } catch (firstErr: any) {
+        const isNetworkOrColdStart =
+          !firstErr.response ||
+          firstErr.code === 'ECONNABORTED' ||
+          firstErr.message?.includes('timeout') ||
+          firstErr.response?.status >= 500;
+
+        if (isNetworkOrColdStart) {
+          let attempts = 0;
+          let lastErr = firstErr;
+          while (attempts < 2) {
+            attempts++;
+            setStatusNotice(`Connecting to campus backend (attempt ${attempts + 1}/3)... Please hold on.`);
+            await new Promise((r) => setTimeout(r, 3000));
+            try {
+              res = await tryLogin();
+              break;
+            } catch (retryErr: any) {
+              lastErr = retryErr;
+              if (retryErr.response && retryErr.response.status < 500) {
+                throw retryErr;
+              }
+            }
+          }
+          if (!res) throw lastErr;
+        } else {
+          throw firstErr;
+        }
+      }
+
+      clearTimeout(warmupTimer);
+      setStatusNotice('');
       login(res.access, res.refresh, res.user);
 
       if (res.user.is_staff) {
@@ -96,21 +106,25 @@ export const LoginPage: React.FC = () => {
         navigate('/');
       }
     } catch (err: any) {
+      clearTimeout(warmupTimer);
+      setStatusNotice('');
+
       if (!err.response) {
         if (err.code === 'ECONNABORTED' || err.message?.includes('timeout')) {
-          setErrorMessage('Backend is waking up from idle state. Please retry in 15 seconds.');
+          setErrorMessage('Campus backend is waking up from idle state. Please click Sign In again in a few moments.');
         } else {
           setErrorMessage('Connecting to campus backend... If the service was idle, please retry in 10-15 seconds.');
         }
         return;
       }
+
       const resp = err.response?.data;
       if (resp?.code === 'EMAIL_NOT_VERIFIED') {
-        navigate(`/verify-email?email=${encodeURIComponent(resp.email || email)}`);
+        navigate(`/verify-email?email=${encodeURIComponent(resp.email || cleanEmail)}`);
         return;
       }
       if (resp?.code === 'COLLEGE_VERIFICATION_PENDING' || resp?.code === 'COLLEGE_VERIFICATION_REJECTED') {
-        navigate(`/verification-pending?email=${encodeURIComponent(resp.email || email)}`);
+        navigate(`/verification-pending?email=${encodeURIComponent(resp.email || cleanEmail)}`);
         return;
       }
       const msg =
@@ -119,8 +133,26 @@ export const LoginPage: React.FC = () => {
         (typeof resp === 'string' ? resp : 'Invalid credentials. Please verify your email and password.');
       setErrorMessage(msg);
     } finally {
+      clearTimeout(warmupTimer);
       setLoading(false);
     }
+  };
+
+  const handleQuickDemoStudent = () => {
+    executeLogin('demo_mail@adityauniversity.in', 'DemoPassword123!');
+  };
+
+  const handleQuickDemoAdmin = () => {
+    executeLogin('admin@adityauniversity.in', 'AdminPassword123!');
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!email || !password) {
+      setErrorMessage('Please enter both your institutional email and password.');
+      return;
+    }
+    executeLogin(email, password);
   };
 
   const handleSendResetCode = async (e: React.FormEvent) => {
@@ -190,7 +222,7 @@ export const LoginPage: React.FC = () => {
             <Logo size="lg" />
           </Link>
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold mb-2" style={{ backgroundColor: '#E9E3FF', border: '1px solid #D8D0F5', color: '#7563D9' }}>
-            <ShieldCheck className="w-3.5 h-3.5" />
+            <ShieldCheck className="w-3.5 h-3.5" aria-hidden="true" />
             <span>{collegeName.endsWith('Network') ? collegeName : `${collegeName} Network`}</span>
           </div>
           <h2 className="text-xl font-extrabold" style={{ color: '#303653' }}>Student &amp; Faculty Portal</h2>
@@ -201,25 +233,37 @@ export const LoginPage: React.FC = () => {
 
         {/* Card */}
         <div className="rounded-3xl shadow-sm p-5 sm:p-8" style={{ backgroundColor: '#FFFCF7', border: '1px solid #EAE6E1' }}>
+          {statusNotice && (
+            <motion.div
+              initial={{ opacity: 0, y: -6 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="mb-4 p-3.5 rounded-xl bg-purple-50 border border-purple-200/80 flex items-center gap-2.5 text-xs font-semibold text-purple-700"
+            >
+              <div className="w-3.5 h-3.5 border-2 border-purple-300 border-t-purple-600 rounded-full animate-spin shrink-0" aria-hidden="true" />
+              <span>{statusNotice}</span>
+            </motion.div>
+          )}
+
           {errorMessage && (
             <motion.div
               initial={{ opacity: 0, y: -6 }}
               animate={{ opacity: 1, y: 0 }}
               className="mb-5 p-3.5 rounded-xl bg-red-50 border border-red-200/80 flex items-start gap-2.5 text-xs text-red-700"
             >
-              <AlertCircle className="w-4 h-4 text-red-500 shrink-0 mt-0.5" />
+              <AlertCircle className="w-4 h-4 text-red-500 shrink-0 mt-0.5" aria-hidden="true" />
               <span>{errorMessage}</span>
             </motion.div>
           )}
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block text-xs font-bold mb-1.5" style={{ color: '#303653' }}>
+              <label htmlFor="login-email" className="block text-xs font-bold mb-1.5" style={{ color: '#303653' }}>
                 Institutional Email
               </label>
               <div className="relative">
-                <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4" style={{ color: '#85899B' }} />
+                <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 pointer-events-none" style={{ color: '#85899B' }} aria-hidden="true" />
                 <input
+                  id="login-email"
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
@@ -245,7 +289,7 @@ export const LoginPage: React.FC = () => {
 
             <div>
               <div className="flex justify-between items-center mb-1.5">
-                <label className="text-xs font-bold" style={{ color: '#303653' }}>Password</label>
+                <label htmlFor="login-password" className="text-xs font-bold" style={{ color: '#303653' }}>Password</label>
                 <button
                   type="button"
                   onClick={() => {
@@ -259,8 +303,9 @@ export const LoginPage: React.FC = () => {
                 </button>
               </div>
               <div className="relative">
-                <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4" style={{ color: '#85899B' }} />
+                <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 pointer-events-none" style={{ color: '#85899B' }} aria-hidden="true" />
                 <input
+                  id="login-password"
                   type={showPassword ? 'text' : 'password'}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
@@ -284,10 +329,11 @@ export const LoginPage: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
+                  aria-label={showPassword ? "Hide password" : "Show password"}
                   className="absolute right-3.5 top-1/2 -translate-y-1/2 cursor-pointer"
                   style={{ color: '#85899B' }}
                 >
-                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  {showPassword ? <EyeOff className="w-4 h-4" aria-hidden="true" /> : <Eye className="w-4 h-4" aria-hidden="true" />}
                 </button>
               </div>
             </div>
@@ -301,11 +347,11 @@ export const LoginPage: React.FC = () => {
               onMouseLeave={e => (e.currentTarget.style.backgroundColor = '#7563D9')}
             >
               {loading ? (
-                <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" aria-hidden="true" />
               ) : (
                 <>
                   <span>Sign In</span>
-                  <ArrowRight className="w-4 h-4" />
+                  <ArrowRight className="w-4 h-4" aria-hidden="true" />
                 </>
               )}
             </button>

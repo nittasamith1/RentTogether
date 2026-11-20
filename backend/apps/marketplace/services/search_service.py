@@ -38,8 +38,7 @@ def apply_full_text_search(queryset, search_query: str):
             search_expr = " & ".join(prefix_terms)
             query_obj = SearchQuery(search_expr, search_type='raw')
             ranked_qs = queryset.annotate(rank=SearchRank(vector, query_obj)).filter(rank__gt=0.01).order_by('-rank')
-            if ranked_qs.exists():
-                return ranked_qs
+            return ranked_qs
         except Exception:
             # Fall back to multi-word filter if vector search encounters issue
             pass

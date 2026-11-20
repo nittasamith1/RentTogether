@@ -17,6 +17,9 @@ export const getMediaUrl = (url: string | null | undefined): string => {
     trimmed.startsWith('blob:') ||
     trimmed.startsWith('data:')
   ) {
+    if (trimmed.includes('res.cloudinary.com') && trimmed.includes('/upload/') && !trimmed.includes('/upload/f_auto')) {
+      return trimmed.replace('/upload/', '/upload/f_auto,q_auto/');
+    }
     return trimmed;
   }
   const cleanBase = API_BASE_URL.replace(/\/+$/, '');

@@ -52,6 +52,7 @@ def calculate_renter_stats(user) -> dict:
     """
     Aggregates authoritative renter (borrower) statistics from completed bookings.
     Total savings = sum(reference_purchase_price_inr - rental_price_inr) for items rented.
+    Uses .values() to fetch only required numerical columns, optimizing memory and query time.
     """
     completed_bookings = Booking.objects.filter(
         renter=user,
@@ -64,19 +65,19 @@ def calculate_renter_stats(user) -> dict:
     ).count()
 
     total_borrowed = completed_bookings.count()
-
     total_spending = Decimal('0.00')
     total_savings = Decimal('0.00')
 
-    for b in completed_bookings:
-        total_spending += b.rental_price_inr
-        # Calculate documented savings against purchase price
-        if b.reference_purchase_price_inr and b.reference_purchase_price_inr > b.rental_price_inr:
-            total_savings += (b.reference_purchase_price_inr - b.rental_price_inr)
+    # Efficient projection: query only required monetary columns
+    for b in completed_bookings.values('total_rental_fee', 'reference_purchase_price_inr'):
+        fee = b['total_rental_fee'] or Decimal('0.00')
+        ref_price = b['reference_purchase_price_inr'] or Decimal('0.00')
+        total_spending += fee
+        if ref_price and ref_price > fee:
+            total_savings += (ref_price - fee)
         else:
-            # Baseline conservative saving: renting costs ~15-20% of buying retail
-            estimated_retail = b.rental_price_inr * Decimal('4.00')
-            total_savings += (estimated_retail - b.rental_price_inr)
+            estimated_retail = fee * Decimal('4.00')
+            total_savings += (estimated_retail - fee)
 
     score, review_count = calculate_renter_reputation(user.id)
     badge = get_reputation_badge(score, review_count)
@@ -97,13 +98,14 @@ def calculate_renter_stats(user) -> dict:
 def sync_profile_stats(user) -> StudentProfile:
     """
     Calculates all statistics and updates the student's StudentProfile record.
+    Attaches cached results directly to the instance to avoid re-querying in serializers.
     """
     owner_stats = calculate_owner_stats(user)
     renter_stats = calculate_renter_stats(user)
 
     profile, _ = StudentProfile.objects.get_or_create(
         user=user,
-        defaults={'college': user.college}
+        defaults={'college': getattr(user, 'college', None)}
     )
 
     profile.total_items_lent = owner_stats['total_items_lent']
@@ -125,5 +127,8 @@ def sync_profile_stats(user) -> StudentProfile:
         'reputation_as_renter',
         'updated_at'
     ])
+
+    profile._cached_owner_stats = owner_stats
+    profile._cached_renter_stats = renter_stats
     return profile
 

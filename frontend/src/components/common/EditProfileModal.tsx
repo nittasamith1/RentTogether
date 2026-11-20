@@ -28,16 +28,27 @@ export const EditProfileModal: React.FC<EditProfileModalProps> = ({
   currentProfile,
   onProfileUpdated,
 }) => {
-  const [bio, setBio] = useState(currentProfile.bio || '');
-  const [phoneNumber, setPhoneNumber] = useState(currentProfile.phone_number || '');
+  const [bio, setBio] = useState(currentProfile?.bio || '');
+  const [phoneNumber, setPhoneNumber] = useState(currentProfile?.phone_number || '');
   const [selectedSpots, setSelectedSpots] = useState<string[]>(
-    currentProfile.preferred_pickup_spots || []
+    currentProfile?.preferred_pickup_spots || []
   );
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
-  const [avatarPreview, setAvatarPreview] = useState<string>(currentProfile.avatar_url || '');
+  const [avatarPreview, setAvatarPreview] = useState<string>(currentProfile?.avatar_url || '');
 
   const [isSaving, setIsSaving] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+
+  React.useEffect(() => {
+    if (isOpen && currentProfile) {
+      setBio(currentProfile.bio || '');
+      setPhoneNumber(currentProfile.phone_number || '');
+      setSelectedSpots(currentProfile.preferred_pickup_spots || []);
+      setAvatarPreview(currentProfile.avatar_url || '');
+      setAvatarFile(null);
+      setErrorMsg(null);
+    }
+  }, [isOpen, currentProfile]);
 
   if (!isOpen) return null;
 

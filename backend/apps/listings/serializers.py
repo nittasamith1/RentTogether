@@ -118,7 +118,12 @@ class OwnerListingSummarySerializer(serializers.ModelSerializer):
         request = self.context.get('request')
         url = obj.primary_image_url
         if not url:
-            first_img = obj.images.filter(is_primary=True).first() or obj.images.first()
+            # Check prefetched images cache to eliminate N+1 SQL queries
+            if hasattr(obj, '_prefetched_objects_cache') and 'images' in obj._prefetched_objects_cache:
+                prefetched_imgs = obj._prefetched_objects_cache['images']
+                first_img = next((img for img in prefetched_imgs if img.is_primary), None) or (prefetched_imgs[0] if prefetched_imgs else None)
+            else:
+                first_img = obj.images.filter(is_primary=True).first() or obj.images.first()
             if first_img:
                 url = first_img.image_url
         return format_media_url(url, request)
@@ -196,7 +201,12 @@ class OwnerListingDetailSerializer(serializers.ModelSerializer):
         request = self.context.get('request')
         url = obj.primary_image_url
         if not url:
-            first_img = obj.images.filter(is_primary=True).first() or obj.images.first()
+            # Check prefetched images cache to eliminate N+1 SQL queries
+            if hasattr(obj, '_prefetched_objects_cache') and 'images' in obj._prefetched_objects_cache:
+                prefetched_imgs = obj._prefetched_objects_cache['images']
+                first_img = next((img for img in prefetched_imgs if img.is_primary), None) or (prefetched_imgs[0] if prefetched_imgs else None)
+            else:
+                first_img = obj.images.filter(is_primary=True).first() or obj.images.first()
             if first_img:
                 url = first_img.image_url
         return format_media_url(url, request)

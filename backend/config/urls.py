@@ -35,6 +35,7 @@ auth_patterns = [
 urlpatterns = [
     # Root & Health Check Endpoints (for Render health monitoring)
     path('', HealthCheckView.as_view(), name='root-health'),
+    path('health/', HealthCheckView.as_view(), name='health-check-short'),
     path('api/v1/health/', HealthCheckView.as_view(), name='health-check'),
 
     # Django Admin Portal

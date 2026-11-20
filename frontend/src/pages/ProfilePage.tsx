@@ -723,12 +723,74 @@ export const ProfilePage: React.FC = () => {
       </div>
 
       {/* Modals */}
-      {detailedProfile && (
+      {isOwnProfile && (
         <EditProfileModal
           isOpen={isEditModalOpen}
           onClose={() => setIsEditModalOpen(false)}
-          currentProfile={detailedProfile}
-          onProfileUpdated={(updated) => setDetailedProfile(updated)}
+          currentProfile={detailedProfile || {
+            id: user?.id || '',
+            user: {
+              id: user?.id || '',
+              email: user?.email || '',
+              first_name: user?.first_name || '',
+              last_name: user?.last_name || '',
+              full_name: user ? `${user.first_name || ''} ${user.last_name || ''}`.trim() || user.name || user.email : 'Student',
+              college_code: user?.college_code || 'ADITYA',
+              college_name: collegeName,
+              date_joined: new Date().toISOString(),
+            },
+            college_name: collegeName,
+            college_code: user?.college_code || 'ADITYA',
+            roll_number: '',
+            department: '',
+            year_of_study: 1,
+            avatar: null,
+            avatar_url: '',
+            bio: '',
+            phone_number: '',
+            reputation_as_owner: 5.0,
+            reputation_as_renter: 5.0,
+            owner_badge: 'New Member',
+            renter_badge: 'New Member',
+            total_items_lent: 0,
+            total_items_borrowed: 0,
+            total_savings_inr: 0,
+            total_earnings_inr: 0,
+            preferred_pickup_spots: [],
+            owner_stats: {
+              total_items_lent: 0,
+              completed_lending_transactions: 0,
+              active_listings: 0,
+              total_rental_earnings: 0,
+              owner_reputation: 5.0,
+              owner_review_count: 0,
+              owner_badge: 'New Member',
+              has_owner_reviews: false,
+            },
+            renter_stats: {
+              total_items_borrowed: 0,
+              completed_rentals: 0,
+              active_rentals: 0,
+              total_rental_spending: 0,
+              total_savings_inr: 0,
+              renter_reputation: 5.0,
+              renter_review_count: 0,
+              renter_badge: 'New Member',
+              has_renter_reviews: false,
+            },
+            is_verified: true,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+          }}
+          onProfileUpdated={(updated) => {
+            setDetailedProfile(updated);
+            dialog.alert({
+              title: 'Profile Updated',
+              message: 'Your campus profile details and preferred meetup spots have been updated successfully.',
+              variant: 'success',
+              confirmText: 'Done',
+            });
+          }}
         />
       )}
 
