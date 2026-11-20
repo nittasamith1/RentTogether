@@ -7,7 +7,6 @@ from datetime import timedelta
 from decimal import Decimal
 from django.utils import timezone
 from django.db.models import Q
-import pandas as pd
 
 
 def compute_image_dhash(image_field_or_path, hash_size: int = 8) -> str:
@@ -73,16 +72,20 @@ def extract_listing_risk_signals(item, user, image_file=None) -> dict:
     from ml_engine.services.pricing_service import predict_fair_rental_price
 
     # 1. Price Deviation Ratio
-    listed_price = float(getattr(item, 'rental_price_per_day', 0.0) or 0.0)
+    listed_price = float(getattr(item, 'rental_price_per_day', 0.0) or getattr(item, 'daily_rental_price', 0.0) or 0.0)
     category_slug = item.category.slug if getattr(item, 'category', None) else 'academic'
     condition = getattr(item, 'condition', 'GOOD')
-    original_price = float(getattr(item, 'original_retail_price', 0.0) or 1000.0)
+    original_price = float(getattr(item, 'original_price', 0.0) or getattr(item, 'original_purchase_price', 0.0) or getattr(item, 'original_retail_price', 0.0) or 1000.0)
+    age_months = getattr(item, 'item_age_months', None)
+    if age_months is None:
+        age_months = getattr(item, 'age_in_months', 6)
+    age_months = int(age_months or 6)
 
     try:
         ai_pricing = predict_fair_rental_price(
             category=category_slug,
             original_retail_price=original_price if original_price > 0 else 1000.0,
-            age_in_months=getattr(item, 'age_in_months', 6) or 6,
+            age_in_months=age_months,
             condition=condition
         )
         predicted_fair_price = max(5.0, float(ai_pricing.get('recommended_price_per_day', 25.0)))
@@ -90,7 +93,11 @@ def extract_listing_risk_signals(item, user, image_file=None) -> dict:
         predicted_fair_price = 25.0
 
     if predicted_fair_price > 0:
-        price_deviation_ratio = abs(listed_price - predicted_fair_price) / predicted_fair_price
+        # Only upward price gouging deviation triggers price risk
+        if listed_price > predicted_fair_price:
+            price_deviation_ratio = (listed_price - predicted_fair_price) / predicted_fair_price
+        else:
+            price_deviation_ratio = 0.0
     else:
         price_deviation_ratio = 0.0
 

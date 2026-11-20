@@ -67,8 +67,6 @@ LOCAL_APPS = [
     'apps.listings',
     'apps.bookings',
     'apps.availability',
-    'apps.payments',
-    'apps.reviews',
     'apps.notifications',
     'apps.recommendations',
     'apps.sustainability',
@@ -293,34 +291,6 @@ CSRF_TRUSTED_ORIGINS = list(set(
     ]
 ))
 
-
-# Celery / Redis Settings
-CELERY_BROKER_URL = os.getenv('REDIS_URL', 'redis://localhost:6379/0')
-CELERY_RESULT_BACKEND = os.getenv('REDIS_URL', 'redis://localhost:6379/0')
-CELERY_ACCEPT_CONTENT = ['json']
-CELERY_TASK_SERIALIZER = 'json'
-CELERY_RESULT_SERIALIZER = 'json'
-CELERY_TIMEZONE = TIME_ZONE
-
-# Celery Beat Schedule — Phase 16 Background Workers
-CELERY_BEAT_SCHEDULE = {
-    'check-unanswered-booking-requests-every-30-mins': {
-        'task': 'apps.bookings.tasks.check_unanswered_booking_requests',
-        'schedule': 1800.0,  # 30 mins
-    },
-    'send-return-due-reminders-hourly': {
-        'task': 'apps.bookings.tasks.send_return_due_reminders',
-        'schedule': 3600.0,  # 1 hour
-    },
-    'mark-overdue-bookings-every-2-hours': {
-        'task': 'apps.bookings.tasks.mark_overdue_bookings',
-        'schedule': 7200.0,  # 2 hours
-    },
-    'expire-unpaid-bookings-every-15-mins': {
-        'task': 'apps.bookings.tasks.expire_payment_requests',
-        'schedule': 900.0,   # 15 mins
-    },
-}
 
 # Email Configuration
 EMAIL_HOST = os.getenv('EMAIL_HOST', 'smtp.gmail.com')

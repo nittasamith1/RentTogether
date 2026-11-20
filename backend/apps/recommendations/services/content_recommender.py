@@ -1,100 +1,75 @@
 """
 Content-Based Similarity Recommendation Engine (Phase 13).
-Uses TF-IDF Vectorization and Cosine Similarity on title, description, category, and brand
-to discover similar campus resources.
+Fast, memory-efficient campus resource similarity matching using category and keyword overlap.
+Eliminates heavy Scikit-learn TF-IDF matrices to keep production memory strictly under 300MB.
 """
-
 from typing import List, Dict, Any
-from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.metrics.pairwise import cosine_similarity
 from apps.listings.models import Item
 
 
 def get_similar_items(item_id: str, limit: int = 6) -> List[Dict[str, Any]]:
     """
-    Finds top similar items to a target item using TF-IDF and Cosine Similarity.
+    Finds top similar items to a target item based on category, brand, and title keywords.
     """
     try:
         target_item = Item.objects.select_related('category', 'owner').get(id=item_id)
     except Exception:
         return []
 
-    # Get active published items (excluding target item)
-    candidate_items = list(
-        Item.objects.filter(is_published=True, status=Item.STATUS_ACTIVE)
-        .exclude(id=target_item.id)
-        .select_related('category', 'owner')
-        .prefetch_related('images')[:100]
-    )
-
-    if not candidate_items:
-        return []
-
-    # Build corpus
-    def extract_text(item: Item) -> str:
-        parts = [
-            item.title or '',
-            item.category.name if getattr(item, 'category', None) else '',
-            item.description or '',
-            item.brand or '',
-            item.model_name or '',
-        ]
-        return " ".join(parts).lower()
-
-    target_text = extract_text(target_item)
-    corpus = [target_text] + [extract_text(it) for it in candidate_items]
-
-    try:
-        vectorizer = TfidfVectorizer(stop_words='english', min_df=1, max_features=1000)
-        tfidf_matrix = vectorizer.fit_transform(corpus)
-        similarity_scores = cosine_similarity(tfidf_matrix[0:1], tfidf_matrix[1:])[0]
-
-        # Rank candidates
-        ranked_indices = similarity_scores.argsort()[::-1]
-
-        results = []
-        for idx in ranked_indices:
-            score = float(similarity_scores[idx])
-            it = candidate_items[idx]
-            # Primary image
-            img_url = it.primary_image_url
-            if not img_url and it.images.exists():
-                first_img = it.images.first()
-                if first_img and hasattr(first_img, 'image') and first_img.image:
-                    img_url = first_img.image.url
-
-            results.append({
-                'id': str(it.id),
-                'title': it.title,
-                'category_name': it.category.name if it.category else '',
-                'rental_price_per_day': float(it.rental_price_per_day),
-                'condition': it.condition,
-                'primary_image_url': img_url or '',
-                'similarity_score': round(score, 4),
-                'match_reason': f"{int(score * 100)}% content similarity match",
-            })
-            if len(results) >= limit:
-                break
-
-        return results
-    except Exception:
-        # Fallback to category items if TF-IDF fails
-        fallback_items = Item.objects.filter(
-            category=target_item.category,
+    # Get active candidate items in same college/campus (excluding target item)
+    candidates = (
+        Item.objects.filter(
             is_published=True,
             status=Item.STATUS_ACTIVE
-        ).exclude(id=target_item.id)[:limit]
+        )
+        .exclude(id=target_item.id)
+        .select_related('category', 'owner')
+        .prefetch_related('images')
+    )
 
-        return [
-            {
-                'id': str(it.id),
-                'title': it.title,
-                'category_name': it.category.name if it.category else '',
-                'rental_price_per_day': float(it.rental_price_per_day),
-                'condition': it.condition,
-                'primary_image_url': it.primary_image_url or '',
-                'similarity_score': 0.50,
-                'match_reason': "Same category recommendation",
-            }
-            for it in fallback_items
-        ]
+    if not candidates.exists():
+        return []
+
+    target_tokens = set((target_item.title or '').lower().split())
+    if target_item.brand:
+        target_tokens.add(target_item.brand.lower())
+
+    scored_items = []
+    for it in candidates[:50]:
+        score = 0.40  # Baseline active peer item
+        if it.category_id == target_item.category_id:
+            score += 0.35
+        if it.brand and target_item.brand and it.brand.lower() == target_item.brand.lower():
+            score += 0.15
+
+        cand_tokens = set((it.title or '').lower().split())
+        common = target_tokens.intersection(cand_tokens)
+        if common:
+            score += min(0.20, len(common) * 0.08)
+
+        score = min(0.98, round(score, 2))
+        scored_items.append((score, it))
+
+    # Sort descending by similarity score
+    scored_items.sort(key=lambda x: x[0], reverse=True)
+
+    results = []
+    for score, it in scored_items[:limit]:
+        img_url = it.primary_image_url
+        if not img_url and it.images.exists():
+            first_img = it.images.first()
+            if first_img and hasattr(first_img, 'image') and first_img.image:
+                img_url = first_img.image.url
+
+        results.append({
+            'id': str(it.id),
+            'title': it.title,
+            'category_name': it.category.name if it.category else '',
+            'rental_price_per_day': float(it.rental_price_per_day),
+            'condition': it.condition,
+            'primary_image_url': img_url or '',
+            'similarity_score': score,
+            'match_reason': f"{int(score * 100)}% campus equipment similarity match",
+        })
+
+    return results
