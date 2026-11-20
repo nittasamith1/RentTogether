@@ -33,14 +33,7 @@ class StudentProfileMeView(views.APIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def get(self, request):
-        profile, _ = StudentProfile.objects.get_or_create(
-            user=request.user,
-            defaults={'college': request.user.college}
-        )
-        # Authoritatively sync stats and reputation from bookings and reviews
-        sync_profile_stats(request.user)
-        profile.refresh_from_db()
-
+        profile = sync_profile_stats(request.user)
         serializer = StudentProfileSerializer(profile)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
@@ -63,6 +56,9 @@ class StudentProfileMeView(views.APIView):
         )
         serializer.is_valid(raise_exception=True)
         updated_profile = serializer.save()
+
+        # Authoritatively sync stats to attach cached values to instance
+        updated_profile = sync_profile_stats(request.user)
 
         # Return the complete student profile with fresh stats
         return Response(
