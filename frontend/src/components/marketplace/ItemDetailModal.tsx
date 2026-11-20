@@ -328,17 +328,17 @@ export const ItemDetailModal: React.FC<ItemDetailModalProps> = ({
 
   return createPortal(
     <div
-      className="fixed inset-0 z-[100] overflow-y-auto bg-[#303653]/70 backdrop-blur-sm p-3 sm:p-6 md:p-8 flex items-start justify-center overscroll-contain"
+      className="fixed inset-0 z-[100] overflow-y-auto bg-[#303653]/70 backdrop-blur-sm p-2 sm:p-6 md:p-8 flex items-center justify-center overscroll-contain"
       onClick={onClose}
     >
       <div
-        className="relative w-full max-w-4xl my-auto max-h-[calc(100vh-2rem)] sm:max-h-[calc(100vh-3.5rem)] rounded-3xl border shadow-2xl flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-150"
+        className="relative w-full max-w-4xl my-auto max-h-[calc(100vh-1rem)] sm:max-h-[calc(100vh-3.5rem)] rounded-2xl sm:rounded-3xl border shadow-2xl flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-150"
         style={{ backgroundColor: '#FFFCF7', borderColor: '#EAE6E1' }}
         onClick={(e) => e.stopPropagation()}
       >
         {/* Modal Header */}
         <div
-          className="sticky top-0 z-20 px-6 py-4 border-b flex items-center justify-between shrink-0"
+          className="sticky top-0 z-20 px-4 py-3 sm:px-6 sm:py-4 border-b flex items-center justify-between shrink-0"
           style={{ backgroundColor: '#FFFCF7', borderColor: '#EAE6E1' }}
         >
           <div className="flex items-center gap-2 flex-wrap">
@@ -415,7 +415,7 @@ export const ItemDetailModal: React.FC<ItemDetailModalProps> = ({
         {/* Scrollable Modal Content */}
         <div className="overflow-y-auto flex-1 overscroll-contain">
           {/* Modal Body */}
-          <div className="p-6 grid grid-cols-1 md:grid-cols-12 gap-6 sm:gap-8">
+          <div className="p-4 sm:p-6 grid grid-cols-1 md:grid-cols-12 gap-5 sm:gap-8">
           {/* Left Column: Photos Gallery & Details (5 cols) */}
           <div className="min-w-0 md:col-span-5 flex flex-col gap-3">
             <div

@@ -131,7 +131,7 @@ export const DashboardPage: React.FC = () => {
       </div>
 
       {/* 2. Phase 14: Real-Time KPI Cards (Matching Mockup) */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         {/* Card 1: [3] Active Rentals — Soft Lavender */}
         <div
           onClick={() => navigate('/rentals')}
@@ -412,24 +412,24 @@ export const DashboardPage: React.FC = () => {
           className="rounded-3xl p-6 border shadow-xs space-y-4"
           style={{ backgroundColor: '#FFFCF7', borderColor: '#EAE6E1' }}
         >
-          <div className="flex items-center justify-between pb-1">
-            <div className="flex items-center gap-2.5">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 pb-1">
+            <div className="flex items-start sm:items-center gap-2.5 min-w-0">
               <div
-                className="w-10 h-10 rounded-2xl flex items-center justify-center shadow-xs"
+                className="w-10 h-10 rounded-2xl flex items-center justify-center shadow-xs shrink-0"
                 style={{ backgroundColor: '#E9E3FF', color: '#7563D9' }}
               >
                 <Sparkles className="w-5 h-5 stroke-[2.2]" />
               </div>
-              <div>
-                <div className="flex items-center gap-2">
-                  <h2 className="text-base font-bold" style={{ color: '#303653' }}>
+              <div className="min-w-0 flex-1">
+                <div className="flex flex-wrap items-center gap-2">
+                  <h2 className="text-base font-bold shrink-0" style={{ color: '#303653' }}>
                     Recommended For You
                   </h2>
                   <span
-                    className="px-2.5 py-0.5 rounded-full text-[10px] font-bold border flex items-center gap-1"
+                    className="px-2.5 py-0.5 rounded-full text-[10px] font-bold border inline-flex items-center gap-1 shrink-0"
                     style={{ backgroundColor: '#DDF3E7', color: '#42A879', borderColor: '#B8E5CC' }}
                   >
-                    <GraduationCap className="w-3 h-3" />
+                    <GraduationCap className="w-3 h-3 shrink-0" />
                     <span>
                       {personalizedData.department
                         ? `${personalizedData.department.toUpperCase()} Department Picks`
@@ -445,7 +445,7 @@ export const DashboardPage: React.FC = () => {
 
             <Link
               to="/marketplace"
-              className="text-xs font-bold text-[#7563D9] flex items-center gap-1 hover:underline"
+              className="text-xs font-bold text-[#7563D9] flex items-center gap-1 hover:underline self-end sm:self-auto shrink-0"
             >
               <span>Explore all</span>
               <ArrowRight className="w-3.5 h-3.5" />
@@ -453,21 +453,21 @@ export const DashboardPage: React.FC = () => {
           </div>
 
           {loadingRecs ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4 pt-1">
-              {[1, 2, 3, 4, 5, 6].map((n) => (
+            <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 pt-1">
+              {[1, 2, 3, 4].map((n) => (
                 <ItemCardSkeleton key={n} />
               ))}
             </div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4 pt-1">
+            <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 pt-1">
               {personalizedData.recommendations.map((item) => (
                 <div
                   key={item.id}
                   onClick={() => setSelectedItemId(item.id)}
-                  className="p-3.5 rounded-2xl border transition-all cursor-pointer group flex flex-col justify-between hover:shadow-card-hover"
+                  className="p-3 sm:p-3.5 rounded-2xl border transition-all cursor-pointer group flex flex-col justify-between hover:shadow-card-hover"
                   style={{ backgroundColor: '#FFFFFF', borderColor: '#EAE6E1' }}
                 >
-                  <div className="h-28 rounded-xl overflow-hidden relative border border-[#EAE6E1] flex items-center justify-center bg-[#FFF8ED]">
+                  <div className="h-24 sm:h-28 rounded-xl overflow-hidden relative border border-[#EAE6E1] flex items-center justify-center bg-[#FFF8ED]">
                     {item.primary_image_url ? (
                       <img
                         src={getMediaUrl(item.primary_image_url)}
@@ -484,7 +484,7 @@ export const DashboardPage: React.FC = () => {
                       <Package className="w-8 h-8 text-[#85899B]" />
                     )}
                     <span
-                      className="absolute top-1.5 left-1.5 px-2 py-0.5 rounded-full text-[9px] font-bold border pointer-events-none"
+                      className="absolute top-1.5 left-1.5 px-1.5 sm:px-2 py-0.5 rounded-full text-[8px] sm:text-[9px] font-bold border pointer-events-none"
                       style={{ backgroundColor: '#FFFCF7', color: '#7563D9', borderColor: '#EAE6E1' }}
                     >
                       {item.category_name}
@@ -493,28 +493,43 @@ export const DashboardPage: React.FC = () => {
                       type="button"
                       onClick={(e) => {
                         e.stopPropagation();
-                        toggleWishlist({ id: item.id, is_wishlisted: false });
+                        toggleWishlist({
+                          id: item.id,
+                          owner_id: item.owner_id,
+                          is_wishlisted: Boolean(item.is_wishlisted),
+                        });
                       }}
-                      className="absolute top-1.5 right-1.5 p-1 rounded-full shadow-xs bg-white/90 text-neutral-400 hover:text-red-500"
+                      aria-label={item.is_wishlisted ? 'Remove from wishlist' : 'Save to wishlist'}
+                      title={item.is_wishlisted ? 'Saved in wishlist' : 'Save to wishlist'}
+                      className="absolute top-1.5 sm:top-2 right-1.5 sm:right-2 p-1.5 rounded-full transition-transform active:scale-80 hover:scale-110 duration-150 shadow-md cursor-pointer z-10"
+                      style={{
+                        backgroundColor: item.is_wishlisted ? '#FFE5D6' : 'rgba(255, 255, 255, 0.95)',
+                        color: item.is_wishlisted ? '#F28B82' : '#85899B',
+                        border: item.is_wishlisted ? '1px solid #F5CDB8' : '1px solid rgba(234, 230, 225, 0.9)',
+                      }}
                     >
-                      <Heart className="w-3 h-3 text-[#85899B]" />
+                      <Heart
+                        className={`w-3.5 h-3.5 transition-colors duration-150 ${
+                          item.is_wishlisted ? 'fill-current text-[#F28B82]' : 'text-[#85899B]'
+                        }`}
+                      />
                     </button>
                   </div>
 
                   <div className="mt-2.5 space-y-1">
                     <span
-                      className="inline-block px-1.5 py-0.5 rounded text-[9px] font-bold tracking-tight"
+                      className="inline-block px-1.5 py-0.5 rounded text-[8px] sm:text-[9px] font-bold tracking-tight line-clamp-1"
                       style={{ backgroundColor: '#E9E3FF', color: '#7563D9' }}
                     >
                       {item.recommendation_reason || item.match_reason || 'Smart Match'}
                     </span>
-                    <h4 className="text-xs font-bold text-[#303653] line-clamp-1">{item.title}</h4>
+                    <h4 className="text-xs sm:text-sm font-bold text-[#303653] line-clamp-1">{item.title}</h4>
                     <div className="flex items-center justify-between pt-1 border-t border-[#EAE6E1]">
-                      <span className="text-xs font-extrabold text-[#7563D9]">
+                      <span className="text-xs sm:text-sm font-extrabold text-[#7563D9]">
                         ₹{item.rental_price_per_day}
                         <span className="text-[10px] text-[#85899B] font-normal">/day</span>
                       </span>
-                      <span className="text-[9px] font-bold text-[#42A879]">₹0 Dep</span>
+                      <span className="text-[9px] sm:text-[10px] font-bold text-[#42A879]">₹0 Dep</span>
                     </div>
                   </div>
                 </div>
@@ -529,9 +544,9 @@ export const DashboardPage: React.FC = () => {
         className="rounded-3xl p-6 border shadow-xs space-y-4"
         style={{ backgroundColor: '#FFFCF7', borderColor: '#EAE6E1' }}
       >
-        <div className="flex items-center justify-between pb-1">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 pb-1">
           <div className="flex items-center gap-2">
-            <div className="p-2 rounded-xl text-white shadow-xs" style={{ backgroundColor: '#7563D9' }}>
+            <div className="p-2 rounded-xl text-white shadow-xs shrink-0" style={{ backgroundColor: '#7563D9' }}>
               <Flame className="w-4 h-4 fill-white" />
             </div>
             <div>
@@ -545,7 +560,7 @@ export const DashboardPage: React.FC = () => {
           </div>
           <Link
             to="/marketplace"
-            className="text-xs font-bold text-[#7563D9] flex items-center gap-1 hover:underline"
+            className="text-xs font-bold text-[#7563D9] flex items-center gap-1 hover:underline self-end sm:self-auto shrink-0"
           >
             <span>Explore all items</span>
             <ArrowRight className="w-3.5 h-3.5" />
@@ -553,7 +568,7 @@ export const DashboardPage: React.FC = () => {
         </div>
 
         {loadingPopular ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 pt-1">
+          <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 pt-1">
             {[1, 2, 3, 4].map((n) => (
               <ItemCardSkeleton key={n} />
             ))}
@@ -574,7 +589,7 @@ export const DashboardPage: React.FC = () => {
             </button>
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 pt-1">
+          <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 pt-1">
             {popularItems.map((item) => (
               <div
                 key={item.id}

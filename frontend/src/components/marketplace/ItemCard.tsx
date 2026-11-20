@@ -64,16 +64,16 @@ export const ItemCard = React.memo<ItemCardProps>(({ item, onSelect }) => {
         )}
 
         {/* Condition Badge */}
-        <div className="absolute top-3 left-3 flex flex-wrap gap-1.5 items-center pointer-events-none">
+        <div className="absolute top-2 left-2 sm:top-3 sm:left-3 flex flex-wrap gap-1 items-center pointer-events-none">
           <span
-            className="px-2.5 py-0.5 rounded-full text-xs font-semibold border shadow-xs"
+            className="px-2 sm:px-2.5 py-0.5 rounded-full text-[10px] sm:text-xs font-semibold border shadow-xs"
             style={{ backgroundColor: cond.bg, color: cond.text, borderColor: cond.border }}
           >
             {cond.label}
           </span>
           {isAvailable ? (
             <span
-              className="px-2 py-0.5 rounded-full text-[11px] font-semibold text-white shadow-xs flex items-center gap-1"
+              className="px-1.5 sm:px-2 py-0.5 rounded-full text-[9px] sm:text-[11px] font-semibold text-white shadow-xs flex items-center gap-1"
               style={{ backgroundColor: '#42A879' }}
             >
               <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
@@ -81,7 +81,7 @@ export const ItemCard = React.memo<ItemCardProps>(({ item, onSelect }) => {
             </span>
           ) : (
             <span
-              className="px-2 py-0.5 rounded-full text-[11px] font-semibold text-white shadow-xs flex items-center gap-1"
+              className="px-1.5 sm:px-2 py-0.5 rounded-full text-[9px] sm:text-[11px] font-semibold text-white shadow-xs flex items-center gap-1"
               style={{ backgroundColor: '#303653' }}
             >
               <Clock className="w-3 h-3" />
@@ -96,20 +96,20 @@ export const ItemCard = React.memo<ItemCardProps>(({ item, onSelect }) => {
           onClick={handleWishlistClick}
           aria-label={item.is_wishlisted ? 'Remove from wishlist' : 'Save to wishlist'}
           title={item.is_wishlisted ? 'Saved in wishlist' : 'Save to wishlist'}
-          className="absolute top-3 right-3 p-2 rounded-full transition-transform active:scale-80 hover:scale-110 duration-150 shadow-md cursor-pointer z-10"
+          className="absolute top-2 right-2 sm:top-3 sm:right-3 p-1.5 sm:p-2 rounded-full transition-transform active:scale-80 hover:scale-110 duration-150 shadow-md cursor-pointer z-10"
           style={{
             backgroundColor: item.is_wishlisted ? '#FFE5D6' : 'rgba(255, 255, 255, 0.95)',
             color: item.is_wishlisted ? '#F28B82' : '#85899B',
             border: item.is_wishlisted ? '1px solid #F5CDB8' : '1px solid rgba(234, 230, 225, 0.9)',
           }}
         >
-          <Heart className={`w-4 h-4 transition-colors ${item.is_wishlisted ? 'fill-[#F28B82] text-[#F28B82]' : ''}`} />
+          <Heart className={`w-3.5 h-3.5 sm:w-4 sm:h-4 transition-colors ${item.is_wishlisted ? 'fill-[#F28B82] text-[#F28B82]' : ''}`} />
         </button>
 
         {/* Category Pill */}
-        <div className="absolute bottom-2.5 left-3 pointer-events-none">
+        <div className="absolute bottom-2 left-2 sm:bottom-2.5 sm:left-3 pointer-events-none">
           <span
-            className="px-2.5 py-1 rounded-md text-xs font-semibold text-white flex items-center gap-1 shadow-xs"
+            className="px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-md text-[10px] sm:text-xs font-semibold text-white flex items-center gap-1 shadow-xs"
             style={{ backgroundColor: 'rgba(48, 54, 83, 0.90)' }}
           >
             {item.category_name}
@@ -118,44 +118,44 @@ export const ItemCard = React.memo<ItemCardProps>(({ item, onSelect }) => {
       </div>
 
       {/* Item Content */}
-      <div className="p-4 flex-1 flex flex-col justify-between">
+      <div className="p-3 sm:p-4 flex-1 flex flex-col justify-between">
         <div>
           {/* Title & Brand */}
           <div className="flex items-start justify-between gap-2">
             <h3
-              className="font-bold line-clamp-1 transition-colors group-hover:text-[#7563D9]"
+              className="text-xs sm:text-sm font-bold line-clamp-1 transition-colors group-hover:text-[#7563D9]"
               style={{ color: '#303653' }}
             >
               {item.title}
             </h3>
           </div>
           {item.brand && (
-            <p className="text-xs font-medium mt-0.5" style={{ color: '#85899B' }}>
+            <p className="text-[11px] sm:text-xs font-medium mt-0.5" style={{ color: '#85899B' }}>
               {item.brand} {item.model_name ? `• ${item.model_name}` : ''}
             </p>
           )}
 
           {/* Short Description */}
-          <p className="text-xs mt-2 line-clamp-2 leading-relaxed" style={{ color: '#85899B' }}>
+          <p className="text-[11px] sm:text-xs mt-1.5 sm:mt-2 line-clamp-2 leading-relaxed" style={{ color: '#85899B' }}>
             {item.short_description}
           </p>
         </div>
 
-        <div className="mt-4 pt-3 flex flex-col gap-2.5" style={{ borderTop: '1px solid #EAE6E1' }}>
+        <div className="mt-3 sm:mt-4 pt-2.5 sm:pt-3 flex flex-col gap-2 sm:gap-2.5" style={{ borderTop: '1px solid #EAE6E1' }}>
           {/* Pricing & Deposit */}
-          <div className="flex items-baseline justify-between">
-            <div className="flex items-baseline gap-1.5 flex-wrap">
-              <span className="text-lg font-black" style={{ color: '#303653' }}>
+          <div className="flex items-baseline justify-between flex-wrap gap-1">
+            <div className="flex items-baseline gap-1 sm:gap-1.5 flex-wrap">
+              <span className="text-sm sm:text-lg font-black" style={{ color: '#303653' }}>
                 ₹{dailyPrice}
               </span>
-              <span className="text-xs font-normal" style={{ color: '#85899B' }}>/day</span>
-              <span className="text-xs font-semibold" style={{ color: '#85899B' }}>•</span>
-              <span className="text-xs font-bold" style={{ color: '#7563D9' }}>
+              <span className="text-[10px] sm:text-xs font-normal" style={{ color: '#85899B' }}>/day</span>
+              <span className="text-xs font-semibold hidden sm:inline" style={{ color: '#85899B' }}>•</span>
+              <span className="text-[10px] sm:text-xs font-bold text-[#7563D9]">
                 ₹{hourlyPrice.toFixed(0)}/hr
               </span>
             </div>
             <span
-              className="text-[10px] px-2 py-0.5 rounded-md font-bold border"
+              className="text-[9px] sm:text-[10px] px-1.5 sm:px-2 py-0.5 rounded-md font-bold border"
               style={{ backgroundColor: '#DDF3E7', color: '#2D7A5B', borderColor: '#B8E5CC' }}
             >
               Zero Deposit

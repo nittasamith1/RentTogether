@@ -11,27 +11,65 @@ from apps.bookings.models import Booking
 
 
 DEPARTMENT_CATEGORY_PREFERENCES = {
-    'cse': ['electronics', 'computers', 'calculators', 'lab'],
-    'computer science': ['electronics', 'computers', 'calculators', 'lab'],
-    'ai': ['electronics', 'computers', 'calculators'],
-    'aiml': ['electronics', 'computers', 'calculators'],
-    'ece': ['electronics', 'hardware', 'calculators', 'laboratory'],
-    'electronics': ['electronics', 'hardware', 'calculators', 'laboratory'],
-    'mechanical': ['hardware', 'tools', 'daily-use', 'drafter'],
-    'civil': ['drafter', 'tools', 'hardware'],
-    'general': ['academic', 'calculators', 'books', 'electronics'],
+    'cse': ['electronics', 'computers', 'calculators', 'academic', 'laboratory', 'project-equipment'],
+    'computer science': ['electronics', 'computers', 'calculators', 'academic', 'laboratory', 'project-equipment'],
+    'ai': ['electronics', 'academic', 'project-equipment', 'laboratory', 'computers', 'calculators'],
+    'aiml': ['electronics', 'academic', 'project-equipment', 'laboratory', 'computers', 'calculators'],
+    'artificial intelligence': ['electronics', 'academic', 'project-equipment', 'laboratory', 'computers'],
+    'ece': ['electronics', 'hardware', 'calculators', 'laboratory', 'project-equipment'],
+    'electronics': ['electronics', 'hardware', 'calculators', 'laboratory', 'project-equipment'],
+    'mechanical': ['hardware', 'tools', 'daily-use', 'drafter', 'laboratory'],
+    'civil': ['drafter', 'tools', 'hardware', 'laboratory'],
+    'general': ['academic', 'calculators', 'books', 'electronics', 'project-equipment', 'laboratory'],
 }
+
+
+def _get_contextual_reason(item: Item, dept_display: str = '') -> str:
+    slug = (item.category.slug if item.category else '').lower()
+    title = item.title.lower()
+    if 'drafter' in title or 'drawing' in title or 'drafter' in slug:
+        return "Engineering Graphics Essential"
+    if 'calculator' in title or 'casio' in title:
+        return "AIML Core Math & Exam Gear"
+    if 'arduino' in title or 'sensor' in title or 'robotics' in title or 'project' in slug:
+        return "IoT & Embedded Systems Lab"
+    if 'headphone' in title or 'sony' in title or 'audio' in title:
+        return "Focus & Coding Headset"
+    if 'lab' in slug:
+        return "Campus Practical Equipment"
+    if 'academic' in slug:
+        return "Essential Academic Courseware"
+    if 'electronic' in slug:
+        return "Student Tech Pick"
+    return f"Top Pick for {dept_display}" if dept_display else "Recommended for you"
 
 
 def get_personalized_recommendations(user, limit: int = 10) -> Dict[str, Any]:
     """
     Returns personalized listings for a student.
-    Handles cold-start using department-level popularity.
+    Handles cold-start using department-level popularity and campus relevance.
     """
+    from apps.marketplace.models import Wishlist
+
+    user_wishlist_ids = set()
+    college_id = getattr(user, 'college_id', None) if user and user.is_authenticated else None
+
+    if user and user.is_authenticated:
+        try:
+            user_wishlist_ids = set(
+                str(w) for w in Wishlist.objects.filter(user=user).values_list('item_id', flat=True)
+            )
+        except Exception:
+            pass
+
+    base_qs = Item.objects.filter(is_published=True, status=Item.STATUS_ACTIVE)
+    if college_id:
+        base_qs = base_qs.filter(owner__college_id=college_id)
+
     if not user or not user.is_authenticated:
         # Public anonymous fallback
         top_items = list(
-            Item.objects.filter(is_published=True, status=Item.STATUS_ACTIVE)
+            base_qs
             .select_related('category', 'owner')
             .prefetch_related('images')
             .order_by('-rental_count', '-created_at')[:limit]
@@ -39,8 +77,11 @@ def get_personalized_recommendations(user, limit: int = 10) -> Dict[str, Any]:
         return {
             'strategy': 'COLD_START_CAMPUS_POPULAR',
             'department': None,
-            'recommendations': [_serialize_item(it, 'Campus Trending') for it in top_items]
+            'recommendations': [_serialize_item(it, _get_contextual_reason(it, 'Campus'), False) for it in top_items]
         }
+
+    # Exclude owner's own items
+    base_qs = base_qs.exclude(owner=user)
 
     # 1. Check student rental history
     past_rentals = list(
@@ -53,111 +94,80 @@ def get_personalized_recommendations(user, limit: int = 10) -> Dict[str, Any]:
         b.item.category.slug for b in past_rentals if b.item and b.item.category
     ]
 
-    rented_item_ids = [str(b.item.id) for b in past_rentals if b.item]
-
     # 2. Check student wishlist
     wishlisted_category_slugs = []
     try:
-        from apps.marketplace.models import Wishlist
         wishlist_objs = Wishlist.objects.filter(user=user).select_related('item', 'item__category')[:15]
         for w in wishlist_objs:
-            if w.item:
-                rented_item_ids.append(str(w.item.id))
-                if w.item.category:
-                    wishlisted_category_slugs.append(w.item.category.slug)
+            if w.item and w.item.category:
+                wishlisted_category_slugs.append(w.item.category.slug)
     except Exception:
         pass
 
     preferred_categories = set(rented_categories + wishlisted_category_slugs)
 
-    # If student has engagement history, serve personalized recommendations
-    if preferred_categories:
-        personalized_qs = (
-            Item.objects.filter(is_published=True, status=Item.STATUS_ACTIVE)
-            .filter(category__slug__in=preferred_categories)
-            .exclude(owner=user)
-            .exclude(id__in=rented_item_ids)
-            .select_related('category', 'owner')
-            .prefetch_related('images')
-            .order_by('-rental_count', '-created_at')[:limit]
-        )
-
-        items = list(personalized_qs)
-        if len(items) < limit:
-            # Backfill with general campus favorites
-            existing_ids = set(str(it.id) for it in items) | set(rented_item_ids)
-            backfill = (
-                Item.objects.filter(is_published=True, status=Item.STATUS_ACTIVE)
-                .exclude(owner=user)
-                .exclude(id__in=existing_ids)
-                .select_related('category', 'owner')
-                .prefetch_related('images')
-                .order_by('-created_at')[:limit - len(items)]
-            )
-            items.extend(list(backfill))
-
-        return {
-            'strategy': 'PERSONALIZED_HISTORY',
-            'department': getattr(user, 'profile', None).department if hasattr(user, 'profile') and user.profile else None,
-            'recommendations': [_serialize_item(it, 'Recommended for you') for it in items]
-        }
-
-    # 3. Cold-Start Fallback: Student Department / Year
+    # 3. Department
     user_dept = ''
     try:
         if hasattr(user, 'profile') and user.profile and user.profile.department:
-            user_dept = user.profile.department.strip().lower()
+            user_dept = user.profile.department.strip()
     except Exception:
         pass
 
+    dept_display = user_dept or 'Campus'
     matched_dept_slugs = []
     for dept_key, slugs in DEPARTMENT_CATEGORY_PREFERENCES.items():
-        if dept_key in user_dept:
+        if dept_key in user_dept.lower():
             matched_dept_slugs.extend(slugs)
             break
 
     if not matched_dept_slugs:
         matched_dept_slugs = DEPARTMENT_CATEGORY_PREFERENCES['general']
 
-    department_qs = (
-        Item.objects.filter(is_published=True, status=Item.STATUS_ACTIVE)
-        .exclude(owner=user)
-        .filter(Q(category__slug__in=matched_dept_slugs) | Q(category__name__icontains=user_dept))
+    all_target_categories = set(preferred_categories) | set(matched_dept_slugs)
+
+    # Fetch targeted items
+    targeted_items = list(
+        base_qs.filter(category__slug__in=all_target_categories)
         .select_related('category', 'owner')
         .prefetch_related('images')
         .order_by('-rental_count', '-created_at')[:limit]
     )
 
-    items = list(department_qs)
+    # Backfill with other active campus equipment if needed
+    items = targeted_items
     if len(items) < limit:
         existing_ids = set(str(it.id) for it in items)
-        generic_backfill = (
-            Item.objects.filter(is_published=True, status=Item.STATUS_ACTIVE)
-            .exclude(owner=user)
-            .exclude(id__in=existing_ids)
+        backfill = list(
+            base_qs.exclude(id__in=existing_ids)
             .select_related('category', 'owner')
             .prefetch_related('images')
             .order_by('-rental_count', '-created_at')[:limit - len(items)]
         )
-        items.extend(list(generic_backfill))
-
-    dept_display = user_dept.upper() if user_dept else 'Campus'
+        items.extend(backfill)
 
     return {
-        'strategy': 'COLD_START_DEPARTMENT',
-        'department': user_dept or 'General Academic',
-        'recommendations': [_serialize_item(it, f"Top Pick for {dept_display} students") for it in items]
+        'strategy': 'COLD_START_DEPARTMENT' if not preferred_categories else 'PERSONALIZED_HISTORY',
+        'department': dept_display,
+        'recommendations': [
+            _serialize_item(
+                it,
+                _get_contextual_reason(it, dept_display),
+                is_wishlisted=(str(it.id) in user_wishlist_ids)
+            )
+            for it in items
+        ]
     }
 
 
-def _serialize_item(item: Item, reason: str) -> Dict[str, Any]:
+def _serialize_item(item: Item, reason: str, is_wishlisted: bool = False) -> Dict[str, Any]:
     img_url = item.primary_image_url
-    if not img_url and item.images.exists():
+    if not img_url:
         first_img = item.images.first()
-        if first_img and hasattr(first_img, 'image') and first_img.image:
-            img_url = first_img.image.url
+        if first_img:
+            img_url = getattr(first_img, 'image_url', '') or (first_img.image.url if hasattr(first_img, 'image') and first_img.image else '')
 
-    owner_name = item.owner.get_full_name() or item.owner.username if item.owner else "Student"
+    owner_name = item.owner.get_full_name() or item.owner.email.split('@')[0] if item.owner else "Student"
 
     return {
         'id': str(item.id),
@@ -168,7 +178,9 @@ def _serialize_item(item: Item, reason: str) -> Dict[str, Any]:
         'security_deposit': 0.0,
         'condition': item.condition,
         'primary_image_url': img_url or '',
+        'owner_id': str(item.owner_id) if item.owner_id else '',
         'owner_name': owner_name,
         'recommendation_reason': reason,
         'is_available': (item.status == Item.STATUS_ACTIVE and item.is_published),
+        'is_wishlisted': is_wishlisted,
     }

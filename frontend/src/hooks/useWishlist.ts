@@ -79,6 +79,17 @@ export function useWishlist() {
         return oldData;
       });
 
+      // 5. Update ['ai-personalized-recommendations'] queries
+      queryClient.setQueriesData({ queryKey: ['ai-personalized-recommendations'] }, (oldData: any) => {
+        if (!oldData || !oldData.recommendations) return oldData;
+        return {
+          ...oldData,
+          recommendations: oldData.recommendations.map((it: any) =>
+            it.id === itemId ? { ...it, is_wishlisted: nextState } : it
+          ),
+        };
+      });
+
       return { prevPopular, prevDashboardPopular, prevDetail };
     },
     onError: (_err: any, { itemId, nextState }, context) => {
@@ -88,6 +99,15 @@ export function useWishlist() {
         return {
           ...oldData,
           results: oldData.results.map((it: ItemSummary) =>
+            it.id === itemId ? { ...it, is_wishlisted: rollback } : it
+          ),
+        };
+      });
+      queryClient.setQueriesData({ queryKey: ['ai-personalized-recommendations'] }, (oldData: any) => {
+        if (!oldData || !oldData.recommendations) return oldData;
+        return {
+          ...oldData,
+          recommendations: oldData.recommendations.map((it: any) =>
             it.id === itemId ? { ...it, is_wishlisted: rollback } : it
           ),
         };
@@ -102,10 +122,12 @@ export function useWishlist() {
         queryClient.setQueryData(['item-detail', itemId], context.prevDetail);
       }
       queryClient.invalidateQueries({ queryKey: ['marketplace-wishlist'] });
+      queryClient.invalidateQueries({ queryKey: ['ai-personalized-recommendations'] });
     },
     onSettled: (_data, _err, { itemId }) => {
       pendingItemsRef.current.delete(itemId);
       queryClient.invalidateQueries({ queryKey: ['marketplace-wishlist'] });
+      queryClient.invalidateQueries({ queryKey: ['ai-personalized-recommendations'] });
     },
   });
 

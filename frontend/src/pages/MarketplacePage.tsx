@@ -334,7 +334,7 @@ export const MarketplacePage: React.FC = () => {
           {/* Product Cards Grid (9 cols) */}
           <div className="lg:col-span-9 flex flex-col gap-6 min-w-0">
             {isItemsLoading ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-4 sm:gap-6">
+              <div className="grid grid-cols-2 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-3 sm:gap-6">
                 {Array.from({ length: 8 }).map((_, i) => (
                   <ItemCardSkeleton key={i} />
                 ))}

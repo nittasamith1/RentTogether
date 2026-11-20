@@ -9,12 +9,14 @@ export interface RecommendedItem {
   security_deposit: number;
   condition: string;
   primary_image_url: string;
+  owner_id?: string;
   owner_name: string;
   recommendation_reason?: string;
   paired_reason?: string;
   similarity_score?: number;
   match_reason?: string;
   is_available: boolean;
+  is_wishlisted?: boolean;
 }
 
 export interface PersonalizedRecommendationsResponse {
