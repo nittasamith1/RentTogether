@@ -352,7 +352,7 @@ export const MyListingsPage: React.FC = () => {
             onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#7563D9')}
           >
             <Plus className="w-4 h-4" />
-            <span>+ List your first item</span>
+            <span>List your first item</span>
           </button>
         </div>
       ) : (
