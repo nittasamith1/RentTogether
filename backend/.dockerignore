@@ -1,0 +1,24 @@
+# Git & VCS
+.git
+.gitignore
+
+# Virtual Environments
+.venv
+venv/
+env/
+
+# Python Cache & Bytecode
+__pycache__/
+*.py[cod]
+*.so
+.pytest_cache/
+
+# Local databases & storage
+*.sqlite3
+db.sqlite3
+media/
+
+# Secrets & Environment configs
+.env
+.env.*
+!.env.example

@@ -34,11 +34,11 @@ ALLOWED_HOSTS = list(set(
         host.strip()
         for host in os.getenv(
             'ALLOWED_HOSTS',
-            'localhost,127.0.0.1,0.0.0.0,renttogether.onrender.com,.onrender.com'
+            'localhost,127.0.0.1,0.0.0.0,renttogether.onrender.com,.onrender.com,.run.app,.a.run.app'
         ).split(',')
         if host.strip()
     ]
-    + ['testserver', 'localhost', '127.0.0.1', '0.0.0.0', 'renttogether.onrender.com', '.onrender.com']
+    + ['testserver', 'localhost', '127.0.0.1', '0.0.0.0', 'renttogether.onrender.com', '.onrender.com', '.run.app', '.a.run.app']
 ))
 
 
@@ -257,6 +257,8 @@ CORS_ALLOWED_ORIGIN_REGEXES = [
     r"^https:\/\/.*\.vercel\.app$",
     r"^https:\/\/renttogether.*\.vercel\.app$",
     r"^https:\/\/renttogether.*\.onrender\.com$",
+    r"^https:\/\/.*\.run\.app$",
+    r"^https:\/\/.*\.a\.run\.app$",
 ]
 CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOW_HEADERS = [
@@ -366,6 +368,7 @@ if not DEBUG:
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
     SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+    USE_X_FORWARDED_HOST = True
 
 # Logging Configuration
 LOGGING = {

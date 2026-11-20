@@ -8,11 +8,23 @@ from apps.accounts.models import College
 class HealthCheckView(APIView):
     """
     Health check endpoint for RentTogether platform.
-    Verifies backend runtime, database accessibility, and institutional setup.
+    - Fast liveness probe on `/health/` (0 database queries) for Google Cloud Run container monitoring.
+    - Deep readiness probe on `/api/v1/health/` verifying Neon PostgreSQL connectivity and college setup.
     """
     permission_classes = [AllowAny]
 
     def get(self, request, *args, **kwargs):
+        # Lightweight probe for container health monitoring (0 database queries)
+        is_lightweight = request.path.strip('/') == 'health' and request.query_params.get('db') != 'true'
+        if is_lightweight:
+            return JsonResponse({
+                "status": "healthy",
+                "backend": "online",
+                "runtime": "google-cloud-run",
+                "timestamp": datetime.now(timezone.utc).isoformat(),
+            }, status=200)
+
+        # Full readiness probe with Neon database connectivity verification
         db_status = "connected"
         db_error = None
         college_count = 0
