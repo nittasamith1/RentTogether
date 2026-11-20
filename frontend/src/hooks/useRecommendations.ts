@@ -9,7 +9,7 @@ export function usePersonalizedRecommendations(limit: number = 8) {
   return useQuery<PersonalizedRecommendationsResponse>({
     queryKey: ['personalized-recommendations', limit],
     queryFn: () => recommendationService.getPersonalized(limit),
-    staleTime: 0,
+    staleTime: 60000,
   });
 }
 
@@ -18,6 +18,6 @@ export function useComplementaryRecommendations(itemId: string | null, limit: nu
     queryKey: ['complementary-recommendations', itemId, limit],
     queryFn: () => recommendationService.getComplementary(itemId!, limit),
     enabled: Boolean(itemId),
-    staleTime: 0,
+    staleTime: 60000,
   });
 }

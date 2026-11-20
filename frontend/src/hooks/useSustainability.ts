@@ -9,8 +9,7 @@ export function useMyImpact() {
   return useQuery<StudentImpactResponse>({
     queryKey: ['my-sustainability-impact'],
     queryFn: () => sustainabilityService.getMyImpact(),
-    staleTime: 0,
-    refetchInterval: 15000, // Live real-time updates
+    staleTime: 60000, // 1 minute cache
   });
 }
 
@@ -18,7 +17,6 @@ export function useCampusImpact() {
   return useQuery<CampusImpactResponse>({
     queryKey: ['campus-sustainability-impact'],
     queryFn: () => sustainabilityService.getCampusImpact(),
-    staleTime: 0,
-    refetchInterval: 30000,
+    staleTime: 60000,
   });
 }

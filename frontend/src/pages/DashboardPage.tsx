@@ -45,7 +45,7 @@ export const DashboardPage: React.FC = () => {
   const { data: popularItems = [], isLoading: loadingPopular } = useQuery<ItemSummary[]>({
     queryKey: ['popular-items-dashboard'],
     queryFn: () => marketplaceService.getPopularItems(),
-    refetchInterval: 15000, // Live real-time database updates
+    staleTime: 60000, // Cache for 60 seconds (snappy instant renders)
   });
 
   // State

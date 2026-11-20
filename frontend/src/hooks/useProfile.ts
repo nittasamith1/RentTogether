@@ -13,7 +13,7 @@ export const useProfile = () => {
   return useQuery<DetailedStudentProfile, Error>({
     queryKey: PROFILE_KEYS.me(),
     queryFn: () => profileService.getProfileMe(),
-    staleTime: 0, // Real-time sync with database
+    staleTime: 60000, // Cache for 60s, invalidated on update
   });
 };
 
@@ -22,7 +22,7 @@ export const usePublicProfile = (studentId?: string) => {
     queryKey: PROFILE_KEYS.public(studentId || ''),
     queryFn: () => profileService.getPublicProfile(studentId!),
     enabled: Boolean(studentId),
-    staleTime: 0,
+    staleTime: 60000,
   });
 };
 
@@ -31,7 +31,7 @@ export const useStudentReviews = (studentId?: string) => {
     queryKey: PROFILE_KEYS.reviews(studentId || ''),
     queryFn: () => profileService.getStudentReviews(studentId!),
     enabled: Boolean(studentId),
-    staleTime: 0,
+    staleTime: 60000,
   });
 };
 

@@ -12,8 +12,7 @@ export function useAdmin() {
       queryKey: ['admin-platform-analytics'],
       queryFn: () => adminService.getAnalytics(),
       enabled: isStaff,
-      staleTime: 0,
-      refetchInterval: 15000,
+      staleTime: 30000,
     });
   };
 
@@ -22,8 +21,7 @@ export function useAdmin() {
       queryKey: ['admin-disputes', status, search],
       queryFn: () => adminService.getDisputes(status, search),
       enabled: isStaff,
-      staleTime: 0,
-      refetchInterval: 10000,
+      staleTime: 20000,
     });
   };
 
@@ -32,8 +30,7 @@ export function useAdmin() {
       queryKey: ['admin-pending-verifications', status, search],
       queryFn: () => adminService.getPendingVerifications(status, search),
       enabled: isStaff,
-      staleTime: 0,
-      refetchInterval: 10000,
+      staleTime: 20000,
     });
   };
 
@@ -42,8 +39,7 @@ export function useAdmin() {
       queryKey: ['admin-fraud-alerts'],
       queryFn: () => adminService.getFraudAlerts(),
       enabled: isStaff,
-      staleTime: 0,
-      refetchInterval: 10000,
+      staleTime: 20000,
     });
   };
 

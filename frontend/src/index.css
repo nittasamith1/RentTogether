@@ -16,6 +16,7 @@
   }
 
   html {
+    scroll-behavior: smooth;
     -webkit-overflow-scrolling: touch;
     overscroll-behavior-y: none;
     text-size-adjust: 100%;
@@ -29,6 +30,8 @@
     -moz-osx-font-smoothing: grayscale;
     text-rendering: optimizeLegibility;
     overflow-x: hidden;
+    transform: translateZ(0);
+    backface-visibility: hidden;
   }
 
   ::-webkit-scrollbar {
