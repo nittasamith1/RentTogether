@@ -3,8 +3,8 @@ services:
     name: renttogether-backend
     runtime: python
     buildCommand: "./build.sh"
-    startCommand: "cd backend && gunicorn config.wsgi:application --bind 0.0.0.0:$PORT --workers 2 --threads 2 --timeout 120"
-    healthCheckPath: "/api/v1/health/"
+    startCommand: "cd backend && gunicorn --config gunicorn.conf.py config.wsgi:application"
+    healthCheckPath: "/health/"
     envVars:
       - key: PYTHON_VERSION
         value: 3.12.0

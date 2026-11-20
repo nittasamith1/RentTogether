@@ -1,23 +1,23 @@
 """
-RentTogether Production Gunicorn Configuration for Google Cloud Run
-Optimized for 1 vCPU, 1 GiB RAM container instances.
+RentTogether Production Gunicorn Configuration for Render
+Optimized for 512 MB - 1 GB RAM container instances with fast response times.
 """
 import os
 
-# Port injected by Google Cloud Run (defaults to 8080)
-port = os.getenv("PORT", "8080")
+# Port dynamically injected by Render (defaults to 8000 for local production testing)
+port = os.getenv("PORT", "8000")
 bind = f"0.0.0.0:{port}"
 
 # Worker processes & concurrency:
 # Using threaded workers (gthread) instead of sync forks allows handling
-# 8 concurrent requests with only 2 processes, drastically cutting RAM usage.
+# 8 concurrent requests with only 2 processes, keeping RAM strictly under 300MB.
 workers = int(os.getenv("GUNICORN_WORKERS", "2"))
 threads = int(os.getenv("GUNICORN_THREADS", "4"))
 worker_class = "gthread"
 
 # Memory leak prevention:
 # Automatically restart workers after serving 1000 requests (with random jitter)
-# to return memory back to the OS and prevent gradual memory bloat.
+# to return memory back to the OS and prevent gradual memory bloat on Render.
 max_requests = 1000
 max_requests_jitter = 100
 
@@ -31,7 +31,7 @@ timeout = int(os.getenv("GUNICORN_TIMEOUT", "120"))
 graceful_timeout = int(os.getenv("GUNICORN_GRACEFUL_TIMEOUT", "30"))
 keepalive = 5
 
-# Logging: stdout/stderr streaming for Google Cloud Logging
+# Logging: stdout/stderr streaming for Render Log Stream
 accesslog = "-"
 errorlog = "-"
 loglevel = os.getenv("GUNICORN_LOG_LEVEL", "info")
