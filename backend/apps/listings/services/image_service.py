@@ -60,8 +60,10 @@ CATEGORY_FALLBACK_IMAGES = {
 def upload_image_to_storage(file_obj, item_id: str, category_slug: str = "") -> Tuple[str, str]:
     """
     Uploads an image directly to Cloudinary CDN for ultra-low-latency real-time delivery.
-    Seamlessly falls back to resilient CDN or local storage if Cloudinary is unreachable or credentials mismatch,
-    guaranteeing that student listings always publish successfully and images render perfectly.
+    Stores and retrieves images directly from Cloudinary.
+    Falls back to storing the authentic uploaded file in local/persistent storage
+    if Cloudinary is temporarily unreachable or misconfigured.
+    NEVER replaces user-uploaded photographs with generic stock images.
     Returns (image_url, cloudinary_public_id).
     """
     if CLOUDINARY_AVAILABLE:
@@ -86,25 +88,16 @@ def upload_image_to_storage(file_obj, item_id: str, category_slug: str = "") -> 
         except Exception as exc:
             import logging
             logging.getLogger(__name__).warning(
-                f"Cloudinary upload failed ({exc}); applying resilient CDN fallback."
+                f"Cloudinary upload failed ({exc}); storing actual user uploaded file to fallback storage."
             )
             if hasattr(file_obj, 'seek'):
                 file_obj.seek(0)
 
-    # In production without persistent volume, local media is ephemeral and 404s after deploy.
-    # Use resilient high-resolution CDN image matching the category.
-    is_prod = not getattr(settings, 'DEBUG', True) or os.getenv('RENDER')
-    if is_prod:
-        fallback_cdn = (
-            CATEGORY_FALLBACK_IMAGES.get(category_slug)
-            or CATEGORY_FALLBACK_IMAGES['default']
-        )
-        return fallback_cdn, ""
-
-    # Reliable local fallback storage for local development
+    # Save the user's authentic uploaded file directly to storage so their real image is preserved
     if hasattr(file_obj, 'seek'):
         file_obj.seek(0)
-    filename = f"items/{item_id}/{uuid.uuid4().hex}_{getattr(file_obj, 'name', 'image.jpg')}"
+    ext = os.path.splitext(getattr(file_obj, 'name', 'image.jpg'))[1] or '.jpg'
+    filename = f"items/{item_id}/{uuid.uuid4().hex}{ext}"
     saved_path = default_storage.save(filename, file_obj)
     url = default_storage.url(saved_path)
     return url, ""

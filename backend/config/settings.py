@@ -310,22 +310,30 @@ else:
     EMAIL_BACKEND = os.getenv('EMAIL_BACKEND', 'django.core.mail.backends.console.EmailBackend')
 
 # Cloudinary Configuration (Global Low-Latency CDN)
-CLOUDINARY_URL = os.getenv('CLOUDINARY_URL', '').strip()
-CLOUDINARY_CLOUD_NAME = os.getenv('CLOUDINARY_CLOUD_NAME', '').strip()
-CLOUDINARY_API_KEY = os.getenv('CLOUDINARY_API_KEY', '').strip()
-CLOUDINARY_API_SECRET = os.getenv('CLOUDINARY_API_SECRET', '').strip()
+CLOUDINARY_URL = os.getenv('CLOUDINARY_URL', '').strip().strip('"\'')
+CLOUDINARY_CLOUD_NAME = os.getenv('CLOUDINARY_CLOUD_NAME', '').strip().strip('"\'')
+CLOUDINARY_API_KEY = os.getenv('CLOUDINARY_API_KEY', '').strip().strip('"\'')
+CLOUDINARY_API_SECRET = os.getenv('CLOUDINARY_API_SECRET', '').strip().strip('"\'')
 
-if CLOUDINARY_URL or (CLOUDINARY_CLOUD_NAME and CLOUDINARY_API_KEY and CLOUDINARY_API_SECRET):
-    import cloudinary
-    if CLOUDINARY_URL:
+if CLOUDINARY_URL:
+    try:
+        import cloudinary
         cloudinary.config(cloudinary_url=CLOUDINARY_URL, secure=True)
-    else:
+    except Exception as exc:
+        import logging
+        logging.getLogger('renttogether').warning(f"Cloudinary URL config failed: {exc}")
+elif CLOUDINARY_CLOUD_NAME and CLOUDINARY_API_KEY and CLOUDINARY_API_SECRET:
+    try:
+        import cloudinary
         cloudinary.config(
             cloud_name=CLOUDINARY_CLOUD_NAME,
             api_key=CLOUDINARY_API_KEY,
             api_secret=CLOUDINARY_API_SECRET,
             secure=True
         )
+    except Exception as exc:
+        import logging
+        logging.getLogger('renttogether').warning(f"Cloudinary config failed: {exc}")
 
 # Production Security Headers
 if not DEBUG:
