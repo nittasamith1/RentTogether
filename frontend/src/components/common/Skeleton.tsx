@@ -90,3 +90,33 @@ export const DashboardSkeleton: React.FC = () => {
   );
 };
 
+export const PageContentSkeleton: React.FC = () => {
+  return (
+    <div className="space-y-6 max-w-7xl mx-auto pb-12 select-none pt-3 animate-pulse">
+      {/* Header bar skeleton matching real pages */}
+      <div
+        className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-3"
+        style={{ borderBottom: '1px solid #EAE6E1' }}
+      >
+        <div className="space-y-2">
+          <div className="h-6 w-36 bg-[#FFE5D6] rounded-full" />
+          <div className="h-8 w-60 bg-[#E8E2D9] rounded-xl" />
+          <div className="h-4 w-80 max-w-full bg-[#EFEAE2] rounded-md" />
+        </div>
+        <div className="flex items-center gap-3">
+          <div className="h-10 w-28 bg-[#FFFCF7] border border-[#EAE6E1] rounded-2xl" />
+          <div className="h-10 w-32 bg-[#FFFCF7] border border-[#EAE6E1] rounded-2xl" />
+        </div>
+      </div>
+
+      {/* Grid of skeleton cards matching 2-column mobile and 4-column desktop */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3.5 sm:gap-5">
+        {Array.from({ length: 4 }).map((_, i) => (
+          <ItemCardSkeleton key={i} />
+        ))}
+      </div>
+    </div>
+  );
+};
+
+

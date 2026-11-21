@@ -255,6 +255,7 @@ export const Navbar: React.FC<NavbarProps> = ({
         {/* Wishlist Button (Love Symbol Only) */}
         <button
           onClick={() => navigate('/wishlist')}
+          onMouseEnter={() => import('../../pages/WishlistPage')}
           className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center transition-all cursor-pointer hover:scale-105 active:scale-95 duration-150 shadow-2xs shrink-0 relative"
           style={{ backgroundColor: '#FFE5D6', color: '#F28B82', border: '1px solid #F5CDB8' }}
           title={`Wishlist${wishlistCount > 0 ? ` (${wishlistCount} saved)` : ''}`}

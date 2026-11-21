@@ -26,10 +26,31 @@ const VerificationPendingPage = lazy(() => import('./pages/auth/VerificationPend
 const AdminVerificationsPage = lazy(() => import('./pages/admin/AdminVerificationsPage').then((m) => ({ default: m.AdminVerificationsPage })));
 const AdminDashboardPage = lazy(() => import('./pages/admin/AdminDashboardPage').then((m) => ({ default: m.AdminDashboardPage })));
 
+// Background prefetch for instant 0ms tab transitions without network delay
+const prefetchSecondaryRoutes = () => {
+  if (typeof window === 'undefined') return;
+  const load = () => {
+    import('./pages/WishlistPage');
+    import('./pages/listings/MyListingsPage');
+    import('./pages/listings/CreateListingPage');
+    import('./pages/rentals/MyRentalsPage');
+    import('./pages/BookingsCalendarPage');
+    import('./pages/payments/PaymentsEscrowPage');
+    import('./pages/AnalyticsPage');
+    import('./pages/ProfilePage');
+    import('./pages/settings/SettingsPage');
+  };
+
+  if ('requestIdleCallback' in window) {
+    (window as any).requestIdleCallback(load, { timeout: 2000 });
+  } else {
+    setTimeout(load, 500);
+  }
+};
+
 const PageLoadingFallback: React.FC = () => (
-  <div className="w-full min-h-[50vh] flex flex-col items-center justify-center space-y-3 select-none">
+  <div className="min-h-screen w-full flex items-center justify-center select-none" style={{ backgroundColor: '#FFF8ED' }}>
     <div className="w-8 h-8 rounded-full border-3 border-[#EAE6E1] border-t-[#7563D9] animate-spin" />
-    <span className="text-xs font-semibold" style={{ color: '#85899B' }}>Loading...</span>
   </div>
 );
 
@@ -106,6 +127,10 @@ const PublicOnlyRoute: React.FC<{ children: React.ReactNode }> = ({ children }) 
 };
 
 export const App: React.FC = () => {
+  React.useEffect(() => {
+    prefetchSecondaryRoutes();
+  }, []);
+
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>

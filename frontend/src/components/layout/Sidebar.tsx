@@ -20,6 +20,7 @@ interface NavItem {
   name: string;
   path: string;
   icon: React.ComponentType<{ className?: string }>;
+  preload?: () => void;
 }
 
 interface SidebarProps {
@@ -30,12 +31,12 @@ interface SidebarProps {
 const navItems: NavItem[] = [
   { name: 'Dashboard', path: '/', icon: LayoutGrid },
   { name: 'Marketplace', path: '/marketplace', icon: Store },
-  { name: 'My Rentals', path: '/rentals', icon: Package },
-  { name: 'My Listings', path: '/listings', icon: Layers },
-  { name: 'Bookings & Calendar', path: '/bookings', icon: Calendar },
-  { name: 'Payments', path: '/payments', icon: CreditCard },
-  { name: 'Analytics', path: '/analytics', icon: BarChart2 },
-  { name: 'Profile', path: '/profile', icon: User },
+  { name: 'My Rentals', path: '/rentals', icon: Package, preload: () => import('../../pages/rentals/MyRentalsPage') },
+  { name: 'My Listings', path: '/listings', icon: Layers, preload: () => import('../../pages/listings/MyListingsPage') },
+  { name: 'Bookings & Calendar', path: '/bookings', icon: Calendar, preload: () => import('../../pages/BookingsCalendarPage') },
+  { name: 'Payments', path: '/payments', icon: CreditCard, preload: () => import('../../pages/payments/PaymentsEscrowPage') },
+  { name: 'Analytics', path: '/analytics', icon: BarChart2, preload: () => import('../../pages/AnalyticsPage') },
+  { name: 'Profile', path: '/profile', icon: User, preload: () => import('../../pages/ProfilePage') },
 ];
 
 export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
@@ -107,6 +108,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
                   to={item.path}
                   end={item.path === '/'}
                   onClick={onClose}
+                  onMouseEnter={() => item.preload?.()}
                   title={!isOpen ? item.name : undefined}
                   className={({ isActive }) =>
                     `flex items-center rounded-xl font-semibold transition-all duration-200 cursor-pointer ${

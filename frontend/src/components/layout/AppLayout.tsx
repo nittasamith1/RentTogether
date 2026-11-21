@@ -1,7 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
 import { Sidebar } from './Sidebar';
 import { Navbar } from './Navbar';
+import { TopProgressBar } from '../common/TopProgressBar';
+import { PageContentSkeleton } from '../common/Skeleton';
 
 export const AppLayout: React.FC = () => {
   // 1. Default State: CLOSED whenever the user opens or refreshes the application
@@ -26,6 +28,7 @@ export const AppLayout: React.FC = () => {
 
   return (
     <div className="flex h-screen w-full overflow-hidden font-sans" style={{ backgroundColor: '#FFF8ED' }}>
+      <TopProgressBar />
       <Sidebar
         isOpen={isSidebarOpen}
         onClose={() => setIsSidebarOpen(false)}
@@ -42,8 +45,10 @@ export const AppLayout: React.FC = () => {
           }}
           className="flex-1 overflow-y-auto overscroll-contain px-3 sm:px-6 lg:px-8 pb-12 pt-2"
         >
-          <div className="max-w-7xl mx-auto w-full">
-            <Outlet />
+          <div className="max-w-7xl mx-auto w-full transition-opacity duration-200">
+            <Suspense fallback={<PageContentSkeleton />}>
+              <Outlet />
+            </Suspense>
           </div>
         </main>
       </div>
