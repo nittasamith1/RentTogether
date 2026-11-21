@@ -99,11 +99,11 @@ export const MyListingsPage: React.FC = () => {
           </p>
         </div>
 
-        <div className="flex flex-wrap items-center gap-2.5 self-start sm:self-auto">
+        <div className="flex flex-wrap items-center gap-2.5 w-full sm:w-auto">
           {/* Quick link to Bookings & Calendar */}
           <button
             onClick={() => navigate('/bookings')}
-            className="px-4 py-2.5 rounded-2xl font-bold text-xs transition-all border flex items-center gap-2 cursor-pointer hover:bg-[#D8D0F5] active:scale-95 shadow-xs"
+            className="flex-1 sm:flex-initial px-4 py-2.5 rounded-2xl font-bold text-xs transition-all border flex items-center justify-center gap-2 cursor-pointer hover:bg-[#D8D0F5] active:scale-95 shadow-xs"
             style={{ backgroundColor: '#E9E3FF', borderColor: '#D8D0F5', color: '#7563D9' }}
             title="Open Bookings & Smart Calendar"
           >
@@ -114,7 +114,7 @@ export const MyListingsPage: React.FC = () => {
           {/* Primary Action Button */}
           <button
             onClick={() => navigate('/listings/create')}
-            className="text-white px-5 py-2.5 rounded-2xl font-bold text-xs transition-all shadow-md flex items-center gap-2 cursor-pointer active:scale-95"
+            className="flex-1 sm:flex-initial text-white px-5 py-2.5 rounded-2xl font-bold text-xs transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer active:scale-95"
             style={{ backgroundColor: '#7563D9', boxShadow: '0 4px 16px rgba(117, 99, 217, 0.25)' }}
             onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#6552C5')}
             onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#7563D9')}
@@ -126,104 +126,104 @@ export const MyListingsPage: React.FC = () => {
       </div>
 
       {/* Top 4 KPI Summary Cards — Premium Pastel Themed */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-4">
         {/* Card 1: Total Listings — Soft Lavender */}
         <div
-          className="rounded-2xl p-5 border shadow-sm flex flex-col justify-between hover:shadow-card-hover transition-all"
+          className="rounded-2xl p-3.5 sm:p-5 border shadow-sm flex flex-col justify-between hover:shadow-card-hover transition-all"
           style={{ backgroundColor: '#E9E3FF', borderColor: '#D8D0F5' }}
         >
           <div className="flex items-start justify-between">
-            <div className="w-10 h-10 rounded-xl flex items-center justify-center font-bold" style={{ backgroundColor: '#7563D9', color: '#fff' }}>
-              <Layers className="w-5 h-5 stroke-[2]" />
+            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center font-bold" style={{ backgroundColor: '#7563D9', color: '#fff' }}>
+              <Layers className="w-4 h-4 sm:w-5 sm:h-5 stroke-[2]" />
             </div>
             <span
-              className="text-[11px] font-bold px-2 py-0.5 rounded-full"
+              className="text-[10px] sm:text-[11px] font-bold px-2 py-0.5 rounded-full"
               style={{ backgroundColor: '#D8D0F5', color: '#7563D9' }}
             >
               Inventory
             </span>
           </div>
-          <div className="mt-4">
-            <span className="text-xs font-medium" style={{ color: '#85899B' }}>Total Listed Items</span>
-            <div className="text-2xl font-extrabold mt-0.5" style={{ color: '#303653' }}>
+          <div className="mt-3 sm:mt-4">
+            <span className="text-[11px] sm:text-xs font-medium" style={{ color: '#85899B' }}>Total Listed Items</span>
+            <div className="text-xl sm:text-2xl font-extrabold mt-0.5" style={{ color: '#303653' }}>
               {stats.total_listings}
             </div>
-            <span className="text-[11px] mt-0.5 block" style={{ color: '#85899B' }}>Shared on campus</span>
+            <span className="text-[10px] sm:text-[11px] mt-0.5 block truncate" style={{ color: '#85899B' }}>Shared on campus</span>
           </div>
         </div>
 
         {/* Card 2: Active Listings — Fresh Mint */}
         <div
-          className="rounded-2xl p-5 border shadow-sm flex flex-col justify-between hover:shadow-card-hover transition-all"
+          className="rounded-2xl p-3.5 sm:p-5 border shadow-sm flex flex-col justify-between hover:shadow-card-hover transition-all"
           style={{ backgroundColor: '#DDF3E7', borderColor: '#B8E5CC' }}
         >
           <div className="flex items-start justify-between">
-            <div className="w-10 h-10 rounded-xl flex items-center justify-center font-bold" style={{ backgroundColor: '#42A879', color: '#fff' }}>
-              <CheckCircle2 className="w-5 h-5 stroke-[2]" />
+            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center font-bold" style={{ backgroundColor: '#42A879', color: '#fff' }}>
+              <CheckCircle2 className="w-4 h-4 sm:w-5 sm:h-5 stroke-[2]" />
             </div>
             <span
-              className="text-[11px] font-bold px-2 py-0.5 rounded-full"
+              className="text-[10px] sm:text-[11px] font-bold px-2 py-0.5 rounded-full"
               style={{ backgroundColor: '#B8E5CC', color: '#2D7A5B' }}
             >
               Live Now
             </span>
           </div>
-          <div className="mt-4">
-            <span className="text-xs font-medium" style={{ color: '#85899B' }}>Active & Discoverable</span>
-            <div className="text-2xl font-extrabold mt-0.5" style={{ color: '#42A879' }}>
+          <div className="mt-3 sm:mt-4">
+            <span className="text-[11px] sm:text-xs font-medium" style={{ color: '#85899B' }}>Active & Discoverable</span>
+            <div className="text-xl sm:text-2xl font-extrabold mt-0.5" style={{ color: '#42A879' }}>
               {stats.active_listings}
             </div>
-            <span className="text-[11px] mt-0.5 block" style={{ color: '#85899B' }}>Visible to peers</span>
+            <span className="text-[10px] sm:text-[11px] mt-0.5 block truncate" style={{ color: '#85899B' }}>Visible to peers</span>
           </div>
         </div>
 
         {/* Card 3: Paused Listings — Soft Peach */}
         <div
-          className="rounded-2xl p-5 border shadow-sm flex flex-col justify-between hover:shadow-card-hover transition-all"
+          className="rounded-2xl p-3.5 sm:p-5 border shadow-sm flex flex-col justify-between hover:shadow-card-hover transition-all"
           style={{ backgroundColor: '#FFE5D6', borderColor: '#F5CDB8' }}
         >
           <div className="flex items-start justify-between">
-            <div className="w-10 h-10 rounded-xl flex items-center justify-center font-bold" style={{ backgroundColor: '#E8A447', color: '#fff' }}>
-              <PauseCircle className="w-5 h-5 stroke-[2]" />
+            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center font-bold" style={{ backgroundColor: '#E8A447', color: '#fff' }}>
+              <PauseCircle className="w-4 h-4 sm:w-5 sm:h-5 stroke-[2]" />
             </div>
             <span
-              className="text-[11px] font-bold px-2 py-0.5 rounded-full"
+              className="text-[10px] sm:text-[11px] font-bold px-2 py-0.5 rounded-full"
               style={{ backgroundColor: '#F5CDB8', color: '#A06312' }}
             >
-              Temporarily Off
+              Paused
             </span>
           </div>
-          <div className="mt-4">
-            <span className="text-xs font-medium" style={{ color: '#85899B' }}>Paused Items</span>
-            <div className="text-2xl font-extrabold mt-0.5" style={{ color: '#E8A447' }}>
+          <div className="mt-3 sm:mt-4">
+            <span className="text-[11px] sm:text-xs font-medium" style={{ color: '#85899B' }}>Paused Items</span>
+            <div className="text-xl sm:text-2xl font-extrabold mt-0.5" style={{ color: '#E8A447' }}>
               {stats.paused_listings}
             </div>
-            <span className="text-[11px] mt-0.5 block" style={{ color: '#85899B' }}>Hidden from search</span>
+            <span className="text-[10px] sm:text-[11px] mt-0.5 block truncate" style={{ color: '#85899B' }}>Hidden from search</span>
           </div>
         </div>
 
         {/* Card 4: Completed Rentals — Sky Blue */}
         <div
-          className="rounded-2xl p-5 border shadow-sm flex flex-col justify-between hover:shadow-card-hover transition-all"
+          className="rounded-2xl p-3.5 sm:p-5 border shadow-sm flex flex-col justify-between hover:shadow-card-hover transition-all"
           style={{ backgroundColor: '#DFEDFF', borderColor: '#C5DCFA' }}
         >
           <div className="flex items-start justify-between">
-            <div className="w-10 h-10 rounded-xl flex items-center justify-center font-bold" style={{ backgroundColor: '#6398D6', color: '#fff' }}>
-              <TrendingUp className="w-5 h-5 stroke-[2]" />
+            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center font-bold" style={{ backgroundColor: '#6398D6', color: '#fff' }}>
+              <TrendingUp className="w-4 h-4 sm:w-5 sm:h-5 stroke-[2]" />
             </div>
             <span
-              className="text-[11px] font-bold px-2 py-0.5 rounded-full"
+              className="text-[10px] sm:text-[11px] font-bold px-2 py-0.5 rounded-full"
               style={{ backgroundColor: '#C5DCFA', color: '#3A6BB5' }}
             >
-              Peer Trust
+              Trust
             </span>
           </div>
-          <div className="mt-4">
-            <span className="text-xs font-medium" style={{ color: '#85899B' }}>Completed Rentals</span>
-            <div className="text-2xl font-extrabold mt-0.5" style={{ color: '#6398D6' }}>
+          <div className="mt-3 sm:mt-4">
+            <span className="text-[11px] sm:text-xs font-medium" style={{ color: '#85899B' }}>Completed Rentals</span>
+            <div className="text-xl sm:text-2xl font-extrabold mt-0.5" style={{ color: '#6398D6' }}>
               {stats.total_completed_rentals}
             </div>
-            <span className="text-[11px] mt-0.5 block" style={{ color: '#85899B' }}>All-time student handovers</span>
+            <span className="text-[10px] sm:text-[11px] mt-0.5 block truncate" style={{ color: '#85899B' }}>All-time handovers</span>
           </div>
         </div>
       </div>

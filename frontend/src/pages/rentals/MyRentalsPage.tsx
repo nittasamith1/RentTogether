@@ -199,92 +199,92 @@ export const MyRentalsPage: React.FC = () => {
       </div>
 
       {/* Top 4 Stat Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-4">
         {/* Card 1: Active Rentals — Fresh Mint */}
         <div
-          className="rounded-2xl p-5 border shadow-sm flex flex-col justify-between"
+          className="rounded-2xl p-3.5 sm:p-5 border shadow-sm flex flex-col justify-between"
           style={{ backgroundColor: '#DDF3E7', borderColor: '#B8E5CC' }}
         >
           <div className="flex items-start justify-between">
-            <div className="w-10 h-10 rounded-xl flex items-center justify-center font-bold bg-[#42A879] text-white">
-              <CheckCircle2 className="w-5 h-5 stroke-[2]" />
+            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center font-bold bg-[#42A879] text-white">
+              <CheckCircle2 className="w-4 h-4 sm:w-5 sm:h-5 stroke-[2]" />
             </div>
-            <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-[#B8E5CC] text-[#2D7A5B]">
+            <span className="text-[10px] sm:text-[11px] font-bold px-2 py-0.5 rounded-full bg-[#B8E5CC] text-[#2D7A5B]">
               In Hand
             </span>
           </div>
-          <div className="mt-4">
-            <span className="text-xs font-medium" style={{ color: '#85899B' }}>Active Rentals</span>
-            <div className="text-2xl font-extrabold mt-0.5" style={{ color: '#42A879' }}>
+          <div className="mt-3 sm:mt-4">
+            <span className="text-[11px] sm:text-xs font-medium" style={{ color: '#85899B' }}>Active Rentals</span>
+            <div className="text-xl sm:text-2xl font-extrabold mt-0.5" style={{ color: '#42A879' }}>
               {activeCount}
             </div>
-            <span className="text-[11px] mt-0.5 block" style={{ color: '#85899B' }}>Currently in your possession</span>
+            <span className="text-[10px] sm:text-[11px] mt-0.5 block truncate" style={{ color: '#85899B' }}>In your possession</span>
           </div>
         </div>
 
         {/* Card 2: Ready for Handover — Soft Lavender */}
         <div
-          className="rounded-2xl p-5 border shadow-sm flex flex-col justify-between"
+          className="rounded-2xl p-3.5 sm:p-5 border shadow-sm flex flex-col justify-between"
           style={{ backgroundColor: '#E9E3FF', borderColor: '#D8D0F5' }}
         >
           <div className="flex items-start justify-between">
-            <div className="w-10 h-10 rounded-xl flex items-center justify-center font-bold bg-[#7563D9] text-white">
-              <QrCode className="w-5 h-5 stroke-[2]" />
+            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center font-bold bg-[#7563D9] text-white">
+              <QrCode className="w-4 h-4 sm:w-5 sm:h-5 stroke-[2]" />
             </div>
-            <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-[#D8D0F5] text-[#7563D9]">
+            <span className="text-[10px] sm:text-[11px] font-bold px-2 py-0.5 rounded-full bg-[#D8D0F5] text-[#7563D9]">
               Pickup Ready
             </span>
           </div>
-          <div className="mt-4">
-            <span className="text-xs font-medium" style={{ color: '#85899B' }}>Ready for Pickup</span>
-            <div className="text-2xl font-extrabold mt-0.5" style={{ color: '#303653' }}>
+          <div className="mt-3 sm:mt-4">
+            <span className="text-[11px] sm:text-xs font-medium" style={{ color: '#85899B' }}>Ready for Pickup</span>
+            <div className="text-xl sm:text-2xl font-extrabold mt-0.5" style={{ color: '#303653' }}>
               {confirmedHandoverCount}
             </div>
-            <span className="text-[11px] mt-0.5 block" style={{ color: '#85899B' }}>Paid & pass code generated</span>
+            <span className="text-[10px] sm:text-[11px] mt-0.5 block truncate" style={{ color: '#85899B' }}>Pass code generated</span>
           </div>
         </div>
 
         {/* Card 3: Action Required (Cash Handover) — Sky Blue */}
         <div
-          className="rounded-2xl p-5 border shadow-sm flex flex-col justify-between"
+          className="rounded-2xl p-3.5 sm:p-5 border shadow-sm flex flex-col justify-between"
           style={{ backgroundColor: '#DFEDFF', borderColor: '#C5DCFA' }}
         >
           <div className="flex items-start justify-between">
-            <div className="w-10 h-10 rounded-xl flex items-center justify-center font-bold bg-[#6398D6] text-white">
-              <Banknote className="w-5 h-5 stroke-[2]" />
+            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center font-bold bg-[#6398D6] text-white">
+              <Banknote className="w-4 h-4 sm:w-5 sm:h-5 stroke-[2]" />
             </div>
-            <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-[#C5DCFA] text-[#3A6BB5]">
-              Pay Within 12h
+            <span className="text-[10px] sm:text-[11px] font-bold px-2 py-0.5 rounded-full bg-[#C5DCFA] text-[#3A6BB5]">
+              Pay Due
             </span>
           </div>
-          <div className="mt-4">
-            <span className="text-xs font-medium" style={{ color: '#85899B' }}>Cash Handover Due</span>
-            <div className="text-2xl font-extrabold mt-0.5" style={{ color: '#6398D6' }}>
+          <div className="mt-3 sm:mt-4">
+            <span className="text-[11px] sm:text-xs font-medium" style={{ color: '#85899B' }}>Cash Due</span>
+            <div className="text-xl sm:text-2xl font-extrabold mt-0.5" style={{ color: '#6398D6' }}>
               {approvedPaymentCount}
             </div>
-            <span className="text-[11px] mt-0.5 block" style={{ color: '#85899B' }}>Approved by equipment owner</span>
+            <span className="text-[10px] sm:text-[11px] mt-0.5 block truncate" style={{ color: '#85899B' }}>Approved by owner</span>
           </div>
         </div>
 
         {/* Card 4: Awaiting Owner Approval — Soft Peach */}
         <div
-          className="rounded-2xl p-5 border shadow-sm flex flex-col justify-between"
+          className="rounded-2xl p-3.5 sm:p-5 border shadow-sm flex flex-col justify-between"
           style={{ backgroundColor: '#FFE5D6', borderColor: '#F5CDB8' }}
         >
           <div className="flex items-start justify-between">
-            <div className="w-10 h-10 rounded-xl flex items-center justify-center font-bold bg-[#E8A447] text-white">
-              <Clock className="w-5 h-5 stroke-[2]" />
+            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center font-bold bg-[#E8A447] text-white">
+              <Clock className="w-4 h-4 sm:w-5 sm:h-5 stroke-[2]" />
             </div>
-            <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-[#F5CDB8] text-[#A06312]">
-              24h Window
+            <span className="text-[10px] sm:text-[11px] font-bold px-2 py-0.5 rounded-full bg-[#F5CDB8] text-[#A06312]">
+              Pending
             </span>
           </div>
-          <div className="mt-4">
-            <span className="text-xs font-medium" style={{ color: '#85899B' }}>Pending Approval</span>
-            <div className="text-2xl font-extrabold mt-0.5" style={{ color: '#E8A447' }}>
+          <div className="mt-3 sm:mt-4">
+            <span className="text-[11px] sm:text-xs font-medium" style={{ color: '#85899B' }}>Pending</span>
+            <div className="text-xl sm:text-2xl font-extrabold mt-0.5" style={{ color: '#E8A447' }}>
               {pendingCount}
             </div>
-            <span className="text-[11px] mt-0.5 block" style={{ color: '#85899B' }}>Awaiting owner confirmation</span>
+            <span className="text-[10px] sm:text-[11px] mt-0.5 block truncate" style={{ color: '#85899B' }}>Awaiting confirmation</span>
           </div>
         </div>
       </div>

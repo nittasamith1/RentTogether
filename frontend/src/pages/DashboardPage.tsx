@@ -131,27 +131,27 @@ export const DashboardPage: React.FC = () => {
       </div>
 
       {/* 2. Phase 14: Real-Time KPI Cards (Matching Mockup) */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-4">
         {/* Card 1: [3] Active Rentals — Soft Lavender */}
         <div
           onClick={() => navigate('/rentals')}
-          className="rounded-3xl p-5 border shadow-xs hover:shadow-card-hover transition-all flex flex-col justify-between cursor-pointer"
+          className="rounded-2xl sm:rounded-3xl p-3.5 sm:p-5 border shadow-xs hover:shadow-card-hover transition-all flex flex-col justify-between cursor-pointer"
           style={{ backgroundColor: '#E9E3FF', borderColor: '#D8D0F5' }}
         >
           <div className="flex items-start justify-between">
-            <div className="w-9 h-9 rounded-xl flex items-center justify-center" style={{ backgroundColor: '#7563D9' }}>
-              <Clock className="w-4 h-4 stroke-[2.5] text-white" />
+            <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl flex items-center justify-center shrink-0" style={{ backgroundColor: '#7563D9' }}>
+              <Clock className="w-3.5 h-3.5 sm:w-4 sm:h-4 stroke-[2.5] text-white" />
             </div>
-            <ArrowRight className="w-4 h-4 text-[#7563D9]" />
+            <ArrowRight className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#7563D9]" />
           </div>
-          <div className="mt-4">
-            <div className="text-xs font-semibold" style={{ color: '#7563D9' }}>Active Rentals</div>
-            <div className="text-2xl font-black mt-0.5" style={{ color: '#303653' }}>
+          <div className="mt-3 sm:mt-4">
+            <div className="text-[11px] sm:text-xs font-semibold" style={{ color: '#7563D9' }}>Active Rentals</div>
+            <div className="text-xl sm:text-2xl font-black mt-0.5" style={{ color: '#303653' }}>
               {loadingImpact ? '...' : activeRentalsKpi}
             </div>
-            <div className="text-[11px] font-medium mt-1 flex items-center gap-1" style={{ color: '#5B48B8' }}>
-              <Package className="w-3 h-3" />
-              <span>Ongoing borrowed & lent gear</span>
+            <div className="text-[10px] sm:text-[11px] font-medium mt-0.5 sm:mt-1 flex items-center gap-1 truncate" style={{ color: '#5B48B8' }}>
+              <Package className="w-3 h-3 shrink-0" />
+              <span className="truncate">Ongoing borrowed & lent</span>
             </div>
           </div>
         </div>
@@ -159,23 +159,23 @@ export const DashboardPage: React.FC = () => {
         {/* Card 2: [8] Completed Rentals — Sky Blue */}
         <div
           onClick={() => navigate('/rentals')}
-          className="rounded-3xl p-5 border shadow-xs hover:shadow-card-hover transition-all flex flex-col justify-between cursor-pointer"
+          className="rounded-2xl sm:rounded-3xl p-3.5 sm:p-5 border shadow-xs hover:shadow-card-hover transition-all flex flex-col justify-between cursor-pointer"
           style={{ backgroundColor: '#DFEDFF', borderColor: '#C5DCFA' }}
         >
           <div className="flex items-start justify-between">
-            <div className="w-9 h-9 rounded-xl flex items-center justify-center" style={{ backgroundColor: '#6398D6' }}>
-              <CheckCircle2 className="w-4 h-4 stroke-[2.5] text-white" />
+            <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl flex items-center justify-center shrink-0" style={{ backgroundColor: '#6398D6' }}>
+              <CheckCircle2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 stroke-[2.5] text-white" />
             </div>
-            <ArrowRight className="w-4 h-4 text-[#6398D6]" />
+            <ArrowRight className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#6398D6]" />
           </div>
-          <div className="mt-4">
-            <div className="text-xs font-semibold" style={{ color: '#3A6BB5' }}>Completed Rentals</div>
-            <div className="text-2xl font-black mt-0.5" style={{ color: '#303653' }}>
+          <div className="mt-3 sm:mt-4">
+            <div className="text-[11px] sm:text-xs font-semibold" style={{ color: '#3A6BB5' }}>Completed Rentals</div>
+            <div className="text-xl sm:text-2xl font-black mt-0.5" style={{ color: '#303653' }}>
               {loadingImpact ? '...' : completedRentalsKpi}
             </div>
-            <div className="text-[11px] font-medium mt-1 flex items-center gap-1" style={{ color: '#3A6BB5' }}>
-              <RefreshCw className="w-3 h-3" />
-              <span>Resources shared & returned</span>
+            <div className="text-[10px] sm:text-[11px] font-medium mt-0.5 sm:mt-1 flex items-center gap-1 truncate" style={{ color: '#3A6BB5' }}>
+              <RefreshCw className="w-3 h-3 shrink-0" />
+              <span className="truncate">Resources shared & returned</span>
             </div>
           </div>
         </div>
@@ -183,21 +183,21 @@ export const DashboardPage: React.FC = () => {
         {/* Card 3: [₹2,450] Money Saved — Soft Peach */}
         <div
           onClick={() => navigate('/analytics')}
-          className="rounded-3xl p-5 border shadow-xs hover:shadow-card-hover transition-all flex flex-col justify-between cursor-pointer"
+          className="rounded-2xl sm:rounded-3xl p-3.5 sm:p-5 border shadow-xs hover:shadow-card-hover transition-all flex flex-col justify-between cursor-pointer"
           style={{ backgroundColor: '#FFE5D6', borderColor: '#F5CDB8' }}
         >
           <div className="flex items-start justify-between">
-            <div className="w-9 h-9 rounded-xl flex items-center justify-center font-black text-sm text-white" style={{ backgroundColor: '#C45C20' }}>
+            <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl flex items-center justify-center font-black text-xs sm:text-sm text-white shrink-0" style={{ backgroundColor: '#C45C20' }}>
               ₹
             </div>
-            <ArrowRight className="w-4 h-4 text-[#C45C20]" />
+            <ArrowRight className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#C45C20]" />
           </div>
-          <div className="mt-4">
-            <div className="text-xs font-semibold" style={{ color: '#C45C20' }}>Money Saved</div>
-            <div className="text-2xl font-black mt-0.5" style={{ color: '#303653' }}>
+          <div className="mt-3 sm:mt-4">
+            <div className="text-[11px] sm:text-xs font-semibold" style={{ color: '#C45C20' }}>Money Saved</div>
+            <div className="text-xl sm:text-2xl font-black mt-0.5 truncate" style={{ color: '#303653' }}>
               ₹{loadingImpact ? '...' : moneySavedKpi.toLocaleString('en-IN')}
             </div>
-            <div className="text-[11px] font-medium mt-1" style={{ color: '#C45C20' }}>
+            <div className="text-[10px] sm:text-[11px] font-medium mt-0.5 sm:mt-1 truncate" style={{ color: '#C45C20' }}>
               Compared to retail purchases
             </div>
           </div>
@@ -206,21 +206,21 @@ export const DashboardPage: React.FC = () => {
         {/* Card 4: Waste Avoided — Fresh Mint */}
         <div
           onClick={() => navigate('/analytics')}
-          className="rounded-3xl p-5 border shadow-xs hover:shadow-card-hover transition-all flex flex-col justify-between cursor-pointer"
+          className="rounded-2xl sm:rounded-3xl p-3.5 sm:p-5 border shadow-xs hover:shadow-card-hover transition-all flex flex-col justify-between cursor-pointer"
           style={{ backgroundColor: '#DDF3E7', borderColor: '#B8E5CC' }}
         >
           <div className="flex items-start justify-between">
-            <div className="w-9 h-9 rounded-xl flex items-center justify-center" style={{ backgroundColor: '#42A879' }}>
-              <Leaf className="w-4 h-4 stroke-[2.5] text-white" />
+            <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl flex items-center justify-center shrink-0" style={{ backgroundColor: '#42A879' }}>
+              <Leaf className="w-3.5 h-3.5 sm:w-4 sm:h-4 stroke-[2.5] text-white" />
             </div>
-            <ArrowRight className="w-4 h-4 text-[#42A879]" />
+            <ArrowRight className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#42A879]" />
           </div>
-          <div className="mt-4">
-            <div className="text-xs font-semibold" style={{ color: '#2D7A5B' }}>Waste Avoided</div>
-            <div className="text-2xl font-black mt-0.5" style={{ color: '#303653' }}>
+          <div className="mt-3 sm:mt-4">
+            <div className="text-[11px] sm:text-xs font-semibold" style={{ color: '#2D7A5B' }}>Waste Avoided</div>
+            <div className="text-xl sm:text-2xl font-black mt-0.5 truncate" style={{ color: '#303653' }}>
               {loadingImpact ? '...' : `${wasteAvoidedKpi} kg`}
             </div>
-            <div className="text-[11px] font-medium mt-1" style={{ color: '#2D7A5B' }}>
+            <div className="text-[10px] sm:text-[11px] font-medium mt-0.5 sm:mt-1 truncate" style={{ color: '#2D7A5B' }}>
               Embodied e-waste prevented
             </div>
           </div>
@@ -421,16 +421,16 @@ export const DashboardPage: React.FC = () => {
                 <Sparkles className="w-5 h-5 stroke-[2.2]" />
               </div>
               <div className="min-w-0 flex-1">
-                <div className="flex flex-wrap items-center gap-2">
-                  <h2 className="text-base font-bold shrink-0" style={{ color: '#303653' }}>
+                <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
+                  <h2 className="text-sm sm:text-base font-bold shrink-0" style={{ color: '#303653' }}>
                     Recommended For You
                   </h2>
                   <span
-                    className="px-2.5 py-0.5 rounded-full text-[10px] font-bold border inline-flex items-center gap-1 shrink-0"
+                    className="px-2 sm:px-2.5 py-0.5 rounded-full text-[9px] sm:text-[10px] font-bold border inline-flex items-center gap-1 max-w-full"
                     style={{ backgroundColor: '#DDF3E7', color: '#42A879', borderColor: '#B8E5CC' }}
                   >
                     <GraduationCap className="w-3 h-3 shrink-0" />
-                    <span>
+                    <span className="truncate max-w-[200px] sm:max-w-none">
                       {personalizedData.department
                         ? `${personalizedData.department.toUpperCase()} Department Picks`
                         : 'Smart Campus Match'}

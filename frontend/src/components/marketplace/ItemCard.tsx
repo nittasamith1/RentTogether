@@ -64,16 +64,16 @@ export const ItemCard = React.memo<ItemCardProps>(({ item, onSelect }) => {
         )}
 
         {/* Condition Badge */}
-        <div className="absolute top-2 left-2 sm:top-3 sm:left-3 flex flex-wrap gap-1 items-center pointer-events-none">
+        <div className="absolute top-1.5 left-1.5 sm:top-3 sm:left-3 flex flex-wrap gap-1 items-center pointer-events-none">
           <span
-            className="px-2 sm:px-2.5 py-0.5 rounded-full text-[10px] sm:text-xs font-semibold border shadow-xs"
+            className="px-1.5 sm:px-2.5 py-0.5 rounded-full text-[9px] sm:text-xs font-semibold border shadow-xs"
             style={{ backgroundColor: cond.bg, color: cond.text, borderColor: cond.border }}
           >
             {cond.label}
           </span>
           {isAvailable ? (
             <span
-              className="px-1.5 sm:px-2 py-0.5 rounded-full text-[9px] sm:text-[11px] font-semibold text-white shadow-xs flex items-center gap-1"
+              className="px-1.5 sm:px-2 py-0.5 rounded-full text-[8px] sm:text-[11px] font-semibold text-white shadow-xs flex items-center gap-1"
               style={{ backgroundColor: '#42A879' }}
             >
               <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
@@ -81,7 +81,7 @@ export const ItemCard = React.memo<ItemCardProps>(({ item, onSelect }) => {
             </span>
           ) : (
             <span
-              className="px-1.5 sm:px-2 py-0.5 rounded-full text-[9px] sm:text-[11px] font-semibold text-white shadow-xs flex items-center gap-1"
+              className="px-1.5 sm:px-2 py-0.5 rounded-full text-[8px] sm:text-[11px] font-semibold text-white shadow-xs flex items-center gap-1"
               style={{ backgroundColor: '#303653' }}
             >
               <Clock className="w-3 h-3" />
@@ -96,7 +96,7 @@ export const ItemCard = React.memo<ItemCardProps>(({ item, onSelect }) => {
           onClick={handleWishlistClick}
           aria-label={item.is_wishlisted ? 'Remove from wishlist' : 'Save to wishlist'}
           title={item.is_wishlisted ? 'Saved in wishlist' : 'Save to wishlist'}
-          className="absolute top-2 right-2 sm:top-3 sm:right-3 p-1.5 sm:p-2 rounded-full transition-transform active:scale-80 hover:scale-110 duration-150 shadow-md cursor-pointer z-10"
+          className="absolute top-1.5 right-1.5 sm:top-3 sm:right-3 p-1.5 sm:p-2 rounded-full transition-transform active:scale-80 hover:scale-110 duration-150 shadow-md cursor-pointer z-10"
           style={{
             backgroundColor: item.is_wishlisted ? '#FFE5D6' : 'rgba(255, 255, 255, 0.95)',
             color: item.is_wishlisted ? '#F28B82' : '#85899B',
@@ -107,9 +107,9 @@ export const ItemCard = React.memo<ItemCardProps>(({ item, onSelect }) => {
         </button>
 
         {/* Category Pill */}
-        <div className="absolute bottom-2 left-2 sm:bottom-2.5 sm:left-3 pointer-events-none">
+        <div className="absolute bottom-1.5 left-1.5 sm:bottom-2.5 sm:left-3 pointer-events-none">
           <span
-            className="px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-md text-[10px] sm:text-xs font-semibold text-white flex items-center gap-1 shadow-xs"
+            className="px-1.5 sm:px-2.5 py-0.5 sm:py-1 rounded-md text-[9px] sm:text-xs font-semibold text-white flex items-center gap-1 shadow-xs"
             style={{ backgroundColor: 'rgba(48, 54, 83, 0.90)' }}
           >
             {item.category_name}
@@ -118,7 +118,7 @@ export const ItemCard = React.memo<ItemCardProps>(({ item, onSelect }) => {
       </div>
 
       {/* Item Content */}
-      <div className="p-3 sm:p-4 flex-1 flex flex-col justify-between">
+      <div className="p-2.5 sm:p-4 flex-1 flex flex-col justify-between">
         <div>
           {/* Title & Brand */}
           <div className="flex items-start justify-between gap-2">
