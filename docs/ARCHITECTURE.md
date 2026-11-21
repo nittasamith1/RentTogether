@@ -314,11 +314,11 @@ Component	Technology	Purpose
 Database	Neon PostgreSQL	Persistent application data
 Cache	Redis	Frequently accessed data
 Background jobs	Celery	Reminders and scheduled tasks
-Image storage	Cloudinary	Item and profile images
+Image storage	Cloudinary CDN	Optimized item and student ID images
 Authentication	SimpleJWT	Secure API authentication
-Payments	Razorpay	Rental payments
+Payments	In-Person Cash	Direct peer-to-peer settlement (₹0 deposit)
 ML	Scikit-learn/XGBoost	AI predictions
-Deployment	Docker	Application containerization
+Deployment	Docker / Cloud	Application containerization & hosting
 Version control	GitHub	Source code management
 
 
@@ -733,18 +733,13 @@ Purpose: Manage rental payments and financial records.
 
 Functionalities:
 - Calculate rental charges.
-- Security deposit collection.
-- Payment gateway integration.
-- Payment confirmation.
-- Payment history.
-- Transaction tracking.
-- Refund management.
+- In-person physical handover with ₹0.00 security deposit.
+- Peer-to-peer cash settlement upon physical inspection.
+- Dual cryptographic OTP / QR code verification.
+- Payment confirmation and transaction tracking.
 - Owner earnings tracking.
 - Renter spending tracking.
-- Platform commission.
-- Payment receipts.
-- Failed payment handling.
-Use Razorpay test mode initially.
+- Complete audit trail of handovers and returns.
 Module 12: Sustainability & Analytics
 Purpose: Measure the economic and environmental impact of resource sharing.
 
@@ -1315,45 +1310,35 @@ PHASE 08: IN-PERSON CAMPUS HANDOVER, RETURN VERIFICATION & QR CODES
 [x] Handover timestamps and verification proof stored with audit trail.
 
 ================================================================================
-PHASE 09: PAYMENT GATEWAY, SECURITY DEPOSIT ESCROW & FINANCIAL LEDGER
+PHASE 09: IN-PERSON CASH SETTLEMENT, ZERO-DEPOSIT MODEL & FINANCIAL TRACKING
 ================================================================================
-[Goal]: Secure financial transactions via Razorpay (Test Mode) with automated deposit escrow.
+[Goal]: Transparent, zero-friction campus transactions via In-Person Cash Settlement with ₹0 security deposit and OTP/QR handover verification.
 
-9.1. Database Models (apps/payments)
-     - Model: PaymentTransaction
-       * id (UUID, PK)
-       * booking (ForeignKey -> Booking)
-       * user (ForeignKey -> User)
-       * razorpay_order_id (CharField)
-       * razorpay_payment_id (CharField, blank=True)
-       * razorpay_signature (CharField, blank=True)
-       * amount (DecimalField)
-       * type (CharField: RENTAL_CHARGE, SECURITY_DEPOSIT, DEPOSIT_REFUND, OWNER_PAYOUT)
-       * status (CharField: CREATED, SUCCESS, FAILED, REFUNDED)
-       * created_at (DateTimeField, auto_now_add=True)
-     - Model: WalletLedger
-       * user (ForeignKey -> User)
-       * current_balance (DecimalField, default=0.00)
-       * total_spent (DecimalField, default=0.00)
-       * total_earned (DecimalField, default=0.00)
+9.1. Financial Architecture & Models
+     - Model: Booking / Financial Audit
+       * total_rental_fee (DecimalField)
+       * daily_rate (DecimalField)
+       * reference_purchase_price_inr (DecimalField)
+       * payment_method: IN_PERSON_CASH
+       * zero_deposit: True (collateral replaced by verified institutional identity)
+     - Transparent Student Ledgers:
+       * Renter pays agreed rental fee directly to owner upon physical item receipt.
+       * Zero platform cut or hidden fees (100% peer-to-peer exchange).
 
-9.2. Escrow Architecture
-     - Total paid by Renter = Rental Fee + Refundable Security Deposit + Platform Fee.
-     - Security Deposit is kept held in custody by the platform.
-     - Upon successful return verification:
-       * Deposit is automatically refunded to renter's source account via Razorpay Refund API.
-       * Rental earnings (Rental Fee - Platform Commission) are credited to Owner's ledger.
+9.2. Handover & Return Protocol
+     - Strict in-person physical handover at campus landmarks (Library, Canteen, Gate 1).
+     - Dual-verification using 6-digit cryptographic OTP or scannable QR token.
+     - Condition photos captured at pickup and return to ensure dispute-free exchange.
 
 9.3. API Endpoints
-     - POST /api/payments/create-order/ (Creates Razorpay order ID)
-     - POST /api/payments/verify-payment/ (Validates Razorpay HMAC signature)
-     - GET /api/payments/my-ledger/ (Complete transaction history)
-     - POST /api/payments/webhook/ (Handles async payment notifications)
+     - POST /api/bookings/<id>/confirm-handover/ (Verify OTP / QR code)
+     - POST /api/bookings/<id>/confirm-return/ (Verify return completion)
+     - GET /api/bookings/my-rentals/ & /api/bookings/my-listings/
 
 [Definition of Done - Phase 09]:
-[x] Razorpay Checkout opens in modal and processes test card/UPI payments.
-[x] HMAC signature verification secures backend against spoofed payment confirmations.
-[x] Security deposit refund triggers automatically upon verified return.
+[x] Peer-to-peer cash transactions require zero digital escrow or credit cards.
+[x] Instant cryptographic confirmation prevents unverified handovers.
+[x] Zero deposit (₹0) lowers barrier of entry for all college students.
 
 ================================================================================
 PHASE 10: AI FAIR PRICE PREDICTION ENGINE (SCIKIT-LEARN / XGBOOST)
@@ -1483,34 +1468,42 @@ PHASE 14: CAMPUS SUSTAINABILITY IMPACT ANALYTICS & KPI DASHBOARD
 ================================================================================
 [Goal]: Measure and visualize environmental savings and financial benefits for students.
 
-14.1. Impact Calculation Logic
+14.1. Impact Calculation Logic (Strict Database Fidelity)
+     - Core Principle:
+       * Savings and waste avoided are calculated exclusively for items the student borrowed (as renter).
+       * Lending gear earns rental income; it does not constitute "money saved vs retail buying new".
      - Formula:
-       * Total Money Saved = Sum of (Item Original Price - Total Rental Price Paid).
-       * Resources Reused Count = Total completed rental bookings.
+       * Individual Money Saved = Sum of max(0.0, Item Retail Price - Rental Fee Paid).
+       * Item Retail Price is derived strictly from verified database records (`reference_purchase_price_inr` or `item.original_price`).
+       * Zero arbitrary fallback benchmarks (no synthetic defaults).
+       * Resources Reused Count = Total completed rental bookings borrowed by the student.
        * Waste Avoided (kg) = Sum of category-specific embodied waste weights:
          - Textbook / Academic: 0.8 kg waste avoided
          - Calculator / Electronics: 1.2 kg waste avoided
          - Laptop / Computer: 8.5 kg waste avoided
          - Lab Kit / Hardware: 2.4 kg waste avoided
          - Bicycle / Daily Use: 14.0 kg waste avoided
+       * Dynamic Campus Contribution Percentile:
+         Contribution (%) = (Student Completed Rentals / Campus Total Completed Rentals) * 100
 
 14.2. API Endpoints
      - GET /api/sustainability/my-impact/ (Individual student contribution)
      - GET /api/sustainability/campus-impact/ (Aggregate campus-wide metrics)
 
-14.3. Frontend Dashboard Implementation (Matching Mockup)
-     - 4 KPI Stat Cards across top:
-       1. [3] Active Rentals
-       2. [8] Completed Rentals
-       3. [₹2,450] Money Saved
-       4. [12.4 kg] Waste Avoided
+14.3. Frontend Dashboard Implementation
+     - 4 KPI Stat Cards across top (Mobile 2x2 responsive layout):
+       1. Active Rentals (Lavender)
+       2. Completed Rentals (Sky Blue)
+       3. Money Saved (Soft Peach)
+       4. Waste Avoided (Fresh Mint)
      - Sustainability Impact Widget:
-       * Donut Chart showing "78% Your Contribution" (custom SVG / Recharts)
-       * Summary list: Total Money Saved, Resources Reused, Estimated Waste Reduced.
+       * Donut Chart showing dynamic campus contribution percentage
+       * Summary breakdown: Total Money Saved, Resources Reused, Estimated Waste Reduced, Trees Equivalent.
 
 [Definition of Done - Phase 14]:
-[x] KPI numbers update dynamically after every completed rental.
-[x] Donut chart and sustainability stats match the design mockup aesthetics.
+[x] KPI numbers update dynamically after every completed rental strictly from DB records.
+[x] No synthetic or cross-user data conflation: renters and owners maintain independent accurate metrics.
+[x] Donut chart and sustainability stats match the design mockup aesthetics with full mobile responsiveness.
 
 ================================================================================
 PHASE 15: COLLEGE-SPECIFIC ADMIN PORTAL & ON-GROUND DISPUTE MEDIATION
