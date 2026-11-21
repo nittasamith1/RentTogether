@@ -45,21 +45,6 @@ CATEGORY_EMBODIED_WASTE_KG = {
     'mobility': 14.0,
 }
 
-# Retail price fallback benchmarks (if owner did not specify original_price)
-DEFAULT_CATEGORY_RETAIL_PRICE = {
-    'academic': 650.0,
-    'textbooks': 750.0,
-    'calculators': 1200.0,
-    'electronics': 1800.0,
-    'computers': 45000.0,
-    'laptops': 48000.0,
-    'laboratory': 2500.0,
-    'hardware': 2200.0,
-    'tools': 1500.0,
-    'daily-use': 6500.0,
-    'bicycles': 6000.0,
-}
-
 
 def get_category_waste_factor(category_slug: str, title: str = '') -> float:
     """
@@ -91,28 +76,24 @@ def get_category_waste_factor(category_slug: str, title: str = '') -> float:
 def calculate_student_impact(user) -> Dict[str, Any]:
     """
     Calculates individual student environmental savings, money saved, and resources reused.
-    Encompasses items rented as borrower and items lent as lender.
+    Calculations strictly reflect items the student borrowed (as renter), where retail purchase
+    was avoided and actual monetary savings and waste reductions were realized.
     """
     if not user or not user.is_authenticated:
         return _empty_student_impact()
 
-    # Completed bookings where student is renter (borrower) or owner (lender)
+    # Completed bookings where the user is the renter (borrower)
     renter_completed = Booking.objects.filter(
         renter=user,
         status=Booking.STATUS_COMPLETED
     ).select_related('item', 'item__category')
 
-    owner_completed = Booking.objects.filter(
-        owner=user,
-        status=Booking.STATUS_COMPLETED
-    ).select_related('item', 'item__category')
-
     active_rentals_count = Booking.objects.filter(
         Q(renter=user) | Q(owner=user),
-        status__in=['ACTIVE', 'PAID_CONFIRMED', 'APPROVED_PENDING_PAYMENT']
+        status__in=['ACTIVE', 'PAID_CONFIRMED']
     ).count()
 
-    total_completed = renter_completed.count() + owner_completed.count()
+    total_completed = renter_completed.count()
 
     total_money_saved = 0.0
     total_waste_avoided = 0.0
@@ -120,43 +101,15 @@ def calculate_student_impact(user) -> Dict[str, Any]:
 
     for b in renter_completed:
         # Savings formula: Item Original Price - Total Rental Price Paid
+        # Only use verified database values; do not fallback to arbitrary defaults
         retail_price = 0.0
         if b.reference_purchase_price_inr and float(b.reference_purchase_price_inr) > 0:
             retail_price = float(b.reference_purchase_price_inr)
         elif b.item and b.item.original_price and float(b.item.original_price) > 0:
             retail_price = float(b.item.original_price)
-        else:
-            cat_slug = b.item.category.slug if (b.item and b.item.category) else 'academic'
-            retail_price = DEFAULT_CATEGORY_RETAIL_PRICE.get(cat_slug, 1200.0)
 
         rental_fee = float(b.total_rental_fee or 0.0)
-        saving = max(0.0, retail_price - rental_fee)
-        total_money_saved += saving
-
-        cat_slug = b.item.category.slug if (b.item and b.item.category) else 'general'
-        cat_name = b.item.category.name if (b.item and b.item.category) else 'Campus Gear'
-        waste_kg = get_category_waste_factor(cat_slug, b.item_title or (b.item.title if b.item else ''))
-        total_waste_avoided += waste_kg
-
-        if cat_name not in category_counter:
-            category_counter[cat_name] = {'count': 0, 'waste_kg': 0.0, 'money_saved': 0.0}
-        category_counter[cat_name]['count'] += 1
-        category_counter[cat_name]['waste_kg'] += waste_kg
-        category_counter[cat_name]['money_saved'] += saving
-
-    # Also account for lender contribution (enabling peers to avoid purchases)
-    for b in owner_completed:
-        retail_price = 0.0
-        if b.reference_purchase_price_inr and float(b.reference_purchase_price_inr) > 0:
-            retail_price = float(b.reference_purchase_price_inr)
-        elif b.item and b.item.original_price and float(b.item.original_price) > 0:
-            retail_price = float(b.item.original_price)
-        else:
-            cat_slug = b.item.category.slug if (b.item and b.item.category) else 'academic'
-            retail_price = DEFAULT_CATEGORY_RETAIL_PRICE.get(cat_slug, 1200.0)
-
-        rental_fee = float(b.total_rental_fee or 0.0)
-        saving = max(0.0, retail_price - rental_fee)
+        saving = max(0.0, retail_price - rental_fee) if retail_price > 0 else 0.0
         total_money_saved += saving
 
         cat_slug = b.item.category.slug if (b.item and b.item.category) else 'general'
@@ -173,11 +126,15 @@ def calculate_student_impact(user) -> Dict[str, Any]:
     co2_saved_kg = round(total_waste_avoided * 2.1, 2)
     trees_equivalent = round(co2_saved_kg / 21.0, 2)
 
-    # Campus percentile contribution benchmark
-    if total_completed >= 5:
-        contribution_percentile = min(96, 70 + (total_completed * 2))
-    elif total_completed > 0:
-        contribution_percentile = 50 + (total_completed * 6)
+    # Campus percentile contribution benchmark based strictly on actual database completed bookings
+    campus_completed_qs = Booking.objects.filter(status=Booking.STATUS_COMPLETED)
+    college_id = getattr(user, 'college_id', None)
+    if college_id:
+        campus_completed_qs = campus_completed_qs.filter(owner__college_id=college_id)
+    campus_total = campus_completed_qs.count()
+
+    if campus_total > 0 and total_completed > 0:
+        contribution_percentile = round((total_completed / campus_total) * 100)
     else:
         contribution_percentile = 0
 
@@ -205,7 +162,7 @@ def calculate_student_impact(user) -> Dict[str, Any]:
 
 def calculate_campus_impact(college=None) -> Dict[str, Any]:
     """
-    Calculates aggregate campus-wide sustainability impact.
+    Calculates aggregate campus-wide sustainability impact strictly from database records.
     """
     bookings_qs = Booking.objects.filter(status=Booking.STATUS_COMPLETED).select_related('item', 'item__category')
     if college:
@@ -223,12 +180,9 @@ def calculate_campus_impact(college=None) -> Dict[str, Any]:
             retail_price = float(b.reference_purchase_price_inr)
         elif b.item and b.item.original_price and float(b.item.original_price) > 0:
             retail_price = float(b.item.original_price)
-        else:
-            cat_slug = b.item.category.slug if (b.item and b.item.category) else 'academic'
-            retail_price = DEFAULT_CATEGORY_RETAIL_PRICE.get(cat_slug, 1200.0)
 
         rental_fee = float(b.total_rental_fee or 0.0)
-        saving = max(0.0, retail_price - rental_fee)
+        saving = max(0.0, retail_price - rental_fee) if retail_price > 0 else 0.0
         total_money_saved += saving
 
         cat_slug = b.item.category.slug if (b.item and b.item.category) else 'general'
